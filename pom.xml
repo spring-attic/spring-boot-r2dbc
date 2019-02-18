@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.boot.experimental</groupId>
+	<artifactId>spring-boot-r2dbc</artifactId>
+	<version>0.1.0.BUILD-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+	<name>Spring Boot R2DBC</name>
+	<description>Spring Boot R2DBCe</description>
+	<url>http://projects.spring.io/spring-boot/</url>
+
+	<organization>
+		<name>Pivotal Software, Inc.</name>
+		<url>http://www.spring.io</url>
+	</organization>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<revision>0.1.0.BUILD-SNAPSHOT</revision>
+		<disable.checks>false</disable.checks>
+	</properties>
+
+	<modules>
+		<module>spring-boot-r2dbc-build</module>
+		<module>spring-boot-dependencies-r2dbc</module>
+		<module>spring-boot-autoconfigure-r2dbc</module>
+		<module>spring-boot-starter-r2dbc</module>
+		<module>spring-boot-starter-data-r2dbc</module>
+		<module>spring-boot-example-h2</module>
+	</modules>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<property>
+					<name>!disable-spring-boot-default-profile</name>
+				</property>
+			</activation>
+			<properties>
+				<spring-javaformat.version>0.0.6</spring-javaformat.version>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.spring.javaformat</groupId>
+						<artifactId>spring-javaformat-maven-plugin</artifactId>
+						<version>${spring-javaformat.version}</version>
+						<executions>
+							<execution>
+								<phase>validate</phase>
+								<configuration>
+									<skip>${disable.checks}</skip>
+								</configuration>
+								<goals>
+									<goal>validate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>
