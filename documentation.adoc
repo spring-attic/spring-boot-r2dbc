@@ -1,0 +1,159 @@
+[[boot-features-configure-r2dbc-connectionfactory]]
+=== Configure a R2DBC ConnectionFactory
+R2DBC's `io.r2dbc.spi.Connection` interface provides a standard method of working
+with non-blocking database connections . Traditionally, a 'ConnectionFactory' uses a `URL`
+along with some credentials to establish a database connection.
+
+TIP: See <<howto-configure-a-connectionfactory,the "`How-to`" section>> for more
+advanced examples, typically to take full control over the configuration of the
+ConnectionFactory.
+
+[[boot-features-embedded-database-support]]
+==== Embedded Database Support
+It is often convenient to develop applications by using an in-memory embedded database.
+Obviously, in-memory databases do not provide persistent storage. You need to populate
+your database when your application starts and be prepared to throw away data when your
+application ends.
+
+TIP: The "`How-to`" section includes a <<howto.adoc#howto-database-initialization,
+section on how to initialize a database>>.
+
+Spring Boot can auto-configure embedded http://www.h2database.com[H2],
+for reactive usage. You need not provide any connection URLs.
+You need only include a build dependency to the embedded database that you want to use.
+
+[NOTE]
+====
+If you are using this feature in your tests, you may notice that the same database is
+reused by your whole test suite regardless of the number of application contexts that you
+use. If you want to make sure that each context has a separate embedded database, you
+should set `spring.r2dbc.generate-unique-name` to `true`.
+====
+
+[NOTE]
+====
+Embedded databases are typically used through JDBC. Using R2DBC H2 gives you access to
+the same embedded database instance and you can access data through JDBC and R2DBC.
+====
+
+For example, the typical POM dependencies would be as follows:
+
+[source,xml,indent=0]
+----
+	<dependency>
+		<groupId>org.springframework.boot.experimental</groupId>
+		<artifactId>spring-boot-starter-data-r2dbc</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>io.r2dbc</groupId>
+		<artifactId>r2dbc-h2</artifactId>
+		<scope>runtime</scope>
+	</dependency>
+----
+
+[[boot-features-connect-to-r2dbc-production-database]]
+==== Connection to a Production Database
+Production database connections can also be auto-configured by using a pooling
+`ConnectionFactory`.
+
+TIP: Additional connection pools can always be configured manually. If you define your
+own `ConnectionFactory` bean, auto-configuration does not occur.
+
+ConnectionFactory configuration is controlled by external configuration properties in
+`+spring.r2dbc.*+`. For example, you might declare the following section in
+`application.properties`:
+
+[source,properties,indent=0]
+----
+	spring.r2dbc.url=r2dbc:postgresql://localhost/test
+	spring.r2dbc.username=dbuser
+	spring.r2dbc.password=dbpass
+----
+
+NOTE: You should at least specify the URL by setting the `spring.r2dbc.url`
+property. Otherwise, Spring Boot tries to auto-configure an embedded database.
+
+TIP: You do not need to specify a driver class name, since Spring Boot obtains
+the driver from R2DBC's Connection Factory discovery.
+
+[[boot-features-using-database-client]]
+=== Using DatabaseClient
+Spring Data's `DatabaseClient` class is auto-configured, and
+you can `@Autowire` it directly into your own beans, as shown in the following example:
+
+[source,java,indent=0]
+----
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.data.r2dbc.function.DatabaseClient;
+	import org.springframework.stereotype.Component;
+
+	@Component
+	public class MyBean {
+
+		private final DatabaseClient databaseClient;
+
+		@Autowired
+		public MyBean(DatabaseClient databaseClient) {
+			this.databaseClient = databaseClient;
+		}
+
+		// ...
+
+	}
+----
+
+[[boot-features-spring-data-r2dbc-repositories]]
+==== Spring Data R2DBC Repositories
+{spring-data-r2dbc}[Spring Data R2DBC] repositories are interfaces that you can define to
+access data. Queries are created automatically from your method names. For example, a
+`CityRepository` interface might declare a `findAllByState(String state)` method to find
+all the cities in a given state.
+
+For more complex queries, you can annotate your method with Spring Data's
+{spring-data-javadoc}/repository/Query.html[`Query`] annotation.
+
+Spring Data repositories usually extend from the
+{spring-data-commons-javadoc}/repository/Repository.html[`Repository`] or
+{spring-data-commons-javadoc}/repository/reactive/ReactiveCrudRepository.html[`ReactiveCrudRepository`]
+interfaces. If you use auto-configuration, repositories are searched from the package
+containing your main configuration class (the one annotated with
+`@EnableAutoConfiguration` or `@SpringBootApplication`) down.
+
+The following example shows a typical Spring Data repository interface definition:
+
+[source,java,indent=0]
+----
+	package com.example.myapp.domain;
+
+	import org.springframework.data.domain.*;
+	import org.springframework.data.repository.*;
+	import reactor.core.publisher.Mono.
+
+	public interface CityRepository extends Repository<City, Long> {
+
+		Mono<City> findByNameAndStateAllIgnoringCase(String name, String state);
+
+	}
+----
+
+TIP: We have barely scratched the surface of Spring Data R2DBC. For complete details, see
+the https://docs.spring.io/spring-data/r2dbc/docs/current/reference/html/[Spring Data R2DBC
+reference documentation].
+
+[[howto-configure-a-connectionfactory]]
+=== Configure a Custom ConnectionFactory
+To configure your own `ConnectionFactory`, define a `@Bean` of that type in your configuration.
+Spring Boot reuses your `ConnectionFactory` anywhere one is required, including database
+initialization. If you need to externalize some settings, you can bind your
+`ConnectionFactory` to the environment (see
+"`<<spring-boot-features.adoc#boot-features-external-config-3rd-party-configuration>>`").
+
+The following example shows how to define a data source in a bean:
+
+[source,java,indent=0,subs="verbatim,quotes,attributes"]
+----
+	@Bean
+	public ConnectionFactory connectionFactory() {
+		return new FancyConnectionFactory();
+	}
+----
