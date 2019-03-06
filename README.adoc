@@ -37,7 +37,7 @@ Configuration in-memory:
 .application.properties
 [source,xml]
 ----
-spring.r2dbc.url=rdbc:h2:mem:///<database>options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+spring.r2dbc.url=rdbc:h2:mem:///<database>?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
 spring.r2dbc.username=…
 spring.r2dbc.password=…
 ----
@@ -47,7 +47,7 @@ Configuration file:
 .application.properties
 [source,xml]
 ----
-spring.r2dbc.url=rdbc:h2:file:///<path>/<to>/<database>options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+spring.r2dbc.url=rdbc:h2:file:///<path>/<to>/<database>?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
 spring.r2dbc.username=…
 spring.r2dbc.password=…
 ----
