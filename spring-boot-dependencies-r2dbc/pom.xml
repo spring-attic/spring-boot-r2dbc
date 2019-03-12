@@ -15,10 +15,10 @@
 	<packaging>pom</packaging>
 	<name>Spring Boot R2DBC Dependencies</name>
 	<description>Spring Boot R2DBC Dependency Management</description>
-	<url>http://projects.spring.io/spring-boot/</url>
+	<url>https://projects.spring.io/spring-boot/</url>
 	<organization>
 		<name>Pivotal Software, Inc.</name>
-		<url>http://www.spring.io</url>
+		<url>https://www.spring.io</url>
 	</organization>
 
 	<dependencyManagement>
@@ -104,7 +104,7 @@
 			<repositories>
 				<repository>
 					<id>spring-snapshots</id>
-					<url>http://repo.spring.io/snapshot</url>
+					<url>https://repo.spring.io/snapshot</url>
 					<snapshots>
 						<enabled>true</enabled>
 					</snapshots>
@@ -118,7 +118,7 @@
 				</repository>
 				<repository>
 					<id>spring-milestone</id>
-					<url>http://repo.spring.io/milestone</url>
+					<url>https://repo.spring.io/milestone</url>
 				</repository>
 			</repositories>
 		</profile>

@@ -10,11 +10,11 @@
 	<packaging>pom</packaging>
 	<name>Spring Boot R2DBC</name>
 	<description>Spring Boot R2DBCe</description>
-	<url>http://projects.spring.io/spring-boot/</url>
+	<url>https://projects.spring.io/spring-boot/</url>
 
 	<organization>
 		<name>Pivotal Software, Inc.</name>
-		<url>http://www.spring.io</url>
+		<url>https://www.spring.io</url>
 	</organization>
 
 	<properties>
