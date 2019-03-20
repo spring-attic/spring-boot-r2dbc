@@ -18,7 +18,7 @@ application ends.
 TIP: The "`How-to`" section includes a <<howto.adoc#howto-database-initialization,
 section on how to initialize a database>>.
 
-Spring Boot can auto-configure embedded http://www.h2database.com[H2],
+Spring Boot can auto-configure embedded https://www.h2database.com[H2],
 for reactive usage. You need not provide any connection URLs.
 You need only include a build dependency to the embedded database that you want to use.
 
