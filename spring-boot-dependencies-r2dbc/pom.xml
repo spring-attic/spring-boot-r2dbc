@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -15,10 +15,10 @@
 	<packaging>pom</packaging>
 	<name>Spring Boot R2DBC Dependencies</name>
 	<description>Spring Boot R2DBC Dependency Management</description>
-	<url>http://projects.spring.io/spring-boot/</url>
+	<url>https://projects.spring.io/spring-boot/</url>
 	<organization>
 		<name>Pivotal Software, Inc.</name>
-		<url>http://www.spring.io</url>
+		<url>https://www.spring.io</url>
 	</organization>
 
 	<dependencyManagement>
@@ -104,7 +104,7 @@
 			<repositories>
 				<repository>
 					<id>spring-snapshots</id>
-					<url>http://repo.spring.io/snapshot</url>
+					<url>https://repo.spring.io/snapshot</url>
 					<snapshots>
 						<enabled>true</enabled>
 					</snapshots>
@@ -118,7 +118,7 @@
 				</repository>
 				<repository>
 					<id>spring-milestone</id>
-					<url>http://repo.spring.io/milestone</url>
+					<url>https://repo.spring.io/milestone</url>
 				</repository>
 			</repositories>
 		</profile>
