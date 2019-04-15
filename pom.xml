@@ -9,7 +9,7 @@
 
 	<packaging>pom</packaging>
 	<name>Spring Boot R2DBC</name>
-	<description>Spring Boot R2DBCe</description>
+	<description>Spring Boot R2DBC</description>
 	<url>https://projects.spring.io/spring-boot/</url>
 
 	<organization>

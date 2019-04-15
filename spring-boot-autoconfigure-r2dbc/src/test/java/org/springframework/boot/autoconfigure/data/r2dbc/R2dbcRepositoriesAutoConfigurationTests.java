@@ -19,8 +19,6 @@ package org.springframework.boot.autoconfigure.data.r2dbc;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
@@ -46,16 +44,7 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(
-					AutoConfigurations.of(R2dbcRepositoriesAutoConfiguration.class))
-			.withInitializer(registry -> {
-
-				AutoConfigurationPackages
-						.register((BeanDefinitionRegistry) registry.getBeanFactory(),
-								R2dbcRepositoriesAutoConfigurationTests.class
-										.getPackage()
-										.getName());
-
-			});
+					AutoConfigurations.of(R2dbcRepositoriesAutoConfiguration.class));
 
 	@Test
 	public void backsOffWithNoConnectionFactory() {
@@ -127,6 +116,7 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 				});
 	}
 
+	@TestAutoConfigurationPackage(City.class)
 	private static class TestConfiguration {
 
 	}
