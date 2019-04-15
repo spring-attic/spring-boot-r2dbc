@@ -18,20 +18,19 @@ package org.springframework.boot.autoconfigure.r2dbc;
 
 import javax.sql.DataSource;
 
-import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
-import io.r2dbc.spi.Option;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionMessage;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
@@ -60,32 +59,56 @@ public class ConnectionFactoryAutoConfiguration {
 	}
 
 	@Configuration
+	@Conditional(UnpooledConnectionUrlCondition.class)
+	@ConditionalOnClass(ConnectionPool.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
+	@Import(ConnectionFactoryConfiguration.ConnectionPoolConnectionFactoryConfiguration.class)
 	@ConditionalOnProperty("spring.r2dbc.url")
-	protected static class ConnectionFactoryConfiguration {
+	protected static class PooledConnectionFactoryConfiguration {
 
-		@Bean
-		ConnectionFactory connectionFactory(R2dbcProperties properties) {
-			ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions
-					.parse(properties.determineUrl()).mutate();
-			String username = properties.determineUsername();
-			if (StringUtils.hasText(username)) {
-				builder.option(ConnectionFactoryOptions.USER, username);
-			}
-			String password = properties.determinePassword();
-			if (StringUtils.hasText(password)) {
-				builder.option(ConnectionFactoryOptions.PASSWORD, username);
-			}
-			String databaseName = properties.determineDatabaseName();
-			if (StringUtils.hasText(databaseName)) {
-				builder.option(ConnectionFactoryOptions.DATABASE, databaseName);
-			}
-			if (properties.getProperties() != null) {
-				properties.getProperties()
-						.forEach((key, value) -> builder
-								.option(Option.valueOf(key), value));
-			}
-			return ConnectionFactories.get(builder.build());
+	}
+
+	@Configuration
+	@Conditional(GenericDataSourceCondition.class)
+	@ConditionalOnMissingBean(ConnectionFactory.class)
+	@Import(ConnectionFactoryConfiguration.Generic.class)
+	@ConditionalOnProperty("spring.r2dbc.url")
+	protected static class GenericConnectionFactoryConfiguration {
+
+	}
+
+	/**
+	 * {@link AnyNestedCondition} that checks that {@code spring.r2dbc.url}
+	 * is set.
+	 */
+	static class EmbeddedOptOutCondition extends AnyNestedCondition {
+
+		EmbeddedOptOutCondition() {
+			super(ConfigurationPhase.PARSE_CONFIGURATION);
+		}
+
+		@ConditionalOnProperty("spring.r2dbc.url")
+		static class ExplicitUrl {
+		}
+
+	}
+
+	/**
+	 * {@link AnyNestedCondition} that checks that either {@code io.r2dbc.pool.ConnectionPool}
+	 * is not on the class path or the URL defines connection pooling.
+	 */
+	static class GenericDataSourceCondition extends AnyNestedCondition {
+
+		GenericDataSourceCondition() {
+			super(ConfigurationPhase.PARSE_CONFIGURATION);
+		}
+
+		@ConditionalOnMissingClass("io.r2dbc.pool.ConnectionPool")
+		static class NoConnectionPool {
+		}
+
+		@Conditional(PooledConnectionUrlCondition.class)
+		static class PooledConnectionUrl {
 		}
 
 	}
@@ -95,11 +118,17 @@ public class ConnectionFactoryAutoConfiguration {
 	 */
 	static class EmbeddedDatabaseCondition extends SpringBootCondition {
 
+		EmbeddedOptOutCondition pooledCondition = new EmbeddedOptOutCondition();
+
 		@Override
 		public ConditionOutcome getMatchOutcome(ConditionContext context,
 				AnnotatedTypeMetadata metadata) {
 			ConditionMessage.Builder message = ConditionMessage
 					.forCondition("EmbeddedDataSource");
+			if (anyMatches(context, metadata, this.pooledCondition)) {
+				return ConditionOutcome
+						.noMatch(message.foundExactly("supported pooled data source"));
+			}
 			EmbeddedDatabaseType type = EmbeddedDatabaseConnection
 					.get(context.getClassLoader()).getType();
 			if (type == null) {
@@ -108,7 +137,46 @@ public class ConnectionFactoryAutoConfiguration {
 			}
 			return ConditionOutcome.match(message.found("embedded database").items(type));
 		}
+	}
 
+	/**
+	 * {@link Condition} to test {@code spring.r2dbc.url} already contains pooling configuration.
+	 */
+	static class UnpooledConnectionUrlCondition extends SpringBootCondition {
+
+		@Override
+		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+			String url = context.getEnvironment().getProperty("spring.r2dbc.url");
+			if (StringUtils.isEmpty(url)) {
+				return ConditionOutcome.match("R2DBC Connection URL is empty");
+			}
+			if (url.contains(":pool:")) {
+				return ConditionOutcome
+						.noMatch("R2DBC Connection URL contains pooling configuration");
+			}
+			return ConditionOutcome
+					.match("R2DBC Connection URL does not contain pooling configuration");
+		}
+	}
+
+	/**
+	 * {@link Condition} to test {@code spring.r2dbc.url} already contains pooling configuration.
+	 */
+	static class PooledConnectionUrlCondition extends SpringBootCondition {
+
+		@Override
+		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+			String url = context.getEnvironment().getProperty("spring.r2dbc.url");
+			if (StringUtils.isEmpty(url)) {
+				return ConditionOutcome.match("R2DBC Connection URL is empty");
+			}
+			if (url.contains(":pool:")) {
+				return ConditionOutcome
+						.match("R2DBC Connection URL contains pooling configuration");
+			}
+			return ConditionOutcome
+					.noMatch("R2DBC Connection URL does not contain pooling configuration");
+		}
 	}
 
 }

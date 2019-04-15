@@ -16,6 +16,7 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
@@ -66,6 +67,8 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 	 * Extended R2DBC properties.
 	 */
 	private Map<String, String> properties;
+
+	private Pool pool = new Pool();
 
 	private EmbeddedDatabaseConnection embeddedDatabaseConnection = EmbeddedDatabaseConnection.NONE;
 
@@ -219,6 +222,14 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		return null;
 	}
 
+	public Pool getPool() {
+		return pool;
+	}
+
+	public void setPool(Pool pool) {
+		this.pool = pool;
+	}
+
 	private String determineDriverName() {
 		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {
 			return this.embeddedDatabaseConnection.getType().name().toLowerCase();
@@ -250,7 +261,61 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		public EmbeddedDatabaseConnection getConnection() {
 			return this.connection;
 		}
+	}
 
+	static class Pool {
+
+		/**
+		 * Configure a idle {@link Duration timeout}. Defaults to 30 minutes.
+		 */
+		private Duration maxIdleTime = Duration.ofMinutes(30);
+
+		/**
+		 * Configure the initial connection pool size. Defaults to {@code 10}.
+		 */
+		private int initialSize = 10;
+
+		/**
+		 * Configure the maximal connection pool size. Defaults to {@code 10}.
+		 */
+		private int maxSize = 10;
+
+		/**
+		 * Configure a validation query.
+		 */
+		private String validationQuery;
+
+		public Duration getMaxIdleTime() {
+			return maxIdleTime;
+		}
+
+		public void setMaxIdleTime(Duration maxIdleTime) {
+			this.maxIdleTime = maxIdleTime;
+		}
+
+		public int getInitialSize() {
+			return initialSize;
+		}
+
+		public void setInitialSize(int initialSize) {
+			this.initialSize = initialSize;
+		}
+
+		public int getMaxSize() {
+			return maxSize;
+		}
+
+		public void setMaxSize(int maxSize) {
+			this.maxSize = maxSize;
+		}
+
+		public String getValidationQuery() {
+			return validationQuery;
+		}
+
+		public void setValidationQuery(String validationQuery) {
+			this.validationQuery = validationQuery;
+		}
 	}
 
 }

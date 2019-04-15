@@ -16,6 +16,7 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
 import org.junit.Test;
 
@@ -25,7 +26,6 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- *
  * Tests for {@link EmbeddedDatabaseConfiguration}.
  *
  * @author Mark Paluch
@@ -37,9 +37,18 @@ public class EmbeddedDatabaseConfigurationTests {
 					.of(ConnectionFactoryAutoConfiguration.class));
 
 	@Test
-	public void testDefaultConnectionFactoryExists() {
+	public void testDefaultUnpooledConnectionFactoryExists() {
 		this.contextRunner
 				.run((context) -> assertThat(context)
 						.hasSingleBean(ConnectionFactory.class));
+	}
+
+	@Test
+	public void defaultConnectionFactoryIsUnpooled() {
+		this.contextRunner
+				.run((context) -> {
+					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
+					assertThat(bean).isExactlyInstanceOf(H2ConnectionFactory.class);
+				});
 	}
 }

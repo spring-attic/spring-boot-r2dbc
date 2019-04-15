@@ -42,4 +42,5 @@ public class R2dbcAutoConfigurationTests {
 				.run((context) -> assertThat(context)
 						.hasSingleBean(R2dbc.class));
 	}
+
 }

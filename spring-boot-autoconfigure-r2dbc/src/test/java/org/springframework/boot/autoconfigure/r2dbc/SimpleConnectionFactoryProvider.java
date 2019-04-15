@@ -22,6 +22,7 @@ import io.r2dbc.spi.ConnectionFactoryMetadata;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.ConnectionFactoryProvider;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Simple driver to capture {@link ConnectionFactoryOptions}.
@@ -41,6 +42,11 @@ public class SimpleConnectionFactoryProvider implements ConnectionFactoryProvide
 				.equals("simple");
 	}
 
+	@Override
+	public String getDriver() {
+		return "simple";
+	}
+
 	static class TestConnectionFactory implements ConnectionFactory {
 
 		ConnectionFactoryOptions options;
@@ -51,7 +57,7 @@ public class SimpleConnectionFactoryProvider implements ConnectionFactoryProvide
 
 		@Override
 		public Publisher<? extends Connection> create() {
-			throw new UnsupportedOperationException();
+			return Mono.error(new UnsupportedOperationException());
 		}
 
 		@Override
