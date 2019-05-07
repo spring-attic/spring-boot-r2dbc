@@ -19,6 +19,7 @@ package com.example.demo;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +37,7 @@ public class CityController {
 	}
 
 	@GetMapping("/")
+	@Transactional
 	public Flux<City> findCities() {
 		return this.repository.findAll();
 	}
