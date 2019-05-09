@@ -27,20 +27,19 @@ import org.springframework.boot.autoconfigure.data.ConditionalOnRepositoryType;
 import org.springframework.boot.autoconfigure.data.RepositoryType;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.r2dbc.function.DatabaseClient;
+import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.r2dbc.repository.support.R2dbcRepositoryFactoryBean;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for Spring Data R2DBC
- * Repositories.
+ * {@link EnableAutoConfiguration Auto-configuration} for Spring Data R2DBC Repositories.
  *
  * @author Mark Paluch
  * @see EnableR2dbcRepositories
  */
 @Configuration
-@ConditionalOnClass({ConnectionFactory.class, R2dbcRepository.class})
+@ConditionalOnClass({ ConnectionFactory.class, R2dbcRepository.class })
 @ConditionalOnBean(DatabaseClient.class)
 @ConditionalOnRepositoryType(store = "r2dbc", type = RepositoryType.REACTIVE)
 @ConditionalOnMissingBean(R2dbcRepositoryFactoryBean.class)

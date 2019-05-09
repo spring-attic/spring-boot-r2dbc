@@ -16,14 +16,13 @@
 
 package org.springframework.boot.autoconfigure.data.r2dbc;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.*;
 
+import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.data.r2dbc.function.DatabaseClient;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.data.r2dbc.core.DatabaseClient;
 
 /**
  * Tests for {@link R2dbcDataAutoConfiguration}.
@@ -32,14 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class R2dbcDataAutoConfigurationTests {
 
-	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionFactoryAutoConfiguration.class, R2dbcDataAutoConfiguration.class));
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(
+			AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, R2dbcDataAutoConfiguration.class));
 
 	@Test
 	public void testDefaultConnectionFactoryExists() {
-		this.contextRunner
-				.run((context) -> assertThat(context)
-						.hasSingleBean(DatabaseClient.class));
+		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(DatabaseClient.class));
 	}
 }

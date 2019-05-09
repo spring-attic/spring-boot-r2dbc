@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
-import org.springframework.boot.autoconfigure.data.r2dbc.ConnectionFactoryTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.r2dbc.R2dbcTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -34,7 +34,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ReactiveTransactionManager.class)
-@AutoConfigureAfter(ConnectionFactoryTransactionManagerAutoConfiguration.class)
+@AutoConfigureAfter(R2dbcTransactionManagerAutoConfiguration.class)
 public class ReactiveTransactionAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
@@ -43,11 +43,8 @@ public class ReactiveTransactionAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public TransactionalOperator transactionalOperator(
-				ReactiveTransactionManager transactionManager) {
+		public TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
 			return TransactionalOperator.create(transactionManager);
 		}
-
 	}
-
 }

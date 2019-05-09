@@ -28,20 +28,19 @@ import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfigu
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.data.r2dbc.function.connectionfactory.ConnectionFactoryTransactionManager;
+import org.springframework.data.r2dbc.connectionfactory.R2dbcTransactionManager;
 import org.springframework.transaction.ReactiveTransactionManager;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for
- * {@link ConnectionFactoryTransactionManager}.
+ * {@link EnableAutoConfiguration Auto-configuration} for {@link R2dbcTransactionManager}.
  *
  * @author Mark Paluch
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnClass({ConnectionFactoryTransactionManager.class, ReactiveTransactionManager.class})
+@ConditionalOnClass({ R2dbcTransactionManager.class, ReactiveTransactionManager.class })
 @AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 @AutoConfigureBefore(TransactionAutoConfiguration.class)
-public class ConnectionFactoryTransactionManagerAutoConfiguration {
+public class R2dbcTransactionManagerAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnSingleCandidate(ConnectionFactory.class)
@@ -49,10 +48,8 @@ public class ConnectionFactoryTransactionManagerAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean(ReactiveTransactionManager.class)
-		public ConnectionFactoryTransactionManager connectionFactoryTransactionManager(ConnectionFactory connectionFactory) {
-			return new ConnectionFactoryTransactionManager(connectionFactory);
+		public R2dbcTransactionManager connectionFactoryTransactionManager(ConnectionFactory connectionFactory) {
+			return new R2dbcTransactionManager(connectionFactory);
 		}
-
 	}
-
 }

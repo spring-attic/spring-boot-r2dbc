@@ -16,38 +16,38 @@
 
 package org.springframework.boot.autoconfigure.data.r2dbc;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.transaction.reactive.ReactiveTransactionAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.r2dbc.function.connectionfactory.ConnectionFactoryTransactionManager;
+import org.springframework.data.r2dbc.connectionfactory.R2dbcTransactionManager;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /**
- * Tests for {@link ConnectionFactoryTransactionManager}.
+ * Tests for {@link R2dbcTransactionManager}.
  *
  * @author Mark Paluch
+ * @author Oliver Drotbohm
  */
-public class ConnectionFactoryTransactionManagerAutoConfigurationTests {
+public class R2dbcTransactionManagerAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionFactoryTransactionManagerAutoConfiguration.class, ReactiveTransactionAutoConfiguration.class));
+			.withConfiguration(AutoConfigurations.of(R2dbcTransactionManagerAutoConfiguration.class,
+					ReactiveTransactionAutoConfiguration.class));
 
 	@Test
 	public void noTransactionManager() {
@@ -58,22 +58,17 @@ public class ConnectionFactoryTransactionManagerAutoConfigurationTests {
 
 	@Test
 	public void singleTransactionManager() {
-		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class)
-				.run(context -> {
-					assertThat(context).hasSingleBean(TransactionalOperator.class)
-							.hasSingleBean(ReactiveTransactionManager.class);
-				});
+		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class).run(context -> {
+			assertThat(context).hasSingleBean(TransactionalOperator.class).hasSingleBean(ReactiveTransactionManager.class);
+		});
 	}
 
 	@Test
 	public void transactionManagerEnabled() {
-		contextRunner
-				.withUserConfiguration(SingleConnectionFactoryConfiguration.class, BaseConfiguration.class)
+		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class, BaseConfiguration.class)
 				.run(context -> {
-					TransactionalService bean = context
-							.getBean(TransactionalService.class);
-					bean.isTransactionActive().as(StepVerifier::create).expectNext(true)
-							.verifyComplete();
+					TransactionalService bean = context.getBean(TransactionalService.class);
+					bean.isTransactionActive().as(StepVerifier::create).expectNext(true).verifyComplete();
 				});
 	}
 
@@ -84,8 +79,7 @@ public class ConnectionFactoryTransactionManagerAutoConfigurationTests {
 		ConnectionFactory connectionFactory() {
 			ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 			Connection connection = mock(Connection.class);
-			when(connectionFactory.create())
-					.thenAnswer(invocation -> Mono.just(connection));
+			when(connectionFactory.create()).thenAnswer(invocation -> Mono.just(connection));
 			when(connection.beginTransaction()).thenReturn(Mono.empty());
 			when(connection.commitTransaction()).thenReturn(Mono.empty());
 			when(connection.close()).thenReturn(Mono.empty());

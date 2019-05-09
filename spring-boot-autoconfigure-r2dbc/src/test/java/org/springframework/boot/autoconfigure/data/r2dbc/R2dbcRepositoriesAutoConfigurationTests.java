@@ -16,9 +16,11 @@
 
 package org.springframework.boot.autoconfigure.data.r2dbc;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.*;
+
 import reactor.test.StepVerifier;
 
+import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
@@ -28,12 +30,10 @@ import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfigu
 import org.springframework.boot.autoconfigure.r2dbc.EmbeddedDatabaseConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.r2dbc.function.DatabaseClient;
+import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.r2dbc.repository.config.R2dbcRepositoryConfigurationExtension;
 import org.springframework.data.repository.Repository;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link R2dbcRepositoriesAutoConfiguration}.
@@ -43,44 +43,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class R2dbcRepositoriesAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(
-					AutoConfigurations.of(R2dbcRepositoriesAutoConfiguration.class));
+			.withConfiguration(AutoConfigurations.of(R2dbcRepositoriesAutoConfiguration.class));
 
 	@Test
 	public void backsOffWithNoConnectionFactory() {
 		this.contextRunner.withUserConfiguration(TestConfiguration.class)
-				.run((context) -> assertThat(context)
-						.doesNotHaveBean(R2dbcRepositoryConfigurationExtension.class));
+				.run((context) -> assertThat(context).doesNotHaveBean(R2dbcRepositoryConfigurationExtension.class));
 	}
 
 	@Test
 	public void backsOffWithNoDatabaseClientOperations() {
-		this.contextRunner.withUserConfiguration(EmbeddedDatabaseConfiguration.class,
-				TestConfiguration.class).run((context) -> {
-			assertThat(context).doesNotHaveBean(DatabaseClient.class);
-			assertThat(context)
-					.doesNotHaveBean(R2dbcRepositoryConfigurationExtension.class);
-		});
+		this.contextRunner.withUserConfiguration(EmbeddedDatabaseConfiguration.class, TestConfiguration.class)
+				.run((context) -> {
+					assertThat(context).doesNotHaveBean(DatabaseClient.class);
+					assertThat(context).doesNotHaveBean(R2dbcRepositoryConfigurationExtension.class);
+				});
 	}
 
 	@Test
 	public void basicAutoConfiguration() {
 
 		this.contextRunner
-				.withConfiguration(
-						AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
-								DataSourceAutoConfiguration.class,
-								R2dbcDataAutoConfiguration.class))
-				.withUserConfiguration(TestConfiguration.class,
-						EmbeddedDataSourceConfiguration.class)
-				.withPropertyValues(
-						"spring.datasource.schema=classpath:data-r2dbc-schema.sql",
-						"spring.datasource.data=classpath:city.sql",
-						"spring.datasource.generate-unique-name:true")
+				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
+						DataSourceAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
+				.withUserConfiguration(TestConfiguration.class, EmbeddedDataSourceConfiguration.class)
+				.withPropertyValues("spring.datasource.schema=classpath:data-r2dbc-schema.sql",
+						"spring.datasource.data=classpath:city.sql", "spring.datasource.generate-unique-name:true")
 				.run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);
-					context.getBean(CityRepository.class).findById(2000L)
-							.as(StepVerifier::create).expectNextCount(1).verifyComplete();
+					context.getBean(CityRepository.class).findById(2000L).as(StepVerifier::create).expectNextCount(1)
+							.verifyComplete();
 				});
 	}
 
@@ -88,10 +80,8 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 	public void autoConfigurationWithNoRepositories() {
 		this.contextRunner
 				.withConfiguration(
-						AutoConfigurations
-								.of(ConnectionFactoryAutoConfiguration.class, EmbeddedDatabaseConfiguration.class))
-				.withUserConfiguration(EmptyConfiguration.class)
-				.run((context) -> {
+						AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, EmbeddedDatabaseConfiguration.class))
+				.withUserConfiguration(EmptyConfiguration.class).run((context) -> {
 					assertThat(context).doesNotHaveBean(Repository.class);
 				});
 	}
@@ -99,20 +89,15 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 	@Test
 	public void honorsUsersEnableR2dbcRepositoriesConfiguration() {
 		this.contextRunner
-				.withConfiguration(
-						AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
-								DataSourceAutoConfiguration.class,
-								R2dbcDataAutoConfiguration.class))
-				.withUserConfiguration(EnableRepositoriesConfiguration.class,
-						EmbeddedDataSourceConfiguration.class)
-				.withPropertyValues(
-						"spring.datasource.schema=classpath:data-r2dbc-schema.sql",
-						"spring.datasource.data=classpath:city.sql",
-						"spring.datasource.generate-unique-name:true")
+				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
+						DataSourceAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
+				.withUserConfiguration(EnableRepositoriesConfiguration.class, EmbeddedDataSourceConfiguration.class)
+				.withPropertyValues("spring.datasource.schema=classpath:data-r2dbc-schema.sql",
+						"spring.datasource.data=classpath:city.sql", "spring.datasource.generate-unique-name:true")
 				.run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);
-					context.getBean(CityRepository.class).findById(2000L)
-							.as(StepVerifier::create).expectNextCount(1).verifyComplete();
+					context.getBean(CityRepository.class).findById(2000L).as(StepVerifier::create).expectNextCount(1)
+							.verifyComplete();
 				});
 	}
 

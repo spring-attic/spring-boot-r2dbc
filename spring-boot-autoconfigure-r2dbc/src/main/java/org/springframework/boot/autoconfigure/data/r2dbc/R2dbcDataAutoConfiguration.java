@@ -27,14 +27,15 @@ import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfigu
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
-import org.springframework.data.r2dbc.function.DatabaseClient;
-import org.springframework.data.r2dbc.function.ReactiveDataAccessStrategy;
+import org.springframework.data.r2dbc.core.DatabaseClient;
+import org.springframework.data.r2dbc.core.ReactiveDataAccessStrategy;
 import org.springframework.data.r2dbc.support.R2dbcExceptionTranslator;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link DatabaseClient}.
  *
  * @author Mark Paluch
+ * @author Oliver Drotbohm
  */
 @Configuration
 @ConditionalOnClass(DatabaseClient.class)
@@ -56,10 +57,9 @@ public class R2dbcDataAutoConfiguration extends AbstractR2dbcConfiguration {
 
 	@Bean
 	@Override
-	public DatabaseClient databaseClient(ReactiveDataAccessStrategy dataAccessStrategy, R2dbcExceptionTranslator exceptionTranslator) {
-		return DatabaseClient.builder()
-				.connectionFactory(this.connectionFactory())
-				.dataAccessStrategy(dataAccessStrategy)
+	public DatabaseClient databaseClient(ReactiveDataAccessStrategy dataAccessStrategy,
+			R2dbcExceptionTranslator exceptionTranslator) {
+		return DatabaseClient.builder().connectionFactory(this.connectionFactory()).dataAccessStrategy(dataAccessStrategy)
 				.exceptionTranslator(exceptionTranslator).build();
 	}
 
