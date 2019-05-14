@@ -1,3 +1,6 @@
+:spring-data-commons-javadoc: https://docs.spring.io/spring-data/commons/docs/current/api/
+
+
 [[boot-features-configure-r2dbc-connectionfactory]]
 === Configure a R2DBC ConnectionFactory
 R2DBC's `io.r2dbc.spi.Connection` interface provides a standard method of working
@@ -104,13 +107,13 @@ you can `@Autowire` it directly into your own beans, as shown in the following e
 
 [[boot-features-spring-data-r2dbc-repositories]]
 ==== Spring Data R2DBC Repositories
-{spring-data-r2dbc}[Spring Data R2DBC] repositories are interfaces that you can define to
+https://spring.io/projects/spring-data-r2dbc[Spring Data R2DBC] repositories are interfaces that you can define to
 access data. Queries are created automatically from your method names. For example, a
 `CityRepository` interface might declare a `findAllByState(String state)` method to find
 all the cities in a given state.
 
 For more complex queries, you can annotate your method with Spring Data's
-{spring-data-javadoc}/repository/Query.html[`Query`] annotation.
+https://docs.spring.io/spring-data/r2dbc/docs/1.0.x/api/org/springframework/data/r2dbc/repository/query/Query.html[`Query`] annotation.
 
 Spring Data repositories usually extend from the
 {spring-data-commons-javadoc}/repository/Repository.html[`Repository`] or
@@ -137,7 +140,7 @@ The following example shows a typical Spring Data repository interface definitio
 ----
 
 TIP: We have barely scratched the surface of Spring Data R2DBC. For complete details, see
-the https://docs.spring.io/spring-data/r2dbc/docs/current/reference/html/[Spring Data R2DBC
+the https://docs.spring.io/spring-data/r2dbc/docs/1.0.x/reference/html/[Spring Data R2DBC
 reference documentation].
 
 [[howto-configure-a-connectionfactory]]
