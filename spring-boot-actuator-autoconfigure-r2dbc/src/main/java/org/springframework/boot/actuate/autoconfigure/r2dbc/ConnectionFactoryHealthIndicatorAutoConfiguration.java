@@ -55,8 +55,8 @@ public class ConnectionFactoryHealthIndicatorAutoConfiguration extends Composite
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(name = "r2dbcFactoryHealthIndicator")
-	public ReactiveHealthIndicator r2dbcFactoryHealthIndicator() {
+	@ConditionalOnMissingBean(name = "r2dbcConnectionFactoryHealthIndicator")
+	public ReactiveHealthIndicator r2dbcConnectionFactoryHealthIndicator() {
 		return this.createHealthIndicator(this.connectionFactory);
 	}
 }
