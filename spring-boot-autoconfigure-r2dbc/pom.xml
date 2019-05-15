@@ -18,10 +18,16 @@
 		<url>https://www.spring.io</url>
 	</organization>
 	<dependencies>
+		<!-- Compile -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-spi</artifactId>
 		</dependency>
+		<!-- Optional -->
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-h2</artifactId>
@@ -47,15 +53,13 @@
 			<artifactId>spring-data-r2dbc</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-autoconfigure</artifactId>
-		</dependency>
+		<!-- Annotation processing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<!-- Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-test</artifactId>

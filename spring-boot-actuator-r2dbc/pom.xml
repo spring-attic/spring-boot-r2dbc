@@ -18,6 +18,7 @@
 		<url>https://www.spring.io</url>
 	</organization>
 	<dependencies>
+		<!-- Compile -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot</artifactId>
