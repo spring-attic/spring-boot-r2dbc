@@ -54,6 +54,11 @@
 				<version>1.0.0.M2</version>
 			</dependency>
 			<dependency>
+				<groupId>com.github.jasync-sql</groupId>
+				<artifactId>jasync-r2dbc-mysql</artifactId>
+				<version>0.9.52</version>
+			</dependency>
+			<dependency>
 				<groupId>io.r2dbc</groupId>
 				<artifactId>r2dbc-bom</artifactId>
 				<version>Arabba-M8</version>
@@ -101,6 +106,10 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>jcenter</id>
+			<url>https://jcenter.bintray.com/</url>
 		</repository>
 	</repositories>
 
