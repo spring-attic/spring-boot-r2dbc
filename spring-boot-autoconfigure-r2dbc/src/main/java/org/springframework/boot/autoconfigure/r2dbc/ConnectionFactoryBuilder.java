@@ -48,7 +48,7 @@ public final class ConnectionFactoryBuilder {
 		}
 		String password = properties.determinePassword();
 		if (StringUtils.hasText(password)) {
-			builder.option(ConnectionFactoryOptions.PASSWORD, username);
+			builder.option(ConnectionFactoryOptions.PASSWORD, password);
 		}
 		String databaseName = properties.determineDatabaseName();
 		if (StringUtils.hasText(databaseName)) {
