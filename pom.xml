@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.boot.experimental</groupId>
 	<artifactId>spring-boot-r2dbc</artifactId>
-	<version>0.1.0.M1</version>
+	<version>0.1.0.BUILD-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>Spring Boot R2DBC</name>
@@ -37,7 +37,7 @@
 		<connection>scm:git:https://github.com/spring-projects-experimental/spring-boot-r2dbc.git</connection>
 		<developerConnection>scm:git:https://github.com/spring-projects-experimental/spring-boot-r2dbc.git</developerConnection>
 		<url>http://github.com/spring-projects-experimental/spring-boot-r2dbc</url>
-	  <tag>0.1.0.M1</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<profiles>

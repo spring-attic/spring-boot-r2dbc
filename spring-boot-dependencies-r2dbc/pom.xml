@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>org.springframework.boot.experimental</groupId>
 	<artifactId>spring-boot-dependencies-r2dbc</artifactId>
-	<version>0.1.0.M1</version>
+	<version>0.1.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Boot R2DBC Dependencies</name>
 	<description>Spring Boot R2DBC Dependency Management</description>
@@ -24,32 +24,32 @@
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-autoconfigure-r2dbc</artifactId>
-				<version>0.1.0.M1</version>
+				<version>0.1.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-actuator-r2dbc</artifactId>
-				<version>0.1.0.M1</version>
+				<version>0.1.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-actuator-autoconfigure-r2dbc</artifactId>
-				<version>0.1.0.M1</version>
+				<version>0.1.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-starter-r2dbc</artifactId>
-				<version>0.1.0.M1</version>
+				<version>0.1.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-starter-r2dbc-h2</artifactId>
-				<version>0.1.0.M1</version>
+				<version>0.1.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-starter-data-r2dbc</artifactId>
-				<version>0.1.0.M1</version>
+				<version>0.1.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.data</groupId>
@@ -125,9 +125,4 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
-
-  <scm>
-    <tag>0.1.0.M1</tag>
-  </scm>
 </project>
