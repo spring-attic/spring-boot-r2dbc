@@ -35,6 +35,12 @@
 		<module>spring-boot-example-h2</module>
 	</modules>
 
+	<scm>
+		<connection>scm:git:https://github.com/spring-projects-experimental/spring-boot-r2dbc.git</connection>
+		<developerConnection>scm:git:https://github.com/spring-projects-experimental/spring-boot-r2dbc.git</developerConnection>
+		<url>http://github.com/spring-projects-experimental/spring-boot-r2dbc</url>
+	</scm>
+
 	<profiles>
 		<profile>
 			<id>default</id>
