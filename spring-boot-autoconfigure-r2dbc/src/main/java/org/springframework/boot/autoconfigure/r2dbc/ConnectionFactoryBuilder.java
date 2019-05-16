@@ -97,7 +97,11 @@ public final class ConnectionFactoryBuilder {
 	}
 
 	public ConnectionFactory build() {
-		return ConnectionFactories.get(this.builder.build());
+		return ConnectionFactories.get(getOptions());
+	}
+
+	ConnectionFactoryOptions getOptions() {
+		return this.builder.build();
 	}
 
 	@SuppressWarnings("unchecked")
