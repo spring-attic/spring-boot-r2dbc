@@ -44,6 +44,11 @@
 			<artifactId>r2dbc-spi</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-core</artifactId>
+			<optional>true</optional>
+		</dependency>
 		<!-- Annotation processing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

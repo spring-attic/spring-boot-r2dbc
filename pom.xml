@@ -31,6 +31,7 @@
 		<module>spring-boot-starter-r2dbc-h2</module>
 		<module>spring-boot-starter-data-r2dbc</module>
 		<module>spring-boot-example-h2</module>
+		<module>spring-boot-example-r2dbc-actuator</module>
 	</modules>
 
 	<scm>
