@@ -1,0 +1,5 @@
+= Spring Boot R2DBC Example with R2DBC actuator
+
+Start the application to run the WebFlux server at http://localhost:8080.
+
+Metrics actuator is available under http://localhost:8080/actuator/metrics.
