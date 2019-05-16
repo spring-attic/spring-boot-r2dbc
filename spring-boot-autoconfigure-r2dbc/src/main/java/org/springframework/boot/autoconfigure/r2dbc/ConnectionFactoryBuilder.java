@@ -40,19 +40,27 @@ public final class ConnectionFactoryBuilder {
 
 	public static ConnectionFactoryBuilder create(R2dbcProperties properties) {
 
-		ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions
-				.parse(properties.determineUrl()).mutate();
-		String username = properties.determineUsername();
-		if (StringUtils.hasText(username)) {
-			builder.option(ConnectionFactoryOptions.USER, username);
+		ConnectionFactoryOptions options = ConnectionFactoryOptions
+				.parse(properties.determineUrl());
+		ConnectionFactoryOptions.Builder builder = options.mutate();
+
+		if (!options.hasOption(ConnectionFactoryOptions.USER)) {
+			String username = properties.determineUsername();
+			if (StringUtils.hasText(username)) {
+				builder.option(ConnectionFactoryOptions.USER, username);
+			}
 		}
-		String password = properties.determinePassword();
-		if (StringUtils.hasText(password)) {
-			builder.option(ConnectionFactoryOptions.PASSWORD, password);
+		if (!options.hasOption(ConnectionFactoryOptions.PASSWORD)) {
+			String password = properties.determinePassword();
+			if (StringUtils.hasText(password)) {
+				builder.option(ConnectionFactoryOptions.PASSWORD, password);
+			}
 		}
-		String databaseName = properties.determineDatabaseName();
-		if (StringUtils.hasText(databaseName)) {
-			builder.option(ConnectionFactoryOptions.DATABASE, databaseName);
+		if (!options.hasOption(ConnectionFactoryOptions.DATABASE)) {
+			String databaseName = properties.determineDatabaseName();
+			if (StringUtils.hasText(databaseName)) {
+				builder.option(ConnectionFactoryOptions.DATABASE, databaseName);
+			}
 		}
 		if (properties.getProperties() != null) {
 			properties.getProperties()
