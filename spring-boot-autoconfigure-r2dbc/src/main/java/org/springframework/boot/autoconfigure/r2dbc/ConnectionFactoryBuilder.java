@@ -16,59 +16,38 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
-import javax.sql.DataSource;
+import java.util.function.Supplier;
 
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Option;
 
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
  * Builder for {@link ConnectionFactory}.
  *
  * @author Mark Paluch
+ * @author Tadaya Tsuyukubo
  */
 public final class ConnectionFactoryBuilder {
-
-	private static final String[] CONNECTION_FACTORY_TYPE_NAMES = new String[] {
-			"io.r2dbc.pool.ConnectionPool"};
 
 	private final ConnectionFactoryOptions.Builder builder;
 
 	public static ConnectionFactoryBuilder create(R2dbcProperties properties) {
-
 		ConnectionFactoryOptions options = ConnectionFactoryOptions
 				.parse(properties.determineUrl());
-		ConnectionFactoryOptions.Builder builder = options.mutate();
-
-		if (!options.hasOption(ConnectionFactoryOptions.USER)) {
-			String username = properties.determineUsername();
-			if (StringUtils.hasText(username)) {
-				builder.option(ConnectionFactoryOptions.USER, username);
-			}
-		}
-		if (!options.hasOption(ConnectionFactoryOptions.PASSWORD)) {
-			String password = properties.determinePassword();
-			if (StringUtils.hasText(password)) {
-				builder.option(ConnectionFactoryOptions.PASSWORD, password);
-			}
-		}
-		if (!options.hasOption(ConnectionFactoryOptions.DATABASE)) {
-			String databaseName = properties.determineDatabaseName();
-			if (StringUtils.hasText(databaseName)) {
-				builder.option(ConnectionFactoryOptions.DATABASE, databaseName);
-			}
-		}
+		ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder(options.mutate());
+		builder.applyIfNotEmpty(options, ConnectionFactoryOptions.USER, properties::determineUsername);
+		builder.applyIfNotEmpty(options, ConnectionFactoryOptions.PASSWORD, properties::determinePassword);
+		builder.applyIfNotEmpty(options, ConnectionFactoryOptions.DATABASE, properties::determineDatabaseName);
 		if (properties.getProperties() != null) {
 			properties.getProperties()
 					.forEach((key, value) -> builder
 							.option(Option.valueOf(key), value));
 		}
-
-		return new ConnectionFactoryBuilder(builder);
+		return builder;
 	}
 
 	public static ConnectionFactoryBuilder create() {
@@ -77,6 +56,20 @@ public final class ConnectionFactoryBuilder {
 
 	private ConnectionFactoryBuilder(ConnectionFactoryOptions.Builder builder) {
 		this.builder = builder;
+	}
+
+	private <T extends CharSequence> void applyIfNotEmpty(ConnectionFactoryOptions options, Option<T> option, Supplier<T> valueSupplier) {
+		if (options.hasOption(option)) {
+			return;
+		}
+		T value = valueSupplier.get();
+		if (StringUtils.hasText(value)) {
+			builder.option(option, value);
+		}
+	}
+
+	private void option(Option<String> option, String value) {
+		this.builder.option(option, value);
 	}
 
 	public ConnectionFactoryBuilder username(String username) {
@@ -110,19 +103,5 @@ public final class ConnectionFactoryBuilder {
 
 	ConnectionFactoryOptions getOptions() {
 		return this.builder.build();
-	}
-
-	@SuppressWarnings("unchecked")
-	public static Class<? extends DataSource> findType(ClassLoader classLoader) {
-		for (String name : CONNECTION_FACTORY_TYPE_NAMES) {
-			try {
-				return (Class<? extends DataSource>) ClassUtils.forName(name,
-						classLoader);
-			}
-			catch (Exception ex) {
-				// Swallow and continue
-			}
-		}
-		return null;
 	}
 }

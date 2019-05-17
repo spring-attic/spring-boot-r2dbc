@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link ConnectionFactoryBuilder}.
  *
  * @author Mark Paluch
+ * @author Tadaya Tsuyukubo
  */
 public class ConnectionFactoryBuilderUnitTests {
 
@@ -67,7 +68,9 @@ public class ConnectionFactoryBuilderUnitTests {
 	public void shouldApplyFromUrl() {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://user:pass@local/mydb");
-		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).getOptions();
+		properties.setUsername("someone-else");
+		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties)
+				.getOptions();
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER))
 				.isEqualTo("h2");
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST))
