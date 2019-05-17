@@ -16,9 +16,12 @@
 
 package org.springframework.boot.actuate.autoconfigure.r2dbc.metrics.pool;
 
+import java.util.Map;
+
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.r2dbc.pool.ConnectionPool;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration;
@@ -28,8 +31,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Map;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for metrics on all available
@@ -45,7 +46,8 @@ public class ConnectionPoolMetricsAutoConfiguration {
 
 	@Autowired
 	public void bindConnectionPoolsToRegistry(Map<String, ConnectionPool> pools, MeterRegistry registry) {
-		pools.forEach((beanName, pool) -> new ConnectionPoolMetrics(pool, beanName, Tags.empty()).bindTo(registry));
+		pools.forEach((beanName, pool) -> new ConnectionPoolMetrics(pool, beanName, Tags
+				.empty()).bindTo(registry));
 	}
 
 }

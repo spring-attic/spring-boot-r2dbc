@@ -43,43 +43,37 @@ public class ConnectionPoolMetrics implements MeterBinder {
 	@Override
 	public void bindTo(MeterRegistry registry) {
 		this.pool.getMetrics().ifPresent(poolMetrics -> {
-
 			Gauge.builder("r2dbc.pool.acquired", poolMetrics, PoolMetrics::acquiredSize)
 					.tags(this.tags)
 					.description("Size of successfully acquired connections which are in active use")
 					.baseUnit("connections")
 					.register(registry);
-
 			Gauge.builder("r2dbc.pool.allocated", poolMetrics, PoolMetrics::allocatedSize)
 					.tags(this.tags)
-					.description("Size of allocated connections in the pool which are in active use or in idle")
+					.description("Size of allocated connections in the pool which are in active use or idle")
 					.baseUnit("connections")
 					.register(registry);
-
 			Gauge.builder("r2dbc.pool.idle", poolMetrics, PoolMetrics::idleSize)
 					.tags(this.tags)
 					.description("Size of idle connections in the pool")
 					.baseUnit("connections")
 					.register(registry);
-
 			Gauge.builder("r2dbc.pool.pending", poolMetrics, PoolMetrics::pendingAcquireSize)
 					.tags(this.tags)
-					.description("Size of pending to acquire connections from underlying connection factory")
+					.description("Size of pending to acquire connections from the underlying connection factory")
 					.baseUnit("connections")
 					.register(registry);
-
 			Gauge.builder("r2dbc.pool.max.allocated", poolMetrics, PoolMetrics::getMaxAllocatedSize)
 					.tags(this.tags)
 					.description("Maximum size of allocated connections that this pool allows")
 					.baseUnit("connections")
 					.register(registry);
-
 			Gauge.builder("r2dbc.pool.max.pending", poolMetrics, PoolMetrics::getMaxPendingAcquireSize)
 					.tags(this.tags)
 					.description("Maximum size of pending state to acquire connections that this pool allows")
 					.baseUnit("connections")
 					.register(registry);
-
 		});
 	}
+
 }

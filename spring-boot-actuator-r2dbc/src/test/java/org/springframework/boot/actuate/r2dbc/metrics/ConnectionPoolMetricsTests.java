@@ -16,6 +16,8 @@
 
 package org.springframework.boot.actuate.r2dbc.metrics;
 
+import java.util.Random;
+
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
@@ -27,18 +29,20 @@ import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.spi.ConnectionFactory;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Random;
+import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Tests for {@link ConnectionPoolMetrics}.
  *
  * @author Tadaya Tsuyukubo
+ * @author Mark Paluch
  */
 public class ConnectionPoolMetricsTests {
+
+	Tag fooTag = Tag.of("foo", "FOO");
+	Tag barTag = Tag.of("bar", "BAR");
 
 	private ConnectionFactory connectionFactory;
 
@@ -52,47 +56,33 @@ public class ConnectionPoolMetricsTests {
 	@Test
 	public void metrics() {
 		SimpleMeterRegistry registry = new SimpleMeterRegistry();
-
-		ConnectionPool connectionPool = new ConnectionPool(ConnectionPoolConfiguration.builder(this.connectionFactory)
+		ConnectionPool connectionPool = new ConnectionPool(ConnectionPoolConfiguration
+				.builder(this.connectionFactory)
 				.initialSize(3)
 				.maxSize(7)
 				.build());
 
-		Tag fooTag = Tag.of("foo", "FOO");
-		Tag barTag = Tag.of("bar", "BAR");
-
-		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool", Tags.of(fooTag, barTag));
+		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool", Tags
+				.of(fooTag, barTag));
 		metrics.bindTo(registry);
-
 		// acquire two connections
-		connectionPool.create().subscribe();
-		connectionPool.create().subscribe();
+		connectionPool.create().as(StepVerifier::create).expectNextCount(1)
+				.verifyComplete();
+		connectionPool.create().as(StepVerifier::create).expectNextCount(1)
+				.verifyComplete();
+		assertGauge(registry, "r2dbc.pool.acquired", 2);
+		assertGauge(registry, "r2dbc.pool.allocated", 3);
+		assertGauge(registry, "r2dbc.pool.idle", 1);
+		assertGauge(registry, "r2dbc.pool.pending", 0);
+		assertGauge(registry, "r2dbc.pool.max.allocated", 7);
+		assertGauge(registry, "r2dbc.pool.max.pending", Integer.MAX_VALUE);
+	}
 
-		Gauge gauge;
-
-		gauge = registry.get("r2dbc.pool.acquired").gauge();
-		assertThat(gauge.value()).isEqualTo(2);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
-
-		gauge = registry.get("r2dbc.pool.allocated").gauge();
-		assertThat(gauge.value()).isEqualTo(3);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
-
-		gauge = registry.get("r2dbc.pool.idle").gauge();
-		assertThat(gauge.value()).isEqualTo(1);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
-
-		gauge = registry.get("r2dbc.pool.pending").gauge();
-		assertThat(gauge.value()).isEqualTo(0);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
-
-		gauge = registry.get("r2dbc.pool.max.allocated").gauge();
-		assertThat(gauge.value()).isEqualTo(7);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
-
-		gauge = registry.get("r2dbc.pool.max.pending").gauge();
-		assertThat(gauge.value()).isEqualTo(Integer.MAX_VALUE);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
+	private void assertGauge(SimpleMeterRegistry registry, String metric, int expectedValue) {
+		Gauge gauge = registry.get(metric).gauge();
+		assertThat(gauge.value()).isEqualTo(expectedValue);
+		assertThat(gauge.getId().getTags())
+				.containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
 	}
 
 }

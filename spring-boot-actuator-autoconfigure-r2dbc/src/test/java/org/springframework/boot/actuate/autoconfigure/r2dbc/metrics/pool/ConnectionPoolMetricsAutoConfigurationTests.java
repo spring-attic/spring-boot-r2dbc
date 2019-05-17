@@ -16,6 +16,8 @@
 
 package org.springframework.boot.actuate.autoconfigure.r2dbc.metrics.pool;
 
+import java.util.Random;
+
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -25,12 +27,11 @@ import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.spi.ConnectionFactory;
 import org.junit.Test;
+
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConnectionPoolMetricsAutoConfigurationTests {
 
 	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(ConnectionPoolMetricsAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations
+					.of(ConnectionPoolMetricsAutoConfiguration.class))
 			.withUserConfiguration(TestConfig.class);
 
 	@Test
@@ -74,16 +76,16 @@ public class ConnectionPoolMetricsAutoConfigurationTests {
 
 		@Bean
 		ConnectionPool firstPool(ConnectionFactory connectionFactory) {
-			return new ConnectionPool(ConnectionPoolConfiguration.builder(connectionFactory).build());
+			return new ConnectionPool(ConnectionPoolConfiguration
+					.builder(connectionFactory).build());
 		}
 
 		@Bean
 		ConnectionPool secondPool(ConnectionFactory connectionFactory) {
-			return new ConnectionPool(ConnectionPoolConfiguration.builder(connectionFactory).build());
+			return new ConnectionPool(ConnectionPoolConfiguration
+					.builder(connectionFactory).build());
 		}
 
-
 	}
-
 
 }
