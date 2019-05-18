@@ -46,11 +46,12 @@ import org.springframework.util.StringUtils;
  * @author Mark Paluch
  */
 @Configuration
-@ConditionalOnClass({ConnectionFactory.class, EmbeddedDatabaseType.class})
+@ConditionalOnClass(ConnectionFactory.class)
 @EnableConfigurationProperties(R2dbcProperties.class)
 public class ConnectionFactoryAutoConfiguration {
 
 	@Configuration
+	@ConditionalOnClass(EmbeddedDatabaseType.class)
 	@Conditional(EmbeddedDatabaseCondition.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
 	@Import(EmbeddedDatabaseConfiguration.class)
@@ -129,7 +130,7 @@ public class ConnectionFactoryAutoConfiguration {
 				return ConditionOutcome
 						.noMatch(message.foundExactly("supported pooled data source"));
 			}
-			EmbeddedDatabaseType type = EmbeddedDatabaseConnection
+			String type = EmbeddedDatabaseConnection
 					.get(context.getClassLoader()).getType();
 			if (type == null) {
 				return ConditionOutcome

@@ -102,6 +102,20 @@ public class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
+	public void testUrlConfigurationWithoutSpringJdbc() {
+		this.contextRunner
+				.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo")
+				.withClassLoader(new FilteredClassLoader("org.springframework.jdbc", "io.r2dbc.pool"))
+				.run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class);
+					ConnectionFactory connectionFactory = context
+							.getBean(ConnectionFactory.class);
+					assertThat(connectionFactory)
+							.isInstanceOf(TestConnectionFactory.class);
+				});
+	}
+
+	@Test
 	public void testAdditionalOptions() {
 		this.contextRunner
 				.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",

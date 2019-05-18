@@ -51,4 +51,5 @@ public class EmbeddedDatabaseConfigurationTests {
 					assertThat(bean).isExactlyInstanceOf(H2ConnectionFactory.class);
 				});
 	}
+
 }

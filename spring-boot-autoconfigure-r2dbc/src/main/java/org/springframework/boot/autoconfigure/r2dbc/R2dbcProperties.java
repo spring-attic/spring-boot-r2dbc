@@ -232,7 +232,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	private String determineDriverName() {
 		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {
-			return this.embeddedDatabaseConnection.getType().name().toLowerCase();
+			return this.embeddedDatabaseConnection.getType().toLowerCase();
 		}
 		if (StringUtils.hasText(this.url)) {
 			return ConnectionFactoryOptions.parse(this.url)

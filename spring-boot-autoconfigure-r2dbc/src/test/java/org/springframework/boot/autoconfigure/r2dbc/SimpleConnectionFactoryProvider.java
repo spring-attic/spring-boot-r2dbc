@@ -64,5 +64,7 @@ public class SimpleConnectionFactoryProvider implements ConnectionFactoryProvide
 		public ConnectionFactoryMetadata getMetadata() {
 			throw new UnsupportedOperationException();
 		}
+
 	}
+
 }

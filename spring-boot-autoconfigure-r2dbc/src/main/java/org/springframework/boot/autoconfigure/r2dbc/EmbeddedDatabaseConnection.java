@@ -35,19 +35,21 @@ public enum EmbeddedDatabaseConnection {
 	/**
 	 * H2 Database Connection.
 	 */
-	H2(EmbeddedDatabaseType.H2, "io.r2dbc.h2.H2ConnectionFactoryProvider",
+	H2("H2", "io.r2dbc.h2.H2ConnectionFactoryProvider",
 			"h2", "r2dbc:h2:mem://in-memory/%s?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
 
-	private final EmbeddedDatabaseType type;
+	/**
+	 * @see EmbeddedDatabaseType
+	 */
+	private final String type;
 
 	private final String driverClassName;
 
 	private final String driver;
 
-
 	private final String url;
 
-	EmbeddedDatabaseConnection(EmbeddedDatabaseType type, String driverClassName, String driver, String url) {
+	EmbeddedDatabaseConnection(String type, String driverClassName, String driver, String url) {
 		this.type = type;
 		this.driverClassName = driverClassName;
 		this.driver = driver;
@@ -73,11 +75,11 @@ public enum EmbeddedDatabaseConnection {
 	}
 
 	/**
-	 * Returns the {@link EmbeddedDatabaseType} for the connection.
+	 * Returns the embedded database type name for the connection.
 	 *
 	 * @return the database type
 	 */
-	public EmbeddedDatabaseType getType() {
+	public String getType() {
 		return this.type;
 	}
 

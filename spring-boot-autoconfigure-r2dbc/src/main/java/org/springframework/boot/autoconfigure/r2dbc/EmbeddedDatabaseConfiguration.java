@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.StringUtils;
 
 /**
@@ -45,7 +46,7 @@ import org.springframework.util.StringUtils;
  * @see ConnectionFactoryAutoConfiguration
  */
 @Configuration
-@ConditionalOnClass({Connection.class, ConnectionFactory.class})
+@ConditionalOnClass({Connection.class, ConnectionFactory.class, EmbeddedDatabaseType.class})
 @EnableConfigurationProperties(R2dbcProperties.class)
 @AutoConfigureAfter(EmbeddedDataSourceConfiguration.class)
 public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
@@ -85,8 +86,9 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 	@Bean
 	@ConditionalOnMissingBean
 	public EmbeddedDatabase dataSource(EmbeddedDatabaseConnectionInformation embedded) {
+		String type = EmbeddedDatabaseConnection.get(this.classLoader).getType();
 		this.database = new EmbeddedDatabaseBuilder()
-				.setType(EmbeddedDatabaseConnection.get(this.classLoader).getType())
+				.setType(EmbeddedDatabaseType.valueOf(type))
 				.setName(this.properties.determineDatabaseName()).build();
 		return this.database;
 	}

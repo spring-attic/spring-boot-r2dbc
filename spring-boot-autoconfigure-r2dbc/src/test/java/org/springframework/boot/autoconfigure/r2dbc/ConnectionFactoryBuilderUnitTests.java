@@ -82,4 +82,5 @@ public class ConnectionFactoryBuilderUnitTests {
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DATABASE))
 				.isEqualTo("mydb");
 	}
+
 }
