@@ -48,6 +48,7 @@ import org.springframework.util.StringUtils;
 @Configuration
 @ConditionalOnClass(ConnectionFactory.class)
 @EnableConfigurationProperties(R2dbcProperties.class)
+@Import(ConnectionFactoryInitializationConfiguration.class)
 public class ConnectionFactoryAutoConfiguration {
 
 	@Configuration
@@ -70,7 +71,7 @@ public class ConnectionFactoryAutoConfiguration {
 	}
 
 	@Configuration
-	@Conditional(GenericDataSourceCondition.class)
+	@Conditional(GenericConnectionFactoryCondition.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
 	@Import(ConnectionFactoryConfiguration.Generic.class)
 	@ConditionalOnProperty("spring.r2dbc.url")
@@ -98,9 +99,9 @@ public class ConnectionFactoryAutoConfiguration {
 	 * {@link AnyNestedCondition} that checks that either {@code io.r2dbc.pool.ConnectionPool}
 	 * is not on the class path or the URL defines connection pooling.
 	 */
-	static class GenericDataSourceCondition extends AnyNestedCondition {
+	static class GenericConnectionFactoryCondition extends AnyNestedCondition {
 
-		GenericDataSourceCondition() {
+		GenericConnectionFactoryCondition() {
 			super(ConfigurationPhase.PARSE_CONFIGURATION);
 		}
 

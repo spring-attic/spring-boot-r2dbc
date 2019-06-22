@@ -16,6 +16,8 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import io.r2dbc.spi.ConnectionFactory;
+
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -112,13 +114,23 @@ public enum EmbeddedDatabaseConnection {
 	}
 
 	/**
+	 * Convenience method to determine if a given {@link ConnectionFactory} represents an embedded database type.
+	 *
+	 * @param connectionFactory the ConnectionFactory
+	 * @return true if the connectionFactory is one of the embedded types
+	 */
+	public static boolean isEmbedded(ConnectionFactory connectionFactory) {
+		return isEmbedded(connectionFactory.getMetadata().getName());
+	}
+
+	/**
 	 * Convenience method to determine if a given driver name represents an embedded database type.
 	 *
 	 * @param driver the driver name
 	 * @return true if the driver name is one of the embedded types
 	 */
 	public static boolean isEmbedded(String driver) {
-		return driver != null && (driver.equals(H2.driver));
+		return driver != null && (driver.equalsIgnoreCase(H2.driver));
 	}
 
 }

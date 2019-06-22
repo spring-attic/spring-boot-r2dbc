@@ -81,7 +81,8 @@ public class ConnectionFactoryAutoConfigurationTests {
 	@Test
 	public void testDefaultGenericConnectionFactoryExists() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-"
-				+ new Random().nextInt())
+				+ new Random()
+				.nextInt() + "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
 				.withClassLoader(new FilteredClassLoader("io.r2dbc.pool"))
 				.run((context) -> {
 					assertThat(context)

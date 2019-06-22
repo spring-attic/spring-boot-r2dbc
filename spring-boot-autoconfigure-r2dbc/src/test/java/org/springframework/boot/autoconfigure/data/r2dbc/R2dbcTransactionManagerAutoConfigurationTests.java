@@ -16,15 +16,12 @@
 
 package org.springframework.boot.autoconfigure.data.r2dbc;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
+import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.transaction.reactive.ReactiveTransactionAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -36,6 +33,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link R2dbcTransactionManager}.
@@ -109,7 +110,7 @@ public class R2dbcTransactionManagerAutoConfigurationTests {
 
 		@Override
 		public Mono<Boolean> isTransactionActive() {
-			return TransactionSynchronizationManager.currentTransaction()
+			return TransactionSynchronizationManager.forCurrentTransaction()
 					.map(TransactionSynchronizationManager::isActualTransactionActive);
 		}
 

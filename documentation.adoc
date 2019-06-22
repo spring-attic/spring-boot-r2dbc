@@ -160,3 +160,41 @@ The following example shows how to define a data source in a bean:
 		return new FancyConnectionFactory();
 	}
 ----
+
+
+[[howto-database-initialization]]
+== Database Initialization
+An SQL database can be initialized in different ways depending on what your stack is.
+Of course, you can also do it manually, provided the database is a separate process.
+It is recommended to use a single mechanism for schema generation.
+
+
+[[howto-initialize-a-database-using-spring-data-r2dbc]]
+=== Initialize a Database using R2DBC
+Spring Boot can automatically create the schema (DDL scripts) of your `ConnectionFactory` and
+initialize it (DML scripts). It loads SQL from the standard root classpath locations:
+`schema.sql` and `data.sql`, respectively. In addition, Spring Boot processes the
+`schema-${platform}.sql` and `data-${platform}.sql` files (if present), where `platform`
+is the value of `spring.r2dbc.platform`. This allows you to switch to
+database-specific scripts if necessary. For example, you might choose to set it to the
+vendor name of the database ( `h2`, `mysql`, `postgresql`, and so on).
+
+[NOTE]
+====
+Spring Boot automatically creates the schema of an embedded `ConnectionFactory`. This
+behaviour can be customized by using the `spring.r2dbc.initialization-mode` property.
+For instance, if you want to always initialize the `ConnectionFactory` regardless of its type:
+
+[indent=0,subs="verbatim,quotes,attributes"]
+----
+	spring.r2dbc.initialization-mode=always
+----
+====
+
+By default, Spring Boot enables the fail-fast feature of the Spring Data R2DBC initializer.
+This means that, if the scripts cause exceptions, the application fails to start.
+You can tune that behavior by setting `spring.r2dbc.continue-on-error`.
+
+NOTE: Using embedded database auto-configuration for JDBC and R2DBC lets the R2DBC
+database initialization to back off to prevent double initialization as both database
+technologies point to the same database.
