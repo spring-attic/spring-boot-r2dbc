@@ -186,7 +186,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		String url = (databaseName != null) ? this.embeddedDatabaseConnection
 				.getUrl(databaseName) : null;
 		if (!StringUtils.hasText(url)) {
-			throw new DataSourceBeanCreationException("Failed to determine suitable R2DBC url", this,
+			throw new ConnectionFactoryBeanCreationException("Failed to determine a suitable R2DBC Connection URL", this,
 					this.embeddedDatabaseConnection);
 		}
 		return url;
@@ -462,6 +462,28 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		public void setValidationQuery(String validationQuery) {
 			this.validationQuery = validationQuery;
 		}
+
+	}
+
+	static class ConnectionFactoryBeanCreationException extends BeanCreationException {
+
+		private final R2dbcProperties properties;
+		private final EmbeddedDatabaseConnection embeddedDatabaseConnection;
+
+		ConnectionFactoryBeanCreationException(String message, R2dbcProperties properties, EmbeddedDatabaseConnection embeddedDatabaseConnection) {
+			super(message);
+			this.properties = properties;
+			this.embeddedDatabaseConnection = embeddedDatabaseConnection;
+		}
+
+		EmbeddedDatabaseConnection getEmbeddedDatabaseConnection() {
+			return embeddedDatabaseConnection;
+		}
+
+		R2dbcProperties getProperties() {
+			return this.properties;
+		}
+
 	}
 
 }
