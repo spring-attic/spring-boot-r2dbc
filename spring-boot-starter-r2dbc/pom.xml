@@ -5,7 +5,7 @@
 		<groupId>org.springframework.boot.experimental</groupId>
 		<artifactId>spring-boot-r2dbc-build</artifactId>
 		<version>0.1.0.BUILD-SNAPSHOT</version>
-		<relativePath>..</relativePath>
+		<relativePath>../spring-boot-r2dbc-build</relativePath>
 	</parent>
 	<artifactId>spring-boot-starter-r2dbc</artifactId>
 	<name>Spring Boot R2DBC Starter</name>
