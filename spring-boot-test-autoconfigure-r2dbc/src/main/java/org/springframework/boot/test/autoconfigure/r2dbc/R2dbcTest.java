@@ -1,0 +1,111 @@
+/*
+ * Copyright 2012-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.boot.test.autoconfigure.r2dbc;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
+import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.AliasFor;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.BootstrapWith;
+
+/**
+ * Annotation that can be used in combination with {@code @RunWith(SpringRunner.class)}
+ * for a typical R2DBC test. Can be used when a test focuses <strong>only</strong> on
+ * R2DBC-based components.
+ * <p>
+ * Using this annotation will disable full auto-configuration and instead apply only
+ * configuration relevant to R2DBC tests.
+ * <p>
+ * By default, tests annotated with {@code @R2dbcTest} will use an embedded in-memory
+ * database (replacing any explicit or usually auto-configured ConnectionFactory). The
+ * {@link AutoConfigureTestDatabase @AutoConfigureTestDatabase} annotation can be used to
+ * override these settings.
+ * <p>
+ * If you are looking to load your full application configuration, but use an embedded
+ * database, you should consider {@link SpringBootTest @SpringBootTest} combined with
+ * {@link AutoConfigureTestDatabase @AutoConfigureTestDatabase} rather than this
+ * annotation.
+ *
+ * @author Mark Paluch
+ * @see AutoConfigureR2dbc
+ * @see AutoConfigureTestDatabase
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@BootstrapWith(R2dbcTestContextBootstrapper.class)
+@OverrideAutoConfiguration(enabled = false)
+@TypeExcludeFilters(R2dbcTypeExcludeFilter.class)
+@AutoConfigureCache
+@AutoConfigureR2dbc
+@AutoConfigureTestDatabase
+@ImportAutoConfiguration
+public @interface R2dbcTest {
+
+	/**
+	 * Properties in form {@literal key=value} that should be added to the Spring
+	 * {@link Environment} before the test runs.
+	 * @return the properties to add
+	 */
+	String[] properties() default {};
+
+	/**
+	 * Determines if default filtering should be used with
+	 * {@link SpringBootApplication @SpringBootApplication}. By default no beans are
+	 * included.
+	 * @see #includeFilters()
+	 * @see #excludeFilters()
+	 * @return if default filters should be used
+	 */
+	boolean useDefaultFilters() default true;
+
+	/**
+	 * A set of include filters which can be used to add otherwise filtered beans to the
+	 * application context.
+	 * @return include filters to apply
+	 */
+	ComponentScan.Filter[] includeFilters() default {};
+
+	/**
+	 * A set of exclude filters which can be used to filter beans that would otherwise be
+	 * added to the application context.
+	 * @return exclude filters to apply
+	 */
+	ComponentScan.Filter[] excludeFilters() default {};
+
+	/**
+	 * Auto-configuration exclusions that should be applied for this test.
+	 * @return auto-configuration exclusions to apply
+	 */
+	@AliasFor(annotation = ImportAutoConfiguration.class, attribute = "exclude")
+	Class<?>[] excludeAutoConfiguration() default {};
+
+}

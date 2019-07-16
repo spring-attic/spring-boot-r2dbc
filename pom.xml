@@ -27,6 +27,7 @@
 		<module>spring-boot-autoconfigure-r2dbc</module>
 		<module>spring-boot-actuator-r2dbc</module>
 		<module>spring-boot-actuator-autoconfigure-r2dbc</module>
+		<module>spring-boot-test-autoconfigure-r2dbc</module>
 		<module>spring-boot-starter-r2dbc</module>
 		<module>spring-boot-starter-r2dbc-h2</module>
 		<module>spring-boot-starter-data-r2dbc</module>
