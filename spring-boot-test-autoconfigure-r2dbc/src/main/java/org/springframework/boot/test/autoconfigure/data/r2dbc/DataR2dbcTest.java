@@ -27,7 +27,6 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.core.env.Environment;
@@ -51,7 +50,6 @@ import org.springframework.test.context.BootstrapWith;
 @OverrideAutoConfiguration(enabled = false)
 @TypeExcludeFilters(DataR2dbcTypeExcludeFilter.class)
 @AutoConfigureDataR2dbc
-@AutoConfigureTestDatabase
 @ImportAutoConfiguration
 public @interface DataR2dbcTest {
 

@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 @RunWith(SpringRunner.class)
 @R2dbcTest
-@TestPropertySource(properties = "spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql")
+@TestPropertySource(properties = {"spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql", "spring.r2dbc.initialization-mode=always"})
 public class R2dbcTestIntegrationTests {
 
 	@Autowired

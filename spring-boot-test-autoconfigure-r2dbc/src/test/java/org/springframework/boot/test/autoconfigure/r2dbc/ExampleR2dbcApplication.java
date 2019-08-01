@@ -16,14 +16,7 @@
 
 package org.springframework.boot.test.autoconfigure.r2dbc;
 
-import io.r2dbc.spi.Connection;
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryMetadata;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 /**
  * Example {@link SpringBootApplication} used with {@link R2dbcTest} tests.
@@ -33,20 +26,4 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class ExampleR2dbcApplication {
 
-	@Bean
-	public ConnectionFactory connectionFactory() {
-
-		return new ConnectionFactory() {
-
-			@Override
-			public Publisher<? extends Connection> create() {
-				return Mono.error(new UnsupportedOperationException());
-			}
-
-			@Override
-			public ConnectionFactoryMetadata getMetadata() {
-				return () -> "Custom";
-			}
-		};
-	}
 }

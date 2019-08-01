@@ -14,8 +14,3 @@ org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration,\
 org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration,\
 org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration,\
 org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration
-
-# AutoConfigureTestDatabase auto-configuration imports
-org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase=\
-org.springframework.boot.test.autoconfigure.r2dbc.R2dbcTestDatabaseAutoConfiguration,\
-org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration
