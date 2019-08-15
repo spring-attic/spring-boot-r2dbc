@@ -42,7 +42,7 @@ public class CityController {
 		return this.repository.findAll();
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/by-id/{id}")
 	public Mono<City> findCityById(@PathVariable long id) {
 		return this.repository.findById(id);
 	}
