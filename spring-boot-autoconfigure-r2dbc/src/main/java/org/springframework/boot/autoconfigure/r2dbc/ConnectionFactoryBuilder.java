@@ -16,6 +16,8 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import io.r2dbc.spi.ConnectionFactories;
@@ -39,9 +41,9 @@ public final class ConnectionFactoryBuilder {
 		ConnectionFactoryOptions options = ConnectionFactoryOptions
 				.parse(properties.determineUrl());
 		ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder(options.mutate());
-		builder.applyIfNotEmpty(options, ConnectionFactoryOptions.USER, properties::determineUsername);
-		builder.applyIfNotEmpty(options, ConnectionFactoryOptions.PASSWORD, properties::determinePassword);
-		builder.applyIfNotEmpty(options, ConnectionFactoryOptions.DATABASE, properties::determineDatabaseName);
+		builder.applyIf(options, ConnectionFactoryOptions.USER, properties::determineUsername, Objects::nonNull);
+		builder.applyIf(options, ConnectionFactoryOptions.PASSWORD, properties::determinePassword, Objects::nonNull);
+		builder.applyIf(options, ConnectionFactoryOptions.DATABASE, properties::determineDatabaseName, StringUtils::hasText);
 		if (properties.getProperties() != null) {
 			properties.getProperties()
 					.forEach((key, value) -> builder
@@ -58,12 +60,12 @@ public final class ConnectionFactoryBuilder {
 		this.builder = builder;
 	}
 
-	private <T extends CharSequence> void applyIfNotEmpty(ConnectionFactoryOptions options, Option<T> option, Supplier<T> valueSupplier) {
+	private <T extends CharSequence> void applyIf(ConnectionFactoryOptions options, Option<T> option, Supplier<T> valueSupplier, Predicate<T> setIf) {
 		if (options.hasOption(option)) {
 			return;
 		}
 		T value = valueSupplier.get();
-		if (StringUtils.hasText(value)) {
+		if (setIf.test(value)) {
 			builder.option(option, value);
 		}
 	}

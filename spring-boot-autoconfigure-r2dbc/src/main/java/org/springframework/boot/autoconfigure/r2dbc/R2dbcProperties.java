@@ -240,7 +240,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 				.isEmbedded(determineDriverName())) {
 			return "sa";
 		}
-		return null;
+		return this.username;
 	}
 
 	/**
@@ -357,7 +357,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		if (EmbeddedDatabaseConnection.isEmbedded(determineDriverName())) {
 			return "";
 		}
-		return null;
+		return this.password;
 	}
 
 	public Map<String, String> getProperties() {
@@ -376,13 +376,13 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		this.pool = pool;
 	}
 
-	private String determineDriverName() {
-		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {
-			return this.embeddedDatabaseConnection.getType().toLowerCase();
-		}
+	String determineDriverName() {
 		if (StringUtils.hasText(this.url)) {
 			return ConnectionFactoryOptions.parse(this.url)
 					.getRequiredValue(ConnectionFactoryOptions.DRIVER);
+		}
+		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {
+			return this.embeddedDatabaseConnection.getType().toLowerCase();
 		}
 		throw new DataSourceBeanCreationException("Failed to determine a suitable driver", this,
 				this.embeddedDatabaseConnection);
