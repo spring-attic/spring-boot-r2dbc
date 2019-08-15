@@ -25,17 +25,14 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.autoconfigure.jdbc.EmbeddedDataSourceConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.StringUtils;
 
@@ -48,7 +45,6 @@ import org.springframework.util.StringUtils;
 @Configuration
 @ConditionalOnClass({Connection.class, ConnectionFactory.class, EmbeddedDatabaseType.class})
 @EnableConfigurationProperties(R2dbcProperties.class)
-@AutoConfigureAfter(EmbeddedDataSourceConfiguration.class)
 public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 
 	private EmbeddedDatabase database;
@@ -81,16 +77,6 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 		return new EmbeddedDatabaseConnectionInformation(jdbcProperties
 				.determineDatabaseName(), jdbcProperties
 				.determineUsername(), jdbcProperties.determinePassword());
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	public EmbeddedDatabase dataSource(EmbeddedDatabaseConnectionInformation embedded) {
-		String type = EmbeddedDatabaseConnection.get(this.classLoader).getType();
-		this.database = new EmbeddedDatabaseBuilder()
-				.setType(EmbeddedDatabaseType.valueOf(type))
-				.setName(this.properties.determineDatabaseName()).build();
-		return this.database;
 	}
 
 	@Bean

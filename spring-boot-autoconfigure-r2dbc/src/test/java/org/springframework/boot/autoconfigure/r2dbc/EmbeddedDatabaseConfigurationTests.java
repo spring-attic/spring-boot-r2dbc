@@ -16,6 +16,8 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import javax.sql.DataSource;
+
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
 import org.junit.Test;
@@ -47,8 +49,11 @@ public class EmbeddedDatabaseConfigurationTests {
 	public void defaultConnectionFactoryIsUnpooled() {
 		this.contextRunner
 				.run((context) -> {
-					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
-					assertThat(bean).isExactlyInstanceOf(H2ConnectionFactory.class);
+					ConnectionFactory connectionFactory = context
+							.getBean(ConnectionFactory.class);
+					assertThat(connectionFactory)
+							.isExactlyInstanceOf(H2ConnectionFactory.class);
+					assertThat(context).doesNotHaveBean(DataSource.class);
 				});
 	}
 
