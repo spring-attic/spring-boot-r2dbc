@@ -25,6 +25,8 @@ import java.util.UUID;
 
 import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -59,6 +61,18 @@ public class ConnectionFactoryInitializerInvokerTests {
 			.withPropertyValues("spring.r2dbc.initialization-mode=never",
 					"spring.r2dbc.url:r2dbc:h2:mem:///init-" + UUID
 							.randomUUID() + "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE", "spring.datasource.initialization-mode:never");
+
+	@Before
+	public void before() {
+		System.setProperty("h2.delayWrongPasswordMin", "0");
+		System.setProperty("h2.delayWrongPasswordMax", "1");
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		System.clearProperty("h2.delayWrongPasswordMin");
+		System.clearProperty("h2.delayWrongPasswordMax");
+	}
 
 	@Test
 	public void connectionFactoryInitialized() {
