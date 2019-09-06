@@ -59,12 +59,12 @@
 			<dependency>
 				<groupId>com.github.jasync-sql</groupId>
 				<artifactId>jasync-r2dbc-mysql</artifactId>
-				<version>0.9.52</version>
+				<version>1.0.6</version>
 			</dependency>
 			<dependency>
 				<groupId>io.r2dbc</groupId>
 				<artifactId>r2dbc-bom</artifactId>
-				<version>Arabba-M8</version>
+				<version>Arabba-BUILD-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
