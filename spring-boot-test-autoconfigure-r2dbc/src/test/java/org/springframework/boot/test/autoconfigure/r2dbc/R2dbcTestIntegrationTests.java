@@ -59,8 +59,8 @@ class R2dbcTestIntegrationTests {
 
 	@Test
 	void testR2dbcClient() {
-		this.r2dbc.withHandle((h) -> h.createQuery("SELECT * FROM example").mapRow((row) -> row.get(0))).as(StepVerifier::create)
-				.verifyComplete();
+		this.r2dbc.withHandle((h) -> h.createQuery("SELECT * FROM example").mapRow((row) -> row.get(0)))
+				.as(StepVerifier::create).verifyComplete();
 	}
 
 	@Test

@@ -59,7 +59,8 @@ class ConnectionPoolMetricsTests {
 		ConnectionPool connectionPool = new ConnectionPool(
 				ConnectionPoolConfiguration.builder(this.connectionFactory).initialSize(3).maxSize(7).build());
 
-		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool", Tags.of(this.fooTag, this.barTag));
+		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool",
+				Tags.of(this.fooTag, this.barTag));
 		metrics.bindTo(registry);
 		// acquire two connections
 		connectionPool.create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
@@ -75,7 +76,8 @@ class ConnectionPoolMetricsTests {
 	private void assertGauge(SimpleMeterRegistry registry, String metric, int expectedValue) {
 		Gauge gauge = registry.get(metric).gauge();
 		assertThat(gauge.value()).isEqualTo(expectedValue);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), this.fooTag, this.barTag);
+		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), this.fooTag,
+				this.barTag);
 	}
 
 }
