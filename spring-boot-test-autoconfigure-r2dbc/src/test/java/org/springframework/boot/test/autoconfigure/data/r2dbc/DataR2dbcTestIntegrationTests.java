@@ -18,29 +18,26 @@ package org.springframework.boot.test.autoconfigure.data.r2dbc;
 
 import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Integration tests for {@link DataR2dbcTest}.
  *
  * @author Mark Paluch
  */
-@RunWith(SpringRunner.class)
 @DataR2dbcTest
 @TestPropertySource(
 		properties = { "spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql",
 				"spring.r2dbc.initialization-mode=always" })
-public class DataR2dbcTestIntegrationTests {
+class DataR2dbcTestIntegrationTests {
 
 	@Autowired
 	private DatabaseClient databaseClient;
@@ -55,24 +52,24 @@ public class DataR2dbcTestIntegrationTests {
 	private ApplicationContext applicationContext;
 
 	@Test
-	public void testDatabaseClient() {
+	void testDatabaseClient() {
 		databaseClient.execute("SELECT * FROM example").fetch().all().as(StepVerifier::create).verifyComplete();
 	}
 
 	@Test
-	public void testR2dbcClient() {
+	void testR2dbcClient() {
 		r2dbc.withHandle(h -> h.createQuery("SELECT * FROM example").mapRow(row -> row.get(0))).as(StepVerifier::create)
 				.verifyComplete();
 	}
 
 	@Test
-	public void replacesDefinedConnectionFactoryWithEmbeddedDefault() {
+	void replacesDefinedConnectionFactoryWithEmbeddedDefault() {
 		String product = this.connectionFactory.getMetadata().getName();
 		assertThat(product).isEqualTo("H2");
 	}
 
 	@Test
-	public void registersExampleRepository() {
+	void registersExampleRepository() {
 		assertThat(this.applicationContext.getBeanNamesForType(ExampleRepository.class)).isNotEmpty();
 	}
 

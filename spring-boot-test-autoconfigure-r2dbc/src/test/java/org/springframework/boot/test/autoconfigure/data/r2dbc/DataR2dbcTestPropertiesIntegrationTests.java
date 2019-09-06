@@ -16,14 +16,12 @@
 
 package org.springframework.boot.test.autoconfigure.data.r2dbc;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Tests for the {@link DataR2dbcTest#properties properties} attribute of
@@ -31,15 +29,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mark Paluch
  */
-@RunWith(SpringRunner.class)
 @DataR2dbcTest(properties = "spring.profiles.active=test")
-public class DataR2dbcTestPropertiesIntegrationTests {
+class DataR2dbcTestPropertiesIntegrationTests {
 
 	@Autowired
 	private Environment environment;
 
 	@Test
-	public void environmentWithNewProfile() {
+	void environmentWithNewProfile() {
 		assertThat(this.environment.getActiveProfiles()).containsExactly("test");
 	}
 

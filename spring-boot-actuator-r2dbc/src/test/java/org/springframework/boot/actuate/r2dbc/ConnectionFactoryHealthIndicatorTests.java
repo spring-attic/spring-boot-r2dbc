@@ -23,8 +23,8 @@ import io.r2dbc.h2.H2ConnectionConfiguration;
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import org.springframework.boot.actuate.health.Status;
@@ -38,20 +38,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.entry;
  *
  * @author Mark Paluch
  */
-public class ConnectionFactoryHealthIndicatorTests {
+class ConnectionFactoryHealthIndicatorTests {
 
 	private ConnectionFactoryHealthIndicator healthIndicator;
 
 	private ConnectionFactory connectionFactory;
 
-	@Before
-	public void init() {
+	@BeforeEach
+	void init() {
 		connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
 				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1").build());
 	}
 
 	@Test
-	public void healthIndicatorWithDefaultSettings() {
+	void healthIndicatorWithDefaultSettings() {
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory);
 		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.UP);
@@ -61,7 +61,7 @@ public class ConnectionFactoryHealthIndicatorTests {
 	}
 
 	@Test
-	public void healthIndicatorWithCustomValidationQuery() {
+	void healthIndicatorWithCustomValidationQuery() {
 		String customValidationQuery = "SELECT COUNT(*) from FOO";
 		new R2dbc(connectionFactory)
 				.useHandle(h -> h.createQuery("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)")
@@ -76,7 +76,7 @@ public class ConnectionFactoryHealthIndicatorTests {
 	}
 
 	@Test
-	public void healthIndicatorWithInvalidValidationQuery() {
+	void healthIndicatorWithInvalidValidationQuery() {
 		String invalidValidationQuery = "SELECT COUNT(*) from BAR";
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory, invalidValidationQuery);
 		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {

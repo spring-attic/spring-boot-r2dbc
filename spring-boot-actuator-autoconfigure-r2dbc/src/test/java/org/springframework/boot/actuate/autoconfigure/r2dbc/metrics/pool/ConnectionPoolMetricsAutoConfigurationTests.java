@@ -26,7 +26,7 @@ import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -40,14 +40,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Tadaya Tsuyukubo
  */
-public class ConnectionPoolMetricsAutoConfigurationTests {
+class ConnectionPoolMetricsAutoConfigurationTests {
 
 	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(ConnectionPoolMetricsAutoConfiguration.class))
 			.withUserConfiguration(TestConfig.class);
 
 	@Test
-	public void shouldBindConnectionPoolToMeterRegistry() {
+	void shouldBindConnectionPoolToMeterRegistry() {
 		this.contextRunner.run((context) -> {
 			MeterRegistry registry = context.getBean(MeterRegistry.class);
 			assertThat(registry.find("r2dbc.pool.acquired").gauges()).extracting(Meter::getId)

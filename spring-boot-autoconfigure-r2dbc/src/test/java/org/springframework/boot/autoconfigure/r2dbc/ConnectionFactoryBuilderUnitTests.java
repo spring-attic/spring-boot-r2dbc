@@ -17,7 +17,7 @@
 package org.springframework.boot.autoconfigure.r2dbc;
 
 import io.r2dbc.spi.ConnectionFactoryOptions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,10 +27,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mark Paluch
  * @author Tadaya Tsuyukubo
  */
-public class ConnectionFactoryBuilderUnitTests {
+class ConnectionFactoryBuilderUnitTests {
 
 	@Test
-	public void shouldApplyProperties() {
+	void shouldApplyProperties() {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://foo");
 		properties.setUsername("user");
@@ -43,7 +43,7 @@ public class ConnectionFactoryBuilderUnitTests {
 	}
 
 	@Test
-	public void shouldApplyConfiguration() {
+	void shouldApplyConfiguration() {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://foo");
 		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).username("user").password("pass")
@@ -55,7 +55,7 @@ public class ConnectionFactoryBuilderUnitTests {
 	}
 
 	@Test
-	public void shouldApplyFromUrl() {
+	void shouldApplyFromUrl() {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://user:pass@local/mydb");
 		properties.setUsername("someone-else");

@@ -27,11 +27,11 @@ import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Tests for {@link ConnectionPoolMetrics}.
@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Tadaya Tsuyukubo
  * @author Mark Paluch
  */
-public class ConnectionPoolMetricsTests {
+class ConnectionPoolMetricsTests {
 
 	Tag fooTag = Tag.of("foo", "FOO");
 
@@ -47,14 +47,14 @@ public class ConnectionPoolMetricsTests {
 
 	private ConnectionFactory connectionFactory;
 
-	@Before
-	public void init() {
+	@BeforeEach
+	void init() {
 		connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
 				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1").build());
 	}
 
 	@Test
-	public void metrics() {
+	void metrics() {
 		SimpleMeterRegistry registry = new SimpleMeterRegistry();
 		ConnectionPool connectionPool = new ConnectionPool(
 				ConnectionPoolConfiguration.builder(this.connectionFactory).initialSize(3).maxSize(7).build());

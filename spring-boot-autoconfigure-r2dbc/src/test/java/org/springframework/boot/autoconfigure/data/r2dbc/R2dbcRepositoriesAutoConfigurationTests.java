@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import reactor.test.StepVerifier;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
@@ -40,19 +40,19 @@ import org.springframework.data.repository.Repository;
  *
  * @author Mark Paluch
  */
-public class R2dbcRepositoriesAutoConfigurationTests {
+class R2dbcRepositoriesAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(R2dbcRepositoriesAutoConfiguration.class));
 
 	@Test
-	public void backsOffWithNoConnectionFactory() {
+	void backsOffWithNoConnectionFactory() {
 		this.contextRunner.withUserConfiguration(TestConfiguration.class)
 				.run((context) -> assertThat(context).doesNotHaveBean(R2dbcRepositoryConfigurationExtension.class));
 	}
 
 	@Test
-	public void backsOffWithNoDatabaseClientOperations() {
+	void backsOffWithNoDatabaseClientOperations() {
 		this.contextRunner.withUserConfiguration(EmbeddedDatabaseConfiguration.class, TestConfiguration.class)
 				.run((context) -> {
 					assertThat(context).doesNotHaveBean(DatabaseClient.class);
@@ -61,7 +61,7 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 	}
 
 	@Test
-	public void basicAutoConfiguration() {
+	void basicAutoConfiguration() {
 
 		this.contextRunner
 				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
@@ -77,7 +77,7 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 	}
 
 	@Test
-	public void autoConfigurationWithNoRepositories() {
+	void autoConfigurationWithNoRepositories() {
 		this.contextRunner
 				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
 						EmbeddedDatabaseConfiguration.class))
@@ -87,7 +87,7 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 	}
 
 	@Test
-	public void honorsUsersEnableR2dbcRepositoriesConfiguration() {
+	void honorsUsersEnableR2dbcRepositoriesConfiguration() {
 		this.contextRunner
 				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
 						DataSourceAutoConfiguration.class, R2dbcDataAutoConfiguration.class))

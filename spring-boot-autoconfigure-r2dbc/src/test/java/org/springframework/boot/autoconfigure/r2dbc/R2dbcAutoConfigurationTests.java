@@ -17,7 +17,7 @@
 package org.springframework.boot.autoconfigure.r2dbc;
 
 import io.r2dbc.client.R2dbc;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration;
@@ -30,13 +30,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mark Paluch
  */
-public class R2dbcAutoConfigurationTests {
+class R2dbcAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(
 			AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, R2dbcAutoConfiguration.class));
 
 	@Test
-	public void testDefaultConnectionFactoryExists() {
+	void testDefaultConnectionFactoryExists() {
 		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(R2dbc.class));
 	}
 

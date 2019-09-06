@@ -16,7 +16,7 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -33,12 +33,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mark Paluch
  */
-public class ConnectionFactoryBeanCreationFailureAnalyzerTests {
+class ConnectionFactoryBeanCreationFailureAnalyzerTests {
 
 	private final MockEnvironment environment = new MockEnvironment();
 
 	@Test
-	public void failureAnalysisIsPerformed() {
+	void failureAnalysisIsPerformed() {
 		FailureAnalysis failureAnalysis = performAnalysis(TestConfiguration.class);
 		assertThat(failureAnalysis.getDescription()).contains("'url' attribute is not specified",
 				"no embedded datasource could be configured");
@@ -49,7 +49,7 @@ public class ConnectionFactoryBeanCreationFailureAnalyzerTests {
 	}
 
 	@Test
-	public void failureAnalysisIsPerformedWithActiveProfiles() {
+	void failureAnalysisIsPerformedWithActiveProfiles() {
 		this.environment.setActiveProfiles("first", "second");
 		FailureAnalysis failureAnalysis = performAnalysis(TestConfiguration.class);
 		assertThat(failureAnalysis.getAction()).contains("(the profiles first,second are currently active)");

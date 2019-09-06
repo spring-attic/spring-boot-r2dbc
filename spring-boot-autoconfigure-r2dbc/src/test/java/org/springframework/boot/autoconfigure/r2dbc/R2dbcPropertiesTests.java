@@ -16,7 +16,7 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -28,13 +28,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mark Paluch
  */
-public class R2dbcPropertiesTests {
+class R2dbcPropertiesTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(
 			AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, R2dbcAutoConfiguration.class));
 
 	@Test
-	public void shouldReportEmbeddedDatabase() {
+	void shouldReportEmbeddedDatabase() {
 		this.contextRunner.run((context) -> {
 
 			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
@@ -45,7 +45,7 @@ public class R2dbcPropertiesTests {
 	}
 
 	@Test
-	public void shouldReportCustomDriver() {
+	void shouldReportCustomDriver() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url=r2dbc:simple://:pool:").run((context) -> {
 
 			R2dbcProperties properties = context.getBean(R2dbcProperties.class);

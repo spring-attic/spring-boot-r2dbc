@@ -19,7 +19,7 @@ package org.springframework.boot.autoconfigure.r2dbc;
 import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,10 +33,10 @@ import static org.mockito.Mockito.verify;
  *
  * @author Mark Paluch
  */
-public class ConnectionFactoryInitializerTests {
+class ConnectionFactoryInitializerTests {
 
 	@Test
-	public void initializeEmbeddedByDefault() {
+	void initializeEmbeddedByDefault() {
 		ConnectionFactory connectionFactory = createConnectionFactory();
 		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer(connectionFactory,
 				new R2dbcProperties());
@@ -48,7 +48,7 @@ public class ConnectionFactoryInitializerTests {
 	}
 
 	@Test
-	public void initializeWithModeAlways() {
+	void initializeWithModeAlways() {
 		ConnectionFactory connectionFactory = createConnectionFactory();
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setInitializationMode(ConnectionFactoryInitializationMode.ALWAYS);
@@ -66,7 +66,7 @@ public class ConnectionFactoryInitializerTests {
 	}
 
 	@Test
-	public void initializeWithModeNever() {
+	void initializeWithModeNever() {
 		ConnectionFactory connectionFactory = createConnectionFactory();
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setInitializationMode(ConnectionFactoryInitializationMode.NEVER);
@@ -75,7 +75,7 @@ public class ConnectionFactoryInitializerTests {
 	}
 
 	@Test
-	public void initializeOnlyEmbeddedByDefault() {
+	void initializeOnlyEmbeddedByDefault() {
 		ConnectionFactoryMetadata metadata = mock(ConnectionFactoryMetadata.class);
 		given(metadata.getName()).willReturn("MySQL");
 		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);

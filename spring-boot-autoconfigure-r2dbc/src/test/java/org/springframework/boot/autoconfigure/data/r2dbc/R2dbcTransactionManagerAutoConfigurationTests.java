@@ -18,7 +18,7 @@ package org.springframework.boot.autoconfigure.data.r2dbc;
 
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -44,21 +44,21 @@ import static org.mockito.Mockito.when;
  * @author Mark Paluch
  * @author Oliver Drotbohm
  */
-public class R2dbcTransactionManagerAutoConfigurationTests {
+class R2dbcTransactionManagerAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(R2dbcTransactionManagerAutoConfiguration.class,
 					ReactiveTransactionAutoConfiguration.class));
 
 	@Test
-	public void noTransactionManager() {
+	void noTransactionManager() {
 		contextRunner.run(context -> {
 			assertThat(context).doesNotHaveBean(ReactiveTransactionManager.class);
 		});
 	}
 
 	@Test
-	public void singleTransactionManager() {
+	void singleTransactionManager() {
 		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class).run(context -> {
 			assertThat(context).hasSingleBean(TransactionalOperator.class)
 					.hasSingleBean(ReactiveTransactionManager.class);
@@ -66,7 +66,7 @@ public class R2dbcTransactionManagerAutoConfigurationTests {
 	}
 
 	@Test
-	public void transactionManagerEnabled() {
+	void transactionManagerEnabled() {
 		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class, BaseConfiguration.class)
 				.run(context -> {
 					TransactionalService bean = context.getBean(TransactionalService.class);

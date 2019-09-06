@@ -25,7 +25,7 @@ import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Option;
 import io.r2dbc.spi.Wrapped;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -36,14 +36,14 @@ import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Tests for {@link ConnectionFactoryAutoConfiguration}.
  *
  * @author Mark Paluch
  */
-public class ConnectionFactoryAutoConfigurationTests {
+class ConnectionFactoryAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
@@ -54,7 +54,7 @@ public class ConnectionFactoryAutoConfigurationTests {
 			});
 
 	@Test
-	public void testDefaultPooledConnectionFactoryExists() {
+	void testDefaultPooledConnectionFactoryExists() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-" + new Random().nextInt())
 				.run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
@@ -64,7 +64,7 @@ public class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	public void testDefaultPooledUrlConnectionFactoryExists() {
+	void testDefaultPooledUrlConnectionFactoryExists() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:pool:h2:mem:///testdb-" + new Random().nextInt())
 				.run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
@@ -74,7 +74,7 @@ public class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	public void testDefaultGenericConnectionFactoryExists() {
+	void testDefaultGenericConnectionFactoryExists() {
 		this.contextRunner
 				.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-" + new Random().nextInt()
 						+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
@@ -87,14 +87,14 @@ public class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	public void testBadUrl() {
+	void testBadUrl() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:not-going-to-work")
 				.withClassLoader(new DisableEmbeddedDatabaseClassLoader())
 				.run((context) -> assertThat(context).getFailure().isInstanceOf(BeanCreationException.class));
 	}
 
 	@Test
-	public void testUrlConfigurationWithoutSpringJdbc() {
+	void testUrlConfigurationWithoutSpringJdbc() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo")
 				.withClassLoader(new FilteredClassLoader("org.springframework.jdbc", "io.r2dbc.pool"))
 				.run((context) -> {
@@ -105,7 +105,7 @@ public class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	public void testAdditionalOptions() {
+	void testAdditionalOptions() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",
 				"spring.r2dbc.properties.key=value", "spring.r2dbc.pool.initial-size=0").run((context) -> {
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);

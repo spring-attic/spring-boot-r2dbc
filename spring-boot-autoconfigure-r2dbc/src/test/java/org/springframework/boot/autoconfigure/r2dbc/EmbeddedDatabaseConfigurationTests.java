@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -32,18 +32,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mark Paluch
  */
-public class EmbeddedDatabaseConfigurationTests {
+class EmbeddedDatabaseConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class));
 
 	@Test
-	public void testDefaultUnpooledConnectionFactoryExists() {
+	void testDefaultUnpooledConnectionFactoryExists() {
 		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class));
 	}
 
 	@Test
-	public void defaultConnectionFactoryIsUnpooled() {
+	void defaultConnectionFactoryIsUnpooled() {
 		this.contextRunner.run((context) -> {
 			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 			assertThat(connectionFactory).isExactlyInstanceOf(H2ConnectionFactory.class);

@@ -25,9 +25,9 @@ import java.util.UUID;
 
 import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -46,14 +46,14 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.util.ClassUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Tests for {@link ConnectionFactoryInitializerInvoker}.
  *
  * @author Mark Paluch
  */
-public class ConnectionFactoryInitializerInvokerTests {
+class ConnectionFactoryInitializerInvokerTests {
 
 	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
@@ -62,20 +62,20 @@ public class ConnectionFactoryInitializerInvokerTests {
 							+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
 					"spring.datasource.initialization-mode:never");
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		System.setProperty("h2.delayWrongPasswordMin", "0");
 		System.setProperty("h2.delayWrongPasswordMax", "1");
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	void tearDown() throws Exception {
 		System.clearProperty("h2.delayWrongPasswordMin");
 		System.clearProperty("h2.delayWrongPasswordMax");
 	}
 
 	@Test
-	public void connectionFactoryInitialized() {
+	void connectionFactoryInitialized() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always").run((context) -> {
 			assertThat(context).hasSingleBean(ConnectionFactory.class);
 			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
@@ -84,7 +84,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void initializationAppliesToCustomConnectionFactory() {
+	void initializationAppliesToCustomConnectionFactory() {
 		this.contextRunner.withUserConfiguration(OneConnectionFactory.class)
 				.withPropertyValues("spring.r2dbc.initialization-mode:always").run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
@@ -101,7 +101,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void connectionFactoryInitializedWithExplicitScript() {
+	void connectionFactoryInitializedWithExplicitScript() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
 				"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql"),
 				"spring.r2dbc.data:" + getRelativeLocationFor("data.sql")).run((context) -> {
@@ -112,7 +112,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void connectionFactoryInitializedWithMultipleScripts() {
+	void connectionFactoryInitializedWithMultipleScripts() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
 				"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql") + ","
 						+ getRelativeLocationFor("another.sql"),
@@ -125,7 +125,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void connectionFactoryInitializedWithExplicitSqlScriptEncoding() {
+	void connectionFactoryInitializedWithExplicitSqlScriptEncoding() {
 		this.contextRunner
 				.withPropertyValues("spring.r2dbc.initialization-mode:always", "spring.r2dbc.sqlScriptEncoding:UTF-8",
 						"spring.r2dbc.schema:" + getRelativeLocationFor("encoding-schema.sql"),
@@ -145,12 +145,12 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void initializationDisabled() {
+	void initializationDisabled() {
 		this.contextRunner.run(assertInitializationIsDisabled());
 	}
 
 	@Test
-	public void initializationRunsOnceForJdbcAndR2dbcEmbedded() {
+	void initializationRunsOnceForJdbcAndR2dbcEmbedded() {
 		this.contextRunner
 				.withConfiguration(
 						AutoConfigurations.of(EmbeddedDatabaseConfiguration.class, DataSourceAutoConfiguration.class))
@@ -164,7 +164,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void initializationDoesNotApplyWithSeveralConnectionFactorys() {
+	void initializationDoesNotApplyWithSeveralConnectionFactorys() {
 		this.contextRunner.withUserConfiguration(TwoConnectionFactories.class)
 				.withPropertyValues("spring.r2dbc.initialization-mode:always").run((context) -> {
 					assertThat(context.getBeanNamesForType(ConnectionFactory.class)).hasSize(2);
@@ -196,7 +196,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void connectionFactoryInitializedWithSchemaCredentials() {
+	void connectionFactoryInitializedWithSchemaCredentials() {
 		this.contextRunner
 				.withPropertyValues("spring.r2dbc.initialization-mode:always", "spring.r2dbc.sqlScriptEncoding:UTF-8",
 						"spring.r2dbc.schema:" + getRelativeLocationFor("encoding-schema.sql"),
@@ -209,7 +209,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void connectionFactoryInitializedWithDataCredentials() {
+	void connectionFactoryInitializedWithDataCredentials() {
 		this.contextRunner
 				.withPropertyValues("spring.r2dbc.initialization-mode:always", "spring.r2dbc.sqlScriptEncoding:UTF-8",
 						"spring.r2dbc.schema:" + getRelativeLocationFor("encoding-schema.sql"),
@@ -222,7 +222,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void multipleScriptsAppliedInLexicalOrder() {
+	void multipleScriptsAppliedInLexicalOrder() {
 		new ApplicationContextRunner(() -> {
 			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 			context.setResourceLoader(new ReverseOrderResourceLoader(new DefaultResourceLoader()));
@@ -241,7 +241,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void testConnectionFactoryInitializedWithInvalidSchemaResource() {
+	void testConnectionFactoryInitializedWithInvalidSchemaResource() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
 				"spring.r2dbc.schema:classpath:does/not/exist.sql").run((context) -> {
 					assertThat(context).hasFailed();
@@ -252,7 +252,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	public void connectionFactoryInitializedWithInvalidDataResource() {
+	void connectionFactoryInitializedWithInvalidDataResource() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
 				"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql"),
 				"spring.r2dbc.data:classpath:does/not/exist.sql").run((context) -> {
