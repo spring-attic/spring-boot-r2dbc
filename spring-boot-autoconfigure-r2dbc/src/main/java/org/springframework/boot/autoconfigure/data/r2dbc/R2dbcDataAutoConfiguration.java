@@ -59,8 +59,8 @@ public class R2dbcDataAutoConfiguration extends AbstractR2dbcConfiguration {
 	@Override
 	public DatabaseClient databaseClient(ReactiveDataAccessStrategy dataAccessStrategy,
 			R2dbcExceptionTranslator exceptionTranslator) {
-		return DatabaseClient.builder().connectionFactory(this.connectionFactory()).dataAccessStrategy(dataAccessStrategy)
-				.exceptionTranslator(exceptionTranslator).build();
+		return DatabaseClient.builder().connectionFactory(this.connectionFactory())
+				.dataAccessStrategy(dataAccessStrategy).exceptionTranslator(exceptionTranslator).build();
 	}
 
 }

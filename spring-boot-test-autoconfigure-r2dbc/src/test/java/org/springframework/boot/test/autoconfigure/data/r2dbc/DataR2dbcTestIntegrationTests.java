@@ -37,7 +37,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @DataR2dbcTest
-@TestPropertySource(properties = {"spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql", "spring.r2dbc.initialization-mode=always"})
+@TestPropertySource(
+		properties = { "spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql",
+				"spring.r2dbc.initialization-mode=always" })
 public class DataR2dbcTestIntegrationTests {
 
 	@Autowired
@@ -54,15 +56,13 @@ public class DataR2dbcTestIntegrationTests {
 
 	@Test
 	public void testDatabaseClient() {
-		databaseClient.execute("SELECT * FROM example").fetch().all()
-				.as(StepVerifier::create).verifyComplete();
+		databaseClient.execute("SELECT * FROM example").fetch().all().as(StepVerifier::create).verifyComplete();
 	}
 
 	@Test
 	public void testR2dbcClient() {
-		r2dbc.withHandle(h -> h.createQuery("SELECT * FROM example")
-				.mapRow(row -> row.get(0)))
-				.as(StepVerifier::create).verifyComplete();
+		r2dbc.withHandle(h -> h.createQuery("SELECT * FROM example").mapRow(row -> row.get(0))).as(StepVerifier::create)
+				.verifyComplete();
 	}
 
 	@Test
@@ -73,8 +73,7 @@ public class DataR2dbcTestIntegrationTests {
 
 	@Test
 	public void registersExampleRepository() {
-		assertThat(this.applicationContext.getBeanNamesForType(ExampleRepository.class))
-				.isNotEmpty();
+		assertThat(this.applicationContext.getBeanNamesForType(ExampleRepository.class)).isNotEmpty();
 	}
 
 }

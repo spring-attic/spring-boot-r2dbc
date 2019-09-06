@@ -46,5 +46,7 @@ public class ReactiveTransactionAutoConfiguration {
 		public TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
 			return TransactionalOperator.create(transactionManager);
 		}
+
 	}
+
 }

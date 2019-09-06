@@ -35,26 +35,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EmbeddedDatabaseConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionFactoryAutoConfiguration.class));
+			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class));
 
 	@Test
 	public void testDefaultUnpooledConnectionFactoryExists() {
-		this.contextRunner
-				.run((context) -> assertThat(context)
-						.hasSingleBean(ConnectionFactory.class));
+		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class));
 	}
 
 	@Test
 	public void defaultConnectionFactoryIsUnpooled() {
-		this.contextRunner
-				.run((context) -> {
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
-					assertThat(connectionFactory)
-							.isExactlyInstanceOf(H2ConnectionFactory.class);
-					assertThat(context).doesNotHaveBean(DataSource.class);
-				});
+		this.contextRunner.run((context) -> {
+			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+			assertThat(connectionFactory).isExactlyInstanceOf(H2ConnectionFactory.class);
+			assertThat(context).doesNotHaveBean(DataSource.class);
+		});
 	}
 
 }

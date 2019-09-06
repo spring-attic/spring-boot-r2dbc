@@ -39,15 +39,14 @@ import org.springframework.context.annotation.Configuration;
  * @author Tadaya Tsuyukubo
  */
 @Configuration(proxyBeanMethods = false)
-@AutoConfigureAfter({MetricsAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class})
-@ConditionalOnClass({ConnectionPool.class, MeterRegistry.class})
-@ConditionalOnBean({ConnectionPool.class, MeterRegistry.class})
+@AutoConfigureAfter({ MetricsAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class })
+@ConditionalOnClass({ ConnectionPool.class, MeterRegistry.class })
+@ConditionalOnBean({ ConnectionPool.class, MeterRegistry.class })
 public class ConnectionPoolMetricsAutoConfiguration {
 
 	@Autowired
 	public void bindConnectionPoolsToRegistry(Map<String, ConnectionPool> pools, MeterRegistry registry) {
-		pools.forEach((beanName, pool) -> new ConnectionPoolMetrics(pool, beanName, Tags
-				.empty()).bindTo(registry));
+		pools.forEach((beanName, pool) -> new ConnectionPoolMetrics(pool, beanName, Tags.empty()).bindTo(registry));
 	}
 
 }

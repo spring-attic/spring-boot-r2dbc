@@ -30,14 +30,13 @@ import org.springframework.core.type.AnnotationMetadata;
  * @author Mark Paluch
  */
 @Configuration(proxyBeanMethods = false)
-@Import({ConnectionFactoryInitializerInvoker.class,
-		ConnectionFactoryInitializationConfiguration.Registrar.class})
+@Import({ ConnectionFactoryInitializerInvoker.class, ConnectionFactoryInitializationConfiguration.Registrar.class })
 class ConnectionFactoryInitializationConfiguration {
 
 	/**
 	 * {@link ImportBeanDefinitionRegistrar} to register the
-	 * {@link ConnectionFactoryInitializerPostProcessor} without causing early bean instantiation
-	 * issues.
+	 * {@link ConnectionFactoryInitializerPostProcessor} without causing early bean
+	 * instantiation issues.
 	 */
 	static class Registrar implements ImportBeanDefinitionRegistrar {
 
@@ -48,8 +47,7 @@ class ConnectionFactoryInitializationConfiguration {
 				BeanDefinitionRegistry registry) {
 			if (!registry.containsBeanDefinition(BEAN_NAME)) {
 				GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-				beanDefinition
-						.setBeanClass(ConnectionFactoryInitializerPostProcessor.class);
+				beanDefinition.setBeanClass(ConnectionFactoryInitializerPostProcessor.class);
 				beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				// We don't need this one to be post processed otherwise it can cause a
 				// cascade of bean instantiation that we would rather avoid.

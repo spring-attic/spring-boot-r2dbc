@@ -31,9 +31,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Bean to handle {@link ConnectionFactory} initialization by running {@literal schema-*.sql} on
- * {@link InitializingBean#afterPropertiesSet()} and {@literal data-*.sql} SQL scripts on
- * a {@link ConnectionFactorySchemaCreatedEvent}.
+ * Bean to handle {@link ConnectionFactory} initialization by running
+ * {@literal schema-*.sql} on {@link InitializingBean#afterPropertiesSet()} and
+ * {@literal data-*.sql} SQL scripts on a {@link ConnectionFactorySchemaCreatedEvent}.
  *
  * @author Mark Paluch
  * @see ConnectionFactoryAutoConfiguration
@@ -41,8 +41,7 @@ import org.springframework.util.StringUtils;
 class ConnectionFactoryInitializerInvoker
 		implements ApplicationListener<ConnectionFactorySchemaCreatedEvent>, InitializingBean {
 
-	private static final Log logger = LogFactory
-			.getLog(ConnectionFactoryInitializerInvoker.class);
+	private static final Log logger = LogFactory.getLog(ConnectionFactoryInitializerInvoker.class);
 
 	private final ObjectProvider<ConnectionFactory> connectionFactory;
 
@@ -54,8 +53,8 @@ class ConnectionFactoryInitializerInvoker
 
 	private boolean initialized;
 
-	ConnectionFactoryInitializerInvoker(ObjectProvider<ConnectionFactory> connectionFactory,
-			R2dbcProperties properties, ApplicationContext applicationContext) {
+	ConnectionFactoryInitializerInvoker(ObjectProvider<ConnectionFactory> connectionFactory, R2dbcProperties properties,
+			ApplicationContext applicationContext) {
 		this.connectionFactory = connectionFactory;
 		this.properties = properties;
 		this.applicationContext = applicationContext;
@@ -64,7 +63,8 @@ class ConnectionFactoryInitializerInvoker
 	@Override
 	public void afterPropertiesSet() {
 		if (shouldSkip()) {
-			logger.info("Skipping ConnectionFactory initialization because JDBC and R2DBC are configured to initialize the same embedded database");
+			logger.info(
+					"Skipping ConnectionFactory initialization because JDBC and R2DBC are configured to initialize the same embedded database");
 			return;
 		}
 		ConnectionFactoryInitializer initializer = getConnectionFactoryInitializer();
@@ -82,12 +82,11 @@ class ConnectionFactoryInitializerInvoker
 
 	private boolean wouldJdbcAndR2DbcInitializeDatabases() {
 		DataSourceProperties dataSourceProperties = getDataSourceProperties();
-		if (dataSourceProperties == null || dataSourceProperties
-				.getInitializationMode() != DataSourceInitializationMode.EMBEDDED) {
+		if (dataSourceProperties == null
+				|| dataSourceProperties.getInitializationMode() != DataSourceInitializationMode.EMBEDDED) {
 			return false;
 		}
-		if (this.properties
-				.getInitializationMode() != ConnectionFactoryInitializationMode.EMBEDDED) {
+		if (this.properties.getInitializationMode() != ConnectionFactoryInitializationMode.EMBEDDED) {
 			return false;
 		}
 		return true;
@@ -95,28 +94,24 @@ class ConnectionFactoryInitializerInvoker
 
 	@Nullable
 	private DataSourceProperties getDataSourceProperties() {
-		return this.applicationContext
-				.getBeanProvider(DataSourceProperties.class).getIfAvailable();
+		return this.applicationContext.getBeanProvider(DataSourceProperties.class).getIfAvailable();
 	}
 
 	private boolean isR2dbcEmbedded() {
 		if (StringUtils.hasText(this.properties.getUrl())) {
 			return false;
 		}
-		return this.applicationContext
-				.getBeanNamesForType(EmbeddedDatabaseConfiguration.class).length > 0;
+		return this.applicationContext.getBeanNamesForType(EmbeddedDatabaseConfiguration.class).length > 0;
 	}
 
 	private boolean isJdbcEmbedded() {
-		return this.applicationContext
-				.getBeanNamesForType(EmbeddedDatabase.class).length > 0;
+		return this.applicationContext.getBeanNamesForType(EmbeddedDatabase.class).length > 0;
 	}
 
 	private void initialize(ConnectionFactoryInitializer initializer) {
 		try {
-			this.applicationContext.publishEvent(
-					new ConnectionFactorySchemaCreatedEvent(initializer
-							.getConnectionFactory()));
+			this.applicationContext
+					.publishEvent(new ConnectionFactorySchemaCreatedEvent(initializer.getConnectionFactory()));
 			// The listener might not be registered yet, so don't rely on it.
 			if (!this.initialized && !shouldSkip()) {
 				this.connectionFactoryInitializer.initSchema();
@@ -124,8 +119,7 @@ class ConnectionFactoryInitializerInvoker
 			}
 		}
 		catch (IllegalStateException ex) {
-			logger.warn("Could not send event to complete ConnectionFactory initialization ("
-					+ ex.getMessage() + ")");
+			logger.warn("Could not send event to complete ConnectionFactory initialization (" + ex.getMessage() + ")");
 		}
 	}
 
@@ -144,8 +138,8 @@ class ConnectionFactoryInitializerInvoker
 		if (this.connectionFactoryInitializer == null) {
 			ConnectionFactory connectionFactory = this.connectionFactory.getIfUnique();
 			if (connectionFactory != null) {
-				this.connectionFactoryInitializer = new ConnectionFactoryInitializer(connectionFactory,
-						this.properties, this.applicationContext);
+				this.connectionFactoryInitializer = new ConnectionFactoryInitializer(connectionFactory, this.properties,
+						this.applicationContext);
 			}
 		}
 		return this.connectionFactoryInitializer;

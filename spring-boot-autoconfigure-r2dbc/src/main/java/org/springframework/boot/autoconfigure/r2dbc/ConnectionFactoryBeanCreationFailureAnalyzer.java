@@ -31,8 +31,8 @@ import static org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties.Conne
  *
  * @author Mark Paluch
  */
-class ConnectionFactoryBeanCreationFailureAnalyzer extends AbstractFailureAnalyzer<ConnectionFactoryBeanCreationException>
-		implements EnvironmentAware {
+class ConnectionFactoryBeanCreationFailureAnalyzer
+		extends AbstractFailureAnalyzer<ConnectionFactoryBeanCreationException> implements EnvironmentAware {
 
 	private Environment environment;
 
@@ -58,8 +58,7 @@ class ConnectionFactoryBeanCreationFailureAnalyzer extends AbstractFailureAnalyz
 		if (!StringUtils.hasText(cause.getProperties().getUrl())) {
 			description.append("'url' attribute is not specified and ");
 		}
-		description
-				.append(String.format("no embedded datasource could be configured.%n"));
+		description.append(String.format("no embedded datasource could be configured.%n"));
 		description.append(String.format("%nReason: %s%n", cause.getMessage()));
 		return description.toString();
 	}
@@ -72,8 +71,7 @@ class ConnectionFactoryBeanCreationFailureAnalyzer extends AbstractFailureAnalyz
 					"\tIf you want an embedded database (H2), please put it on the classpath along with Spring JDBC.%n"));
 		}
 		else {
-			action.append(String.format("\tReview the configuration of %s%n.", cause
-					.getEmbeddedDatabaseConnection()));
+			action.append(String.format("\tReview the configuration of %s%n.", cause.getEmbeddedDatabaseConnection()));
 		}
 		action.append("\tIf you have database settings to be loaded from a particular "
 				+ "profile you may need to activate it").append(getActiveProfiles());

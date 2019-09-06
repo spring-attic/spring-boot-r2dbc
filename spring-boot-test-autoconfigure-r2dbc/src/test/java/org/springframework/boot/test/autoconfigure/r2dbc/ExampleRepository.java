@@ -24,4 +24,5 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
  * @author Mark Paluch
  */
 public interface ExampleRepository extends ReactiveCrudRepository<Example, String> {
+
 }

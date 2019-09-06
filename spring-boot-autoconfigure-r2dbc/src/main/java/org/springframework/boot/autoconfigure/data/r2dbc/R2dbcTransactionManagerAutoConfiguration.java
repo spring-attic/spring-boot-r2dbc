@@ -51,5 +51,7 @@ public class R2dbcTransactionManagerAutoConfiguration {
 		public R2dbcTransactionManager connectionFactoryTransactionManager(ConnectionFactory connectionFactory) {
 			return new R2dbcTransactionManager(connectionFactory);
 		}
+
 	}
+
 }

@@ -45,14 +45,12 @@ class ConnectionFactoryInitializerPostProcessor implements BeanPostProcessor, Or
 	}
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName)
-			throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName)
-			throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof DataSource) {
 			// force initialization of this bean as soon as we see a DataSource
 			this.beanFactory.getBean(ConnectionFactoryInitializerInvoker.class);

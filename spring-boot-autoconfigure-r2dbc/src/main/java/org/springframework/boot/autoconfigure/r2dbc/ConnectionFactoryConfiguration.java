@@ -39,13 +39,10 @@ public class ConnectionFactoryConfiguration {
 
 		@Bean(destroyMethod = "dispose")
 		ConnectionPool connectionFactory(R2dbcProperties properties) {
-			ConnectionFactory connectionFactory = ConnectionFactoryBuilder
-					.create(properties).build();
+			ConnectionFactory connectionFactory = ConnectionFactoryBuilder.create(properties).build();
 			R2dbcProperties.Pool pool = properties.getPool();
-			ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration
-					.builder(connectionFactory).maxSize(pool.getMaxSize())
-					.initialSize(pool.getInitialSize())
-					.maxIdleTime(pool.getMaxIdleTime());
+			ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory)
+					.maxSize(pool.getMaxSize()).initialSize(pool.getInitialSize()).maxIdleTime(pool.getMaxIdleTime());
 			if (StringUtils.hasText(pool.getValidationQuery())) {
 				builder.validationQuery(pool.getValidationQuery());
 			}

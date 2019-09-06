@@ -16,7 +16,6 @@
 
 package org.springframework.boot.actuate.r2dbc;
 
-
 import java.util.Random;
 
 import io.r2dbc.client.R2dbc;
@@ -48,8 +47,7 @@ public class ConnectionFactoryHealthIndicatorTests {
 	@Before
 	public void init() {
 		connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
-				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1")
-				.build());
+				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1").build());
 	}
 
 	@Test
@@ -57,8 +55,7 @@ public class ConnectionFactoryHealthIndicatorTests {
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory);
 		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.UP);
-			assertThat(actual.getDetails()).containsOnly(
-					entry("database", "H2"), entry("result", 1),
+			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("result", 1),
 					entry("validationQuery", DatabaseDriver.H2.getValidationQuery()));
 		}).verifyComplete();
 	}
@@ -66,15 +63,14 @@ public class ConnectionFactoryHealthIndicatorTests {
 	@Test
 	public void healthIndicatorWithCustomValidationQuery() {
 		String customValidationQuery = "SELECT COUNT(*) from FOO";
-		new R2dbc(connectionFactory).useHandle(h -> h
-				.createQuery("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)")
-				.mapResult(Result::getRowsUpdated)).as(StepVerifier::create)
-				.expectNextCount(0).verifyComplete();
+		new R2dbc(connectionFactory)
+				.useHandle(h -> h.createQuery("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)")
+						.mapResult(Result::getRowsUpdated))
+				.as(StepVerifier::create).expectNextCount(0).verifyComplete();
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory, customValidationQuery);
 		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.UP);
-			assertThat(actual.getDetails()).containsOnly(
-					entry("database", "H2"), entry("result", 0L),
+			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("result", 0L),
 					entry("validationQuery", customValidationQuery));
 		}).verifyComplete();
 	}
@@ -85,10 +81,10 @@ public class ConnectionFactoryHealthIndicatorTests {
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory, invalidValidationQuery);
 		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.DOWN);
-			assertThat(actual.getDetails()).contains(
-					entry("database", "H2"), entry("validationQuery", invalidValidationQuery));
-			assertThat(actual.getDetails()).containsOnlyKeys("database", "error",
-					"validationQuery");
+			assertThat(actual.getDetails()).contains(entry("database", "H2"),
+					entry("validationQuery", invalidValidationQuery));
+			assertThat(actual.getDetails()).containsOnlyKeys("database", "error", "validationQuery");
 		}).verifyComplete();
 	}
+
 }

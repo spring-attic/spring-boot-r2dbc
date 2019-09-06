@@ -18,7 +18,6 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<revision>0.1.0.BUILD-SNAPSHOT</revision>
-		<disable.checks>false</disable.checks>
 	</properties>
 
 	<modules>
@@ -41,39 +40,5 @@
 		<url>http://github.com/spring-projects-experimental/spring-boot-r2dbc</url>
 	  <tag>HEAD</tag>
   </scm>
-
-	<profiles>
-		<profile>
-			<id>default</id>
-			<activation>
-				<property>
-					<name>!disable-spring-boot-default-profile</name>
-				</property>
-			</activation>
-			<properties>
-				<spring-javaformat.version>0.0.6</spring-javaformat.version>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>io.spring.javaformat</groupId>
-						<artifactId>spring-javaformat-maven-plugin</artifactId>
-						<version>${spring-javaformat.version}</version>
-						<executions>
-							<execution>
-								<phase>validate</phase>
-								<configuration>
-									<skip>${disable.checks}</skip>
-								</configuration>
-								<goals>
-									<goal>validate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>

@@ -45,8 +45,7 @@ import org.springframework.util.StringUtils;
  */
 class ConnectionFactoryInitializer {
 
-	private static final Log logger = LogFactory
-			.getLog(ConnectionFactoryInitializer.class);
+	private static final Log logger = LogFactory.getLog(ConnectionFactoryInitializer.class);
 
 	private final ConnectionFactory connectionFactory;
 
@@ -65,13 +64,12 @@ class ConnectionFactoryInitializer {
 			ResourceLoader resourceLoader) {
 		this.connectionFactory = connectionFactory;
 		this.properties = properties;
-		this.resourceLoader = (resourceLoader != null) ? resourceLoader
-				: new DefaultResourceLoader();
+		this.resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader();
 	}
 
 	/**
-	 * Create a new instance with the {@link ConnectionFactory} to initialize and its matching
-	 * {@link R2dbcProperties configuration}.
+	 * Create a new instance with the {@link ConnectionFactory} to initialize and its
+	 * matching {@link R2dbcProperties configuration}.
 	 * @param connectionFactory the connectionfactory to initialize
 	 * @param properties the matching configuration
 	 */
@@ -89,8 +87,7 @@ class ConnectionFactoryInitializer {
 	 * @see R2dbcProperties#getSchema()
 	 */
 	public boolean createSchema() {
-		List<Resource> scripts = getScripts("spring.r2dbc.schema",
-				this.properties.getSchema(), "schema");
+		List<Resource> scripts = getScripts("spring.r2dbc.schema", this.properties.getSchema(), "schema");
 		if (!scripts.isEmpty()) {
 			if (!isEnabled()) {
 				logger.debug("Initialization disabled (not running DDL scripts)");
@@ -108,8 +105,7 @@ class ConnectionFactoryInitializer {
 	 * @see R2dbcProperties#getData()
 	 */
 	public void initSchema() {
-		List<Resource> scripts = getScripts("spring.r2dbc.data",
-				this.properties.getData(), "data");
+		List<Resource> scripts = getScripts("spring.r2dbc.data", this.properties.getData(), "data");
 		if (!scripts.isEmpty()) {
 			if (!isEnabled()) {
 				logger.debug("Initialization disabled (not running data scripts)");
@@ -122,8 +118,7 @@ class ConnectionFactoryInitializer {
 	}
 
 	private boolean isEnabled() {
-		ConnectionFactoryInitializationMode mode = this.properties
-				.getInitializationMode();
+		ConnectionFactoryInitializationMode mode = this.properties.getInitializationMode();
 		if (mode == ConnectionFactoryInitializationMode.NEVER) {
 			return false;
 		}
@@ -143,8 +138,7 @@ class ConnectionFactoryInitializer {
 		}
 	}
 
-	private List<Resource> getScripts(String propertyName, List<String> resources,
-			String fallback) {
+	private List<Resource> getScripts(String propertyName, List<String> resources, String fallback) {
 		if (resources != null) {
 			return getResources(propertyName, resources, true);
 		}
@@ -155,8 +149,7 @@ class ConnectionFactoryInitializer {
 		return getResources(propertyName, fallbackResources, false);
 	}
 
-	private List<Resource> getResources(String propertyName, List<String> locations,
-			boolean validate) {
+	private List<Resource> getResources(String propertyName, List<String> locations, boolean validate) {
 		List<Resource> resources = new ArrayList<>();
 		for (String location : locations) {
 			for (Resource resource : doGetResources(location)) {
@@ -164,8 +157,8 @@ class ConnectionFactoryInitializer {
 					resources.add(resource);
 				}
 				else if (validate) {
-					throw new InvalidConfigurationPropertyValueException(propertyName,
-							resource, "The specified resource does not exist.");
+					throw new InvalidConfigurationPropertyValueException(propertyName, resource,
+							"The specified resource does not exist.");
 				}
 			}
 		}
@@ -177,8 +170,7 @@ class ConnectionFactoryInitializer {
 
 			ResourcePatternResolver resourcePatternResolver = ResourcePatternUtils
 					.getResourcePatternResolver(this.resourceLoader);
-			List<Resource> resources = new ArrayList<>(
-					Arrays.asList(resourcePatternResolver.getResources(location)));
+			List<Resource> resources = new ArrayList<>(Arrays.asList(resourcePatternResolver.getResources(location)));
 			resources.sort((r1, r2) -> {
 				try {
 					return r1.getURL().toString().compareTo(r2.getURL().toString());
@@ -190,8 +182,7 @@ class ConnectionFactoryInitializer {
 			return resources.toArray(new Resource[0]);
 		}
 		catch (Exception ex) {
-			throw new IllegalStateException("Unable to load resources from " + location,
-					ex);
+			throw new IllegalStateException("Unable to load resources from " + location, ex);
 		}
 	}
 
@@ -210,9 +201,8 @@ class ConnectionFactoryInitializer {
 		}
 		ConnectionFactory connectionFactory = this.connectionFactory;
 		if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-			connectionFactory = ConnectionFactoryBuilder.create(this.properties)
-					.username(username)
-					.password(password).build();
+			connectionFactory = ConnectionFactoryBuilder.create(this.properties).username(username).password(password)
+					.build();
 		}
 
 		// NOTE: We're blocking here

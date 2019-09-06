@@ -139,8 +139,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() {
-		this.embeddedDatabaseConnection = EmbeddedDatabaseConnection
-				.get(this.classLoader);
+		this.embeddedDatabaseConnection = EmbeddedDatabaseConnection.get(this.classLoader);
 	}
 
 	public String getName() {
@@ -161,7 +160,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	/**
 	 * Return the configured url or {@code null} if none was configured.
-	 *
 	 * @return the configured url
 	 * @see #determineUrl()
 	 */
@@ -175,7 +173,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	/**
 	 * Determine the url to use based on this configuration and the environment.
-	 *
 	 * @return the url to use
 	 */
 	public String determineUrl() {
@@ -183,18 +180,16 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 			return this.url;
 		}
 		String databaseName = determineDatabaseName();
-		String url = (databaseName != null) ? this.embeddedDatabaseConnection
-				.getUrl(databaseName) : null;
+		String url = (databaseName != null) ? this.embeddedDatabaseConnection.getUrl(databaseName) : null;
 		if (!StringUtils.hasText(url)) {
-			throw new ConnectionFactoryBeanCreationException("Failed to determine a suitable R2DBC Connection URL", this,
-					this.embeddedDatabaseConnection);
+			throw new ConnectionFactoryBeanCreationException("Failed to determine a suitable R2DBC Connection URL",
+					this, this.embeddedDatabaseConnection);
 		}
 		return url;
 	}
 
 	/**
 	 * Determine the name to used based on this configuration.
-	 *
 	 * @return the database name to use or {@code null}
 	 */
 	public String determineDatabaseName() {
@@ -215,7 +210,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	/**
 	 * Return the configured username or {@code null} if none was configured.
-	 *
 	 * @return the configured username
 	 * @see #determineUsername()
 	 */
@@ -229,15 +223,13 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	/**
 	 * Determine the username to use based on this configuration and the environment.
-	 *
 	 * @return the username to use
 	 */
 	public String determineUsername() {
 		if (StringUtils.hasText(this.username)) {
 			return this.username;
 		}
-		if (EmbeddedDatabaseConnection
-				.isEmbedded(determineDriverName())) {
+		if (EmbeddedDatabaseConnection.isEmbedded(determineDriverName())) {
 			return "sa";
 		}
 		return this.username;
@@ -245,7 +237,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	/**
 	 * Return the configured password or {@code null} if none was configured.
-	 *
 	 * @return the configured password
 	 * @see #determinePassword()
 	 */
@@ -347,7 +338,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	/**
 	 * Determine the password to use based on this configuration and the environment.
-	 *
 	 * @return the password to use
 	 */
 	public String determinePassword() {
@@ -378,8 +368,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	String determineDriverName() {
 		if (StringUtils.hasText(this.url)) {
-			return ConnectionFactoryOptions.parse(this.url)
-					.getRequiredValue(ConnectionFactoryOptions.DRIVER);
+			return ConnectionFactoryOptions.parse(this.url).getRequiredValue(ConnectionFactoryOptions.DRIVER);
 		}
 		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {
 			return this.embeddedDatabaseConnection.getType().toLowerCase();
@@ -394,7 +383,8 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 		private final EmbeddedDatabaseConnection connection;
 
-		DataSourceBeanCreationException(String message, R2dbcProperties properties, EmbeddedDatabaseConnection connection) {
+		DataSourceBeanCreationException(String message, R2dbcProperties properties,
+				EmbeddedDatabaseConnection connection) {
 			super(message);
 			this.properties = properties;
 			this.connection = connection;
@@ -407,6 +397,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		public EmbeddedDatabaseConnection getConnection() {
 			return this.connection;
 		}
+
 	}
 
 	static class Pool {
@@ -468,9 +459,11 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 	static class ConnectionFactoryBeanCreationException extends BeanCreationException {
 
 		private final R2dbcProperties properties;
+
 		private final EmbeddedDatabaseConnection embeddedDatabaseConnection;
 
-		ConnectionFactoryBeanCreationException(String message, R2dbcProperties properties, EmbeddedDatabaseConnection embeddedDatabaseConnection) {
+		ConnectionFactoryBeanCreationException(String message, R2dbcProperties properties,
+				EmbeddedDatabaseConnection embeddedDatabaseConnection) {
 			super(message);
 			this.properties = properties;
 			this.embeddedDatabaseConnection = embeddedDatabaseConnection;

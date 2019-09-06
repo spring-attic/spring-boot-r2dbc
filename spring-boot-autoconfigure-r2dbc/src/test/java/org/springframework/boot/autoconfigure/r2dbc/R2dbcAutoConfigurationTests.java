@@ -32,15 +32,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class R2dbcAutoConfigurationTests {
 
-	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionFactoryAutoConfiguration.class, R2dbcAutoConfiguration.class));
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(
+			AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, R2dbcAutoConfiguration.class));
 
 	@Test
 	public void testDefaultConnectionFactoryExists() {
-		this.contextRunner
-				.run((context) -> assertThat(context)
-						.hasSingleBean(R2dbc.class));
+		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(R2dbc.class));
 	}
 
 }

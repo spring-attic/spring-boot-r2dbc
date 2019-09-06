@@ -75,26 +75,22 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 			return result.map(it -> {
 				builder.withDetail("result", it);
 				return builder.build();
-			}).defaultIfEmpty(builder.build())
-					.onErrorResume(Exception.class, (e) -> Mono
-							.just(builder.down(e).build()));
+			}).defaultIfEmpty(builder.build()).onErrorResume(Exception.class,
+					(e) -> Mono.just(builder.down(e).build()));
 		}
 		return Mono.just(builder.build());
 	}
 
 	private Mono<Object> runValidationQuery(String validationQuery) {
-		return Mono
-				.usingWhen(this.connectionFactory.create(), conn -> {
-					return Flux.from(conn.createStatement(validationQuery).execute())
-							.flatMap(it -> it.map(this::extractResult)).next();
+		return Mono.usingWhen(this.connectionFactory.create(), conn -> {
+			return Flux.from(conn.createStatement(validationQuery).execute()).flatMap(it -> it.map(this::extractResult))
+					.next();
 
-				}, Connection::close, Connection::close, Connection::close);
+		}, Connection::close, Connection::close, Connection::close);
 	}
 
 	private Object extractResult(Row row, RowMetadata metadata) {
-		return row.get(metadata.getColumnMetadatas().iterator()
-				.next()
-				.getName());
+		return row.get(metadata.getColumnMetadatas().iterator().next().getName());
 	}
 
 	private String getProduct() {
@@ -129,4 +125,5 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	public String getQuery() {
 		return this.query;
 	}
+
 }

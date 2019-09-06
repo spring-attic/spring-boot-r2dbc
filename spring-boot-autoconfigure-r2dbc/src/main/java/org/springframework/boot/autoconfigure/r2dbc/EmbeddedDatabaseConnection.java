@@ -37,8 +37,8 @@ public enum EmbeddedDatabaseConnection {
 	/**
 	 * H2 Database Connection.
 	 */
-	H2("H2", "io.r2dbc.h2.H2ConnectionFactoryProvider",
-			"h2", "r2dbc:h2:mem://in-memory/%s?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
+	H2("H2", "io.r2dbc.h2.H2ConnectionFactoryProvider", "h2",
+			"r2dbc:h2:mem://in-memory/%s?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
 
 	/**
 	 * @see EmbeddedDatabaseType
@@ -60,7 +60,6 @@ public enum EmbeddedDatabaseConnection {
 
 	/**
 	 * Returns the driver class name.
-	 *
 	 * @return the driver class name
 	 */
 	public String getDriverClassName() {
@@ -69,7 +68,6 @@ public enum EmbeddedDatabaseConnection {
 
 	/**
 	 * Returns the driver identifier.
-	 *
 	 * @return the driver identifier
 	 */
 	public String getDriver() {
@@ -78,7 +76,6 @@ public enum EmbeddedDatabaseConnection {
 
 	/**
 	 * Returns the embedded database type name for the connection.
-	 *
 	 * @return the database type
 	 */
 	public String getType() {
@@ -87,7 +84,6 @@ public enum EmbeddedDatabaseConnection {
 
 	/**
 	 * Returns the R2DBC URL for the connection using the specified {@code databaseName}.
-	 *
 	 * @param databaseName the name of the database
 	 * @return the connection URL
 	 */
@@ -103,10 +99,8 @@ public enum EmbeddedDatabaseConnection {
 	 * @return an {@link EmbeddedDatabaseConnection} or {@link #NONE}.
 	 */
 	public static EmbeddedDatabaseConnection get(ClassLoader classLoader) {
-		for (EmbeddedDatabaseConnection candidate : EmbeddedDatabaseConnection
-				.values()) {
-			if (candidate != NONE && ClassUtils.isPresent(candidate.getDriverClassName(),
-					classLoader)) {
+		for (EmbeddedDatabaseConnection candidate : EmbeddedDatabaseConnection.values()) {
+			if (candidate != NONE && ClassUtils.isPresent(candidate.getDriverClassName(), classLoader)) {
 				return candidate;
 			}
 		}
@@ -114,8 +108,8 @@ public enum EmbeddedDatabaseConnection {
 	}
 
 	/**
-	 * Convenience method to determine if a given {@link ConnectionFactory} represents an embedded database type.
-	 *
+	 * Convenience method to determine if a given {@link ConnectionFactory} represents an
+	 * embedded database type.
 	 * @param connectionFactory the ConnectionFactory
 	 * @return true if the connectionFactory is one of the embedded types
 	 */
@@ -124,8 +118,8 @@ public enum EmbeddedDatabaseConnection {
 	}
 
 	/**
-	 * Convenience method to determine if a given driver name represents an embedded database type.
-	 *
+	 * Convenience method to determine if a given driver name represents an embedded
+	 * database type.
 	 * @param driver the driver name
 	 * @return true if the driver name is one of the embedded types
 	 */

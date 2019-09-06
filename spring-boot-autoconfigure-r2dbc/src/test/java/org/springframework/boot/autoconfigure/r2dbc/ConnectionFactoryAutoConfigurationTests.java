@@ -46,20 +46,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConnectionFactoryAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionFactoryAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
 			.withInitializer(configurableApplicationContext -> {
-				ConditionEvaluationReportLoggingListener l = new ConditionEvaluationReportLoggingListener(LogLevel.INFO);
+				ConditionEvaluationReportLoggingListener l = new ConditionEvaluationReportLoggingListener(
+						LogLevel.INFO);
 				l.initialize(configurableApplicationContext);
 			});
 
 	@Test
 	public void testDefaultPooledConnectionFactoryExists() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-"
-				+ new Random().nextInt())
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-" + new Random().nextInt())
 				.run((context) -> {
-					assertThat(context)
-							.hasSingleBean(ConnectionFactory.class);
+					assertThat(context).hasSingleBean(ConnectionFactory.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
 					assertThat(bean).isExactlyInstanceOf(ConnectionPool.class);
 				});
@@ -67,12 +65,9 @@ public class ConnectionFactoryAutoConfigurationTests {
 
 	@Test
 	public void testDefaultPooledUrlConnectionFactoryExists() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.url:r2dbc:pool:h2:mem:///testdb-"
-						+ new Random().nextInt())
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:pool:h2:mem:///testdb-" + new Random().nextInt())
 				.run((context) -> {
-					assertThat(context)
-							.hasSingleBean(ConnectionFactory.class);
+					assertThat(context).hasSingleBean(ConnectionFactory.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
 					assertThat(bean).isExactlyInstanceOf(ConnectionPool.class);
 				});
@@ -80,13 +75,11 @@ public class ConnectionFactoryAutoConfigurationTests {
 
 	@Test
 	public void testDefaultGenericConnectionFactoryExists() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-"
-				+ new Random()
-				.nextInt() + "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
-				.withClassLoader(new FilteredClassLoader("io.r2dbc.pool"))
-				.run((context) -> {
-					assertThat(context)
-							.hasSingleBean(ConnectionFactory.class);
+		this.contextRunner
+				.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-" + new Random().nextInt()
+						+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
+				.withClassLoader(new FilteredClassLoader("io.r2dbc.pool")).run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class);
 					assertThat(context).doesNotHaveBean(EmbeddedDatabase.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
 					assertThat(bean).isExactlyInstanceOf(H2ConnectionFactory.class);
@@ -95,40 +88,30 @@ public class ConnectionFactoryAutoConfigurationTests {
 
 	@Test
 	public void testBadUrl() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.url:r2dbc:not-going-to-work")
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:not-going-to-work")
 				.withClassLoader(new DisableEmbeddedDatabaseClassLoader())
-				.run((context) -> assertThat(context).getFailure()
-						.isInstanceOf(BeanCreationException.class));
+				.run((context) -> assertThat(context).getFailure().isInstanceOf(BeanCreationException.class));
 	}
 
 	@Test
 	public void testUrlConfigurationWithoutSpringJdbc() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo")
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo")
 				.withClassLoader(new FilteredClassLoader("org.springframework.jdbc", "io.r2dbc.pool"))
 				.run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
-					assertThat(connectionFactory)
-							.isInstanceOf(TestConnectionFactory.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+					assertThat(connectionFactory).isInstanceOf(TestConnectionFactory.class);
 				});
 	}
 
 	@Test
 	public void testAdditionalOptions() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",
-						"spring.r2dbc.properties.key=value",
-						"spring.r2dbc.pool.initial-size=0")
-				.run((context) -> {
-					ConnectionFactory bean = context
-							.getBean(ConnectionFactory.class);
-					TestConnectionFactory testConnectionFactory = ((Wrapped<TestConnectionFactory>) bean)
-							.unwrap();
-					assertThat((Object) testConnectionFactory.options
-							.getRequiredValue(Option.valueOf("key"))).isEqualTo("value");
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",
+				"spring.r2dbc.properties.key=value", "spring.r2dbc.pool.initial-size=0").run((context) -> {
+					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
+					TestConnectionFactory testConnectionFactory = ((Wrapped<TestConnectionFactory>) bean).unwrap();
+					assertThat((Object) testConnectionFactory.options.getRequiredValue(Option.valueOf("key")))
+							.isEqualTo("value");
 				});
 	}
 
@@ -139,10 +122,8 @@ public class ConnectionFactoryAutoConfigurationTests {
 		}
 
 		@Override
-		protected Class<?> loadClass(String name, boolean resolve)
-				throws ClassNotFoundException {
-			for (EmbeddedDatabaseConnection candidate : EmbeddedDatabaseConnection
-					.values()) {
+		protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+			for (EmbeddedDatabaseConnection candidate : EmbeddedDatabaseConnection.values()) {
 				if (name.equals(candidate.getDriverClassName())) {
 					throw new ClassNotFoundException();
 				}

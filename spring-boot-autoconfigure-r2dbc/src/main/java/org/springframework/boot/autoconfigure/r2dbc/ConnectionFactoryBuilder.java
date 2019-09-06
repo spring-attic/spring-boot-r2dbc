@@ -38,16 +38,14 @@ public final class ConnectionFactoryBuilder {
 	private final ConnectionFactoryOptions.Builder builder;
 
 	public static ConnectionFactoryBuilder create(R2dbcProperties properties) {
-		ConnectionFactoryOptions options = ConnectionFactoryOptions
-				.parse(properties.determineUrl());
+		ConnectionFactoryOptions options = ConnectionFactoryOptions.parse(properties.determineUrl());
 		ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder(options.mutate());
 		builder.applyIf(options, ConnectionFactoryOptions.USER, properties::determineUsername, Objects::nonNull);
 		builder.applyIf(options, ConnectionFactoryOptions.PASSWORD, properties::determinePassword, Objects::nonNull);
-		builder.applyIf(options, ConnectionFactoryOptions.DATABASE, properties::determineDatabaseName, StringUtils::hasText);
+		builder.applyIf(options, ConnectionFactoryOptions.DATABASE, properties::determineDatabaseName,
+				StringUtils::hasText);
 		if (properties.getProperties() != null) {
-			properties.getProperties()
-					.forEach((key, value) -> builder
-							.option(Option.valueOf(key), value));
+			properties.getProperties().forEach((key, value) -> builder.option(Option.valueOf(key), value));
 		}
 		return builder;
 	}
@@ -60,7 +58,8 @@ public final class ConnectionFactoryBuilder {
 		this.builder = builder;
 	}
 
-	private <T extends CharSequence> void applyIf(ConnectionFactoryOptions options, Option<T> option, Supplier<T> valueSupplier, Predicate<T> setIf) {
+	private <T extends CharSequence> void applyIf(ConnectionFactoryOptions options, Option<T> option,
+			Supplier<T> valueSupplier, Predicate<T> setIf) {
 		if (options.hasOption(option)) {
 			return;
 		}
@@ -106,4 +105,5 @@ public final class ConnectionFactoryBuilder {
 	ConnectionFactoryOptions getOptions() {
 		return this.builder.build();
 	}
+
 }

@@ -79,8 +79,8 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 	@Test
 	public void autoConfigurationWithNoRepositories() {
 		this.contextRunner
-				.withConfiguration(
-						AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, EmbeddedDatabaseConfiguration.class))
+				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
+						EmbeddedDatabaseConfiguration.class))
 				.withUserConfiguration(EmptyConfiguration.class).run((context) -> {
 					assertThat(context).doesNotHaveBean(Repository.class);
 				});
@@ -115,4 +115,5 @@ public class R2dbcRepositoriesAutoConfigurationTests {
 	private static class EnableRepositoriesConfiguration {
 
 	}
+
 }

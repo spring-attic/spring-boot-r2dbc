@@ -56,11 +56,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConnectionFactoryInitializerInvokerTests {
 
 	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionFactoryAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
 			.withPropertyValues("spring.r2dbc.initialization-mode=never",
-					"spring.r2dbc.url:r2dbc:h2:mem:///init-" + UUID
-							.randomUUID() + "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE", "spring.datasource.initialization-mode:never");
+					"spring.r2dbc.url:r2dbc:h2:mem:///init-" + UUID.randomUUID()
+							+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
+					"spring.datasource.initialization-mode:never");
 
 	@Before
 	public void before() {
@@ -76,47 +76,36 @@ public class ConnectionFactoryInitializerInvokerTests {
 
 	@Test
 	public void connectionFactoryInitialized() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always")
-				.run((context) -> {
-					assertThat(context).hasSingleBean(ConnectionFactory.class);
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
-					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from BAR", 1);
-				});
+		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always").run((context) -> {
+			assertThat(context).hasSingleBean(ConnectionFactory.class);
+			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+			assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from BAR", 1);
+		});
 	}
 
 	@Test
 	public void initializationAppliesToCustomConnectionFactory() {
 		this.contextRunner.withUserConfiguration(OneConnectionFactory.class)
-				.withPropertyValues("spring.r2dbc.initialization-mode:always")
-				.run((context) -> {
+				.withPropertyValues("spring.r2dbc.initialization-mode:always").run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
-					assertConnectionFactoryIsInitialized(context
-							.getBean(ConnectionFactory.class), "SELECT COUNT(*) from BAR", 1);
+					assertConnectionFactoryIsInitialized(context.getBean(ConnectionFactory.class),
+							"SELECT COUNT(*) from BAR", 1);
 				});
 	}
 
-	private void assertConnectionFactoryIsInitialized(ConnectionFactory connectionFactory, String sql, int expectation) {
+	private void assertConnectionFactoryIsInitialized(ConnectionFactory connectionFactory, String sql,
+			int expectation) {
 		R2dbc r2dbc = new R2dbc(connectionFactory);
-		r2dbc.withHandle(h -> h.createQuery(sql)
-				.mapRow(row -> row.get(0)))
-				.cast(Number.class)
-				.map(Number::intValue)
-				.as(StepVerifier::create)
-				.expectNext(expectation)
-				.verifyComplete();
+		r2dbc.withHandle(h -> h.createQuery(sql).mapRow(row -> row.get(0))).cast(Number.class).map(Number::intValue)
+				.as(StepVerifier::create).expectNext(expectation).verifyComplete();
 	}
 
 	@Test
 	public void connectionFactoryInitializedWithExplicitScript() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always",
-						"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql"),
-						"spring.r2dbc.data:" + getRelativeLocationFor("data.sql"))
-				.run((context) -> {
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
+		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
+				"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql"),
+				"spring.r2dbc.data:" + getRelativeLocationFor("data.sql")).run((context) -> {
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
 					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from FOO", 1);
 				});
@@ -124,14 +113,11 @@ public class ConnectionFactoryInitializerInvokerTests {
 
 	@Test
 	public void connectionFactoryInitializedWithMultipleScripts() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always",
-						"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql") + ","
-								+ getRelativeLocationFor("another.sql"),
-						"spring.r2dbc.data:" + getRelativeLocationFor("data.sql"))
-				.run((context) -> {
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
+		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
+				"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql") + ","
+						+ getRelativeLocationFor("another.sql"),
+				"spring.r2dbc.data:" + getRelativeLocationFor("data.sql")).run((context) -> {
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
 					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from FOO", 1);
 					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from SPAM", 0);
@@ -141,32 +127,20 @@ public class ConnectionFactoryInitializerInvokerTests {
 	@Test
 	public void connectionFactoryInitializedWithExplicitSqlScriptEncoding() {
 		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always",
-						"spring.r2dbc.sqlScriptEncoding:UTF-8",
+				.withPropertyValues("spring.r2dbc.initialization-mode:always", "spring.r2dbc.sqlScriptEncoding:UTF-8",
 						"spring.r2dbc.schema:" + getRelativeLocationFor("encoding-schema.sql"),
 						"spring.r2dbc.data:" + getRelativeLocationFor("encoding-data.sql"))
 				.run((context) -> {
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
 					R2dbc r2dbc = new R2dbc(connectionFactory);
-					r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR")
-							.mapRow(row -> row.get(0)))
-							.cast(Number.class)
-							.map(Number::intValue)
-							.as(StepVerifier::create)
-							.expectNext(2)
+					r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR").mapRow(row -> row.get(0)))
+							.cast(Number.class).map(Number::intValue).as(StepVerifier::create).expectNext(2)
 							.verifyComplete();
-					r2dbc.withHandle(h -> h.createQuery("SELECT name from BAR WHERE id=1")
-							.mapRow(row -> row.get(0)))
-							.as(StepVerifier::create)
-							.expectNext("bar")
-							.verifyComplete();
-					r2dbc.withHandle(h -> h.createQuery("SELECT name from BAR WHERE id=2")
-							.mapRow(row -> row.get(0)))
-							.as(StepVerifier::create)
-							.expectNext("ばー")
-							.verifyComplete();
+					r2dbc.withHandle(h -> h.createQuery("SELECT name from BAR WHERE id=1").mapRow(row -> row.get(0)))
+							.as(StepVerifier::create).expectNext("bar").verifyComplete();
+					r2dbc.withHandle(h -> h.createQuery("SELECT name from BAR WHERE id=2").mapRow(row -> row.get(0)))
+							.as(StepVerifier::create).expectNext("ばー").verifyComplete();
 				});
 	}
 
@@ -178,12 +152,12 @@ public class ConnectionFactoryInitializerInvokerTests {
 	@Test
 	public void initializationRunsOnceForJdbcAndR2dbcEmbedded() {
 		this.contextRunner
-				.withConfiguration(AutoConfigurations
-						.of(EmbeddedDatabaseConfiguration.class, DataSourceAutoConfiguration.class))
-				.withPropertyValues("spring.r2dbc.url:", "spring.datasource.driver-class-name:org.h2.Driver", "spring.r2dbc.initialization-mode:embedded", "spring.datasource.initialization-mode:embedded")
+				.withConfiguration(
+						AutoConfigurations.of(EmbeddedDatabaseConfiguration.class, DataSourceAutoConfiguration.class))
+				.withPropertyValues("spring.r2dbc.url:", "spring.datasource.driver-class-name:org.h2.Driver",
+						"spring.r2dbc.initialization-mode:embedded", "spring.datasource.initialization-mode:embedded")
 				.run(context -> {
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
 					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from BAR", 1);
 				});
@@ -192,22 +166,19 @@ public class ConnectionFactoryInitializerInvokerTests {
 	@Test
 	public void initializationDoesNotApplyWithSeveralConnectionFactorys() {
 		this.contextRunner.withUserConfiguration(TwoConnectionFactories.class)
-				.withPropertyValues("spring.r2dbc.initialization-mode:always")
-				.run((context) -> {
-					assertThat(context.getBeanNamesForType(ConnectionFactory.class))
-							.hasSize(2);
-					assertConnectionFactoryNotInitialized(context
-							.getBean("oneConnectionFactory", ConnectionFactory.class));
-					assertConnectionFactoryNotInitialized(context
-							.getBean("twoConnectionFactory", ConnectionFactory.class));
+				.withPropertyValues("spring.r2dbc.initialization-mode:always").run((context) -> {
+					assertThat(context.getBeanNamesForType(ConnectionFactory.class)).hasSize(2);
+					assertConnectionFactoryNotInitialized(
+							context.getBean("oneConnectionFactory", ConnectionFactory.class));
+					assertConnectionFactoryNotInitialized(
+							context.getBean("twoConnectionFactory", ConnectionFactory.class));
 				});
 	}
 
 	private ContextConsumer<AssertableApplicationContext> assertInitializationIsDisabled() {
 		return (context) -> {
 			assertThat(context).hasSingleBean(ConnectionFactory.class);
-			ConnectionFactory connectionFactory = context
-					.getBean(ConnectionFactory.class);
+			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 			context.publishEvent(new ConnectionFactorySchemaCreatedEvent(connectionFactory));
 			assertConnectionFactoryNotInitialized(connectionFactory);
 		};
@@ -215,45 +186,38 @@ public class ConnectionFactoryInitializerInvokerTests {
 
 	private void assertConnectionFactoryNotInitialized(ConnectionFactory connectionFactory) {
 		R2dbc r2dbc = new R2dbc(connectionFactory);
-		r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR")
-				.mapRow(row -> row.get(0)))
-				.as(StepVerifier::create)
-				.expectErrorSatisfies(throwable -> {
+		r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR").mapRow(row -> row.get(0)))
+				.as(StepVerifier::create).expectErrorSatisfies(throwable -> {
 					assertThat(throwable).isInstanceOf(RuntimeException.class);
 					SQLException ex = (SQLException) throwable.getCause();
 					int expectedCode = 42102; // object not found
 					assertThat(ex.getErrorCode()).isEqualTo(expectedCode);
-				})
-				.verify();
+				}).verify();
 	}
 
 	@Test
 	public void connectionFactoryInitializedWithSchemaCredentials() {
 		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always",
-						"spring.r2dbc.sqlScriptEncoding:UTF-8",
+				.withPropertyValues("spring.r2dbc.initialization-mode:always", "spring.r2dbc.sqlScriptEncoding:UTF-8",
 						"spring.r2dbc.schema:" + getRelativeLocationFor("encoding-schema.sql"),
 						"spring.r2dbc.data:" + getRelativeLocationFor("encoding-data.sql"),
 						"spring.r2dbc.schema-username:admin", "spring.r2dbc.schema-password:admin")
 				.run((context) -> {
 					assertThat(context).hasFailed();
-					assertThat(context.getStartupFailure())
-							.isInstanceOf(BeanCreationException.class);
+					assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
 				});
 	}
 
 	@Test
 	public void connectionFactoryInitializedWithDataCredentials() {
 		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always",
-						"spring.r2dbc.sqlScriptEncoding:UTF-8",
+				.withPropertyValues("spring.r2dbc.initialization-mode:always", "spring.r2dbc.sqlScriptEncoding:UTF-8",
 						"spring.r2dbc.schema:" + getRelativeLocationFor("encoding-schema.sql"),
 						"spring.r2dbc.data:" + getRelativeLocationFor("encoding-data.sql"),
 						"spring.r2dbc.data-username:admin", "spring.r2dbc.data-password:admin")
 				.run((context) -> {
 					assertThat(context).hasFailed();
-					assertThat(context.getStartupFailure())
-							.isInstanceOf(BeanCreationException.class);
+					assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
 				});
 	}
 
@@ -263,16 +227,14 @@ public class ConnectionFactoryInitializerInvokerTests {
 			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 			context.setResourceLoader(new ReverseOrderResourceLoader(new DefaultResourceLoader()));
 			return context;
-		}).withConfiguration(AutoConfigurations
-				.of(ConnectionFactoryAutoConfiguration.class))
+		}).withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
 				.withPropertyValues("spring.r2dbc.initialization-mode=always",
-						"spring.r2dbc.url:r2dbc:h2:mem:///:testdb-" + new Random()
-								.nextInt() + "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
+						"spring.r2dbc.url:r2dbc:h2:mem:///:testdb-" + new Random().nextInt()
+								+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
 						"spring.r2dbc.schema:classpath*:" + getRelativeLocationFor("lexical-schema-*.sql"),
 						"spring.r2dbc.data:classpath*:" + getRelativeLocationFor("data.sql"))
 				.run((context) -> {
-					ConnectionFactory connectionFactory = context
-							.getBean(ConnectionFactory.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
 					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from FOO", 1);
 				});
@@ -280,34 +242,24 @@ public class ConnectionFactoryInitializerInvokerTests {
 
 	@Test
 	public void testConnectionFactoryInitializedWithInvalidSchemaResource() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always",
-						"spring.r2dbc.schema:classpath:does/not/exist.sql")
-				.run((context) -> {
+		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
+				"spring.r2dbc.schema:classpath:does/not/exist.sql").run((context) -> {
 					assertThat(context).hasFailed();
-					assertThat(context.getStartupFailure())
-							.isInstanceOf(BeanCreationException.class);
-					assertThat(context.getStartupFailure())
-							.hasMessageContaining("does/not/exist.sql");
-					assertThat(context.getStartupFailure())
-							.hasMessageContaining("spring.r2dbc.schema");
+					assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+					assertThat(context.getStartupFailure()).hasMessageContaining("does/not/exist.sql");
+					assertThat(context.getStartupFailure()).hasMessageContaining("spring.r2dbc.schema");
 				});
 	}
 
 	@Test
 	public void connectionFactoryInitializedWithInvalidDataResource() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.initialization-mode:always",
-						"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql"),
-						"spring.r2dbc.data:classpath:does/not/exist.sql")
-				.run((context) -> {
+		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:always",
+				"spring.r2dbc.schema:" + getRelativeLocationFor("schema.sql"),
+				"spring.r2dbc.data:classpath:does/not/exist.sql").run((context) -> {
 					assertThat(context).hasFailed();
-					assertThat(context.getStartupFailure())
-							.isInstanceOf(BeanCreationException.class);
-					assertThat(context.getStartupFailure())
-							.hasMessageContaining("does/not/exist.sql");
-					assertThat(context.getStartupFailure())
-							.hasMessageContaining("spring.r2dbc.data");
+					assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
+					assertThat(context.getStartupFailure()).hasMessageContaining("does/not/exist.sql");
+					assertThat(context.getStartupFailure()).hasMessageContaining("spring.r2dbc.data");
 				});
 	}
 
@@ -360,8 +312,7 @@ public class ConnectionFactoryInitializerInvokerTests {
 		@Override
 		public Resource[] getResources(String locationPattern) throws IOException {
 			Resource[] resources = this.resolver.getResources(locationPattern);
-			Arrays.sort(resources, Comparator.comparing(Resource::getFilename)
-					.reversed());
+			Arrays.sort(resources, Comparator.comparing(Resource::getFilename).reversed());
 			return resources;
 		}
 

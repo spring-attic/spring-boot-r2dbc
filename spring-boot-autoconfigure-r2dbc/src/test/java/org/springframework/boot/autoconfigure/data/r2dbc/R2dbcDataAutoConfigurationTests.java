@@ -38,4 +38,5 @@ public class R2dbcDataAutoConfigurationTests {
 	public void testDefaultConnectionFactoryExists() {
 		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(DatabaseClient.class));
 	}
+
 }

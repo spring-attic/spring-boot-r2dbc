@@ -38,8 +38,7 @@ public class SimpleConnectionFactoryProvider implements ConnectionFactoryProvide
 
 	@Override
 	public boolean supports(ConnectionFactoryOptions connectionFactoryOptions) {
-		return connectionFactoryOptions.getRequiredValue(ConnectionFactoryOptions.DRIVER)
-				.equals("simple");
+		return connectionFactoryOptions.getRequiredValue(ConnectionFactoryOptions.DRIVER).equals("simple");
 	}
 
 	@Override

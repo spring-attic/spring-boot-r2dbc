@@ -31,4 +31,3 @@ class DataR2dbcTypeExcludeFilter extends StandardAnnotationCustomizableTypeExclu
 	}
 
 }
-

@@ -28,8 +28,7 @@ import org.springframework.context.annotation.Import;
  * Test annotation to configure the {@link AutoConfigurationPackages} to an arbitrary
  * value.
  *
- * @author Phillip Webb
- * TODO: Remove on merge.
+ * @author Phillip Webb TODO: Remove on merge.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

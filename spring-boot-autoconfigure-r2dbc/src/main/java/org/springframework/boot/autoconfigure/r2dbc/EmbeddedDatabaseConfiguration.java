@@ -43,7 +43,7 @@ import org.springframework.util.StringUtils;
  * @see ConnectionFactoryAutoConfiguration
  */
 @Configuration
-@ConditionalOnClass({Connection.class, ConnectionFactory.class, EmbeddedDatabaseType.class})
+@ConditionalOnClass({ Connection.class, ConnectionFactory.class, EmbeddedDatabaseType.class })
 @EnableConfigurationProperties(R2dbcProperties.class)
 public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 
@@ -63,35 +63,30 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean({EmbeddedDatabase.class, EmbeddedDatabaseConnectionInformation.class})
+	@ConditionalOnMissingBean({ EmbeddedDatabase.class, EmbeddedDatabaseConnectionInformation.class })
 	public EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromR2dbc() {
-		return new EmbeddedDatabaseConnectionInformation(this.properties
-				.determineDatabaseName(), this.properties
-				.determineUsername(), this.properties.determinePassword());
+		return new EmbeddedDatabaseConnectionInformation(this.properties.determineDatabaseName(),
+				this.properties.determineUsername(), this.properties.determinePassword());
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(EmbeddedDatabaseConnectionInformation.class)
-	@ConditionalOnBean({EmbeddedDatabase.class, DataSourceProperties.class})
+	@ConditionalOnBean({ EmbeddedDatabase.class, DataSourceProperties.class })
 	public EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromJdbc(DataSourceProperties jdbcProperties) {
-		return new EmbeddedDatabaseConnectionInformation(jdbcProperties
-				.determineDatabaseName(), jdbcProperties
-				.determineUsername(), jdbcProperties.determinePassword());
+		return new EmbeddedDatabaseConnectionInformation(jdbcProperties.determineDatabaseName(),
+				jdbcProperties.determineUsername(), jdbcProperties.determinePassword());
 	}
 
 	@Bean
 	public ConnectionFactory connectionFactory(EmbeddedDatabaseConnectionInformation embedded) {
-		EmbeddedDatabaseConnection connection = EmbeddedDatabaseConnection
-				.get(this.classLoader);
-		ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions
-				.parse(connection.getUrl(embedded.getName())).mutate();
+		EmbeddedDatabaseConnection connection = EmbeddedDatabaseConnection.get(this.classLoader);
+		ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions.parse(connection.getUrl(embedded.getName()))
+				.mutate();
 		if (StringUtils.hasText(embedded.getUsername())) {
-			builder.option(ConnectionFactoryOptions.USER, embedded
-					.getUsername());
+			builder.option(ConnectionFactoryOptions.USER, embedded.getUsername());
 		}
 		if (StringUtils.hasText(embedded.getUsername())) {
-			builder.option(ConnectionFactoryOptions.PASSWORD, embedded
-					.getPassword());
+			builder.option(ConnectionFactoryOptions.PASSWORD, embedded.getPassword());
 		}
 		return ConnectionFactories.get(builder.build());
 	}
@@ -106,7 +101,9 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 	static class EmbeddedDatabaseConnectionInformation {
 
 		final String name;
+
 		final String username;
+
 		final String password;
 
 		EmbeddedDatabaseConnectionInformation(String name, String username, String password) {
@@ -126,6 +123,7 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 		String getPassword() {
 			return password;
 		}
+
 	}
 
 }

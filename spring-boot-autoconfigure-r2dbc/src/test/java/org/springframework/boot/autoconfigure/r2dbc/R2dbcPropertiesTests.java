@@ -30,33 +30,29 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class R2dbcPropertiesTests {
 
-	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionFactoryAutoConfiguration.class, R2dbcAutoConfiguration.class));
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(
+			AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, R2dbcAutoConfiguration.class));
 
 	@Test
 	public void shouldReportEmbeddedDatabase() {
-		this.contextRunner
-				.run((context) -> {
+		this.contextRunner.run((context) -> {
 
-					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
-					assertThat(properties.determineUsername()).isEqualTo("sa");
-					assertThat(properties.determinePassword()).isEqualTo("");
-					assertThat(properties.determineDriverName()).isEqualTo("h2");
-				});
+			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+			assertThat(properties.determineUsername()).isEqualTo("sa");
+			assertThat(properties.determinePassword()).isEqualTo("");
+			assertThat(properties.determineDriverName()).isEqualTo("h2");
+		});
 	}
 
 	@Test
 	public void shouldReportCustomDriver() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.url=r2dbc:simple://:pool:")
-				.run((context) -> {
+		this.contextRunner.withPropertyValues("spring.r2dbc.url=r2dbc:simple://:pool:").run((context) -> {
 
-					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
-					assertThat(properties.determineUsername()).isNull();
-					assertThat(properties.determinePassword()).isNull();
-					assertThat(properties.determineDriverName()).isEqualTo("simple");
-				});
+			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+			assertThat(properties.determineUsername()).isNull();
+			assertThat(properties.determinePassword()).isNull();
+			assertThat(properties.determineDriverName()).isEqualTo("simple");
+		});
 	}
 
 }

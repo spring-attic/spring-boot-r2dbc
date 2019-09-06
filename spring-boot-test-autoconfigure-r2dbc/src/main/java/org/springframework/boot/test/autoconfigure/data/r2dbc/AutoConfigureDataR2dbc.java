@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 
 /**
- * {@link ImportAutoConfiguration Auto-configuration imports} for typical Data R2DBC tests.
- * Most tests should consider using {@link DataR2dbcTest @DataR2dbcTest} rather than using
- * this annotation directly.
+ * {@link ImportAutoConfiguration Auto-configuration imports} for typical Data R2DBC
+ * tests. Most tests should consider using {@link DataR2dbcTest @DataR2dbcTest} rather
+ * than using this annotation directly.
  *
  * @author Mark Paluch
  * @see DataR2dbcTest

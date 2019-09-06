@@ -30,8 +30,7 @@ class DataR2dbcTestContextBootstrapper extends SpringBootTestContextBootstrapper
 
 	@Override
 	protected String[] getProperties(Class<?> testClass) {
-		return MergedAnnotations.from(testClass, SearchStrategy.INHERITED_ANNOTATIONS)
-				.get(DataR2dbcTest.class)
+		return MergedAnnotations.from(testClass, SearchStrategy.INHERITED_ANNOTATIONS).get(DataR2dbcTest.class)
 				.getValue("properties", String[].class).orElse(null);
 	}
 

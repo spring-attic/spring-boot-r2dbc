@@ -36,8 +36,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for
- *  * {@link ConnectionFactoryHealthIndicator}.
+ * {@link EnableAutoConfiguration Auto-configuration} for *
+ * {@link ConnectionFactoryHealthIndicator}.
+ *
  * @author Mark Paluch
  */
 @Configuration
@@ -46,7 +47,8 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnEnabledHealthIndicator("r2dbc")
 @AutoConfigureBefore(HealthIndicatorAutoConfiguration.class)
 @AutoConfigureAfter(ConnectionFactoryAutoConfiguration.class)
-public class ConnectionFactoryHealthIndicatorAutoConfiguration extends CompositeReactiveHealthIndicatorConfiguration<ConnectionFactoryHealthIndicator, ConnectionFactory> {
+public class ConnectionFactoryHealthIndicatorAutoConfiguration
+		extends CompositeReactiveHealthIndicatorConfiguration<ConnectionFactoryHealthIndicator, ConnectionFactory> {
 
 	private final Map<String, ConnectionFactory> connectionFactory;
 
@@ -59,4 +61,5 @@ public class ConnectionFactoryHealthIndicatorAutoConfiguration extends Composite
 	public ReactiveHealthIndicator r2dbcConnectionFactoryHealthIndicator() {
 		return this.createHealthIndicator(this.connectionFactory);
 	}
+
 }

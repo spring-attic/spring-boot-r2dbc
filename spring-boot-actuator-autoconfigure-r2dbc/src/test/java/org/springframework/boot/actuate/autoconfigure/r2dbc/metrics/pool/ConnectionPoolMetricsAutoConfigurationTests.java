@@ -43,20 +43,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConnectionPoolMetricsAutoConfigurationTests {
 
 	private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations
-					.of(ConnectionPoolMetricsAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations.of(ConnectionPoolMetricsAutoConfiguration.class))
 			.withUserConfiguration(TestConfig.class);
 
 	@Test
 	public void shouldBindConnectionPoolToMeterRegistry() {
-		this.contextRunner
-				.run((context) -> {
-					MeterRegistry registry = context.getBean(MeterRegistry.class);
-					assertThat(registry.find("r2dbc.pool.acquired").gauges())
-							.extracting(Meter::getId)
-							.extracting(id -> id.getTag("name"))
-							.containsExactlyInAnyOrder("firstPool", "secondPool");
-				});
+		this.contextRunner.run((context) -> {
+			MeterRegistry registry = context.getBean(MeterRegistry.class);
+			assertThat(registry.find("r2dbc.pool.acquired").gauges()).extracting(Meter::getId)
+					.extracting(id -> id.getTag("name")).containsExactlyInAnyOrder("firstPool", "secondPool");
+		});
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -69,21 +65,18 @@ public class ConnectionPoolMetricsAutoConfigurationTests {
 
 		@Bean
 		ConnectionFactory connectionFactory() {
-			return new H2ConnectionFactory(H2ConnectionConfiguration.builder()
-					.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1")
-					.build());
+			return new H2ConnectionFactory(H2ConnectionConfiguration.builder().inMemory("db-" + new Random().nextInt())
+					.option("DB_CLOSE_DELAY=-1").build());
 		}
 
 		@Bean
 		ConnectionPool firstPool(ConnectionFactory connectionFactory) {
-			return new ConnectionPool(ConnectionPoolConfiguration
-					.builder(connectionFactory).build());
+			return new ConnectionPool(ConnectionPoolConfiguration.builder(connectionFactory).build());
 		}
 
 		@Bean
 		ConnectionPool secondPool(ConnectionFactory connectionFactory) {
-			return new ConnectionPool(ConnectionPoolConfiguration
-					.builder(connectionFactory).build());
+			return new ConnectionPool(ConnectionPoolConfiguration.builder(connectionFactory).build());
 		}
 
 	}

@@ -35,33 +35,23 @@ public class ConnectionFactoryBuilderUnitTests {
 		properties.setUrl("r2dbc:h2://foo");
 		properties.setUsername("user");
 		properties.setPassword("pass");
-		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties)
-				.getOptions();
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER))
-				.isEqualTo("h2");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST))
-				.isEqualTo("foo");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER))
-				.isEqualTo("user");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.PASSWORD))
-				.isEqualTo("pass");
+		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).getOptions();
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER)).isEqualTo("h2");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST)).isEqualTo("foo");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER)).isEqualTo("user");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.PASSWORD)).isEqualTo("pass");
 	}
 
 	@Test
 	public void shouldApplyConfiguration() {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://foo");
-		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties)
-				.username("user").password("pass")
+		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).username("user").password("pass")
 				.getOptions();
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER))
-				.isEqualTo("h2");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST))
-				.isEqualTo("foo");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER))
-				.isEqualTo("user");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.PASSWORD))
-				.isEqualTo("pass");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER)).isEqualTo("h2");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST)).isEqualTo("foo");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER)).isEqualTo("user");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.PASSWORD)).isEqualTo("pass");
 	}
 
 	@Test
@@ -69,18 +59,12 @@ public class ConnectionFactoryBuilderUnitTests {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://user:pass@local/mydb");
 		properties.setUsername("someone-else");
-		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties)
-				.getOptions();
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER))
-				.isEqualTo("h2");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST))
-				.isEqualTo("local");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER))
-				.isEqualTo("user");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.PASSWORD))
-				.isEqualTo("pass");
-		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DATABASE))
-				.isEqualTo("mydb");
+		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).getOptions();
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER)).isEqualTo("h2");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST)).isEqualTo("local");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER)).isEqualTo("user");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.PASSWORD)).isEqualTo("pass");
+		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DATABASE)).isEqualTo("mydb");
 	}
 
 }

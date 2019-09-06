@@ -39,7 +39,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 @RunWith(SpringRunner.class)
 @R2dbcTest
-@TestPropertySource(properties = {"spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql", "spring.r2dbc.initialization-mode=always"})
+@TestPropertySource(
+		properties = { "spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql",
+				"spring.r2dbc.initialization-mode=always" })
 public class R2dbcTestIntegrationTests {
 
 	@Autowired
@@ -56,15 +58,13 @@ public class R2dbcTestIntegrationTests {
 
 	@Test
 	public void testDatabaseClient() {
-		databaseClient.execute("SELECT * FROM example").fetch().all()
-				.as(StepVerifier::create).verifyComplete();
+		databaseClient.execute("SELECT * FROM example").fetch().all().as(StepVerifier::create).verifyComplete();
 	}
 
 	@Test
 	public void testR2dbcClient() {
-		r2dbc.withHandle(h -> h.createQuery("SELECT * FROM example")
-				.mapRow(row -> row.get(0)))
-				.as(StepVerifier::create).verifyComplete();
+		r2dbc.withHandle(h -> h.createQuery("SELECT * FROM example").mapRow(row -> row.get(0))).as(StepVerifier::create)
+				.verifyComplete();
 	}
 
 	@Test
@@ -75,8 +75,8 @@ public class R2dbcTestIntegrationTests {
 
 	@Test
 	public void didNotInjectExampleRepository() {
-		assertThatExceptionOfType(NoSuchBeanDefinitionException.class).isThrownBy(
-				() -> this.applicationContext.getBean(ExampleRepository.class));
+		assertThatExceptionOfType(NoSuchBeanDefinitionException.class)
+				.isThrownBy(() -> this.applicationContext.getBean(ExampleRepository.class));
 	}
 
 }

@@ -39,8 +39,8 @@ class TestConnectionFactory {
 	 * Create an in-memory database with a given name.
 	 */
 	public static ConnectionFactory get(String name) {
-		return ConnectionFactories.get(String
-				.format("r2dbc:h2:mem:///%s?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE", name));
+		return ConnectionFactories
+				.get(String.format("r2dbc:h2:mem:///%s?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE", name));
 	}
 
 }

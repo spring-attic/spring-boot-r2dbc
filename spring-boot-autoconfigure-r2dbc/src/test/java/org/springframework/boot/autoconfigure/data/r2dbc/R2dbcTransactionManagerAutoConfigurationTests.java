@@ -60,7 +60,8 @@ public class R2dbcTransactionManagerAutoConfigurationTests {
 	@Test
 	public void singleTransactionManager() {
 		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class).run(context -> {
-			assertThat(context).hasSingleBean(TransactionalOperator.class).hasSingleBean(ReactiveTransactionManager.class);
+			assertThat(context).hasSingleBean(TransactionalOperator.class)
+					.hasSingleBean(ReactiveTransactionManager.class);
 		});
 	}
 
@@ -86,6 +87,7 @@ public class R2dbcTransactionManagerAutoConfigurationTests {
 			when(connection.close()).thenReturn(Mono.empty());
 			return connectionFactory;
 		}
+
 	}
 
 	@Configuration(proxyBeanMethods = false)

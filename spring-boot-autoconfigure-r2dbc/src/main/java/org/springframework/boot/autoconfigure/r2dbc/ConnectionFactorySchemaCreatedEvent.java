@@ -22,8 +22,8 @@ import org.springframework.context.ApplicationEvent;
 
 /**
  * {@link ApplicationEvent} used internally to indicate that the schema of a new
- * {@link ConnectionFactory} has been created. This happens when {@literal schema-*.sql} files
- * are executed.
+ * {@link ConnectionFactory} has been created. This happens when {@literal schema-*.sql}
+ * files are executed.
  *
  * @author Mark Paluch
  */

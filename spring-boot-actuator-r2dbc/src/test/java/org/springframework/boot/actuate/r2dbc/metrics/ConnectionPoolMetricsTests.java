@@ -42,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConnectionPoolMetricsTests {
 
 	Tag fooTag = Tag.of("foo", "FOO");
+
 	Tag barTag = Tag.of("bar", "BAR");
 
 	private ConnectionFactory connectionFactory;
@@ -49,27 +50,20 @@ public class ConnectionPoolMetricsTests {
 	@Before
 	public void init() {
 		connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
-				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1")
-				.build());
+				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1").build());
 	}
 
 	@Test
 	public void metrics() {
 		SimpleMeterRegistry registry = new SimpleMeterRegistry();
-		ConnectionPool connectionPool = new ConnectionPool(ConnectionPoolConfiguration
-				.builder(this.connectionFactory)
-				.initialSize(3)
-				.maxSize(7)
-				.build());
+		ConnectionPool connectionPool = new ConnectionPool(
+				ConnectionPoolConfiguration.builder(this.connectionFactory).initialSize(3).maxSize(7).build());
 
-		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool", Tags
-				.of(fooTag, barTag));
+		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool", Tags.of(fooTag, barTag));
 		metrics.bindTo(registry);
 		// acquire two connections
-		connectionPool.create().as(StepVerifier::create).expectNextCount(1)
-				.verifyComplete();
-		connectionPool.create().as(StepVerifier::create).expectNextCount(1)
-				.verifyComplete();
+		connectionPool.create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
+		connectionPool.create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
 		assertGauge(registry, "r2dbc.pool.acquired", 2);
 		assertGauge(registry, "r2dbc.pool.allocated", 3);
 		assertGauge(registry, "r2dbc.pool.idle", 1);
@@ -81,8 +75,7 @@ public class ConnectionPoolMetricsTests {
 	private void assertGauge(SimpleMeterRegistry registry, String metric, int expectedValue) {
 		Gauge gauge = registry.get(metric).gauge();
 		assertThat(gauge.value()).isEqualTo(expectedValue);
-		assertThat(gauge.getId().getTags())
-				.containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
+		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
 	}
 
 }

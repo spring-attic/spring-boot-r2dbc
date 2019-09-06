@@ -38,7 +38,8 @@ public class ConnectionFactoryInitializerTests {
 	@Test
 	public void initializeEmbeddedByDefault() {
 		ConnectionFactory connectionFactory = createConnectionFactory();
-		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer(connectionFactory, new R2dbcProperties());
+		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer(connectionFactory,
+				new R2dbcProperties());
 		R2dbc r2dbc = new R2dbc(connectionFactory);
 		assertThat(initializer.createSchema()).isTrue();
 		assertNumberOfRows(r2dbc, 0);
@@ -60,13 +61,8 @@ public class ConnectionFactoryInitializerTests {
 	}
 
 	private void assertNumberOfRows(R2dbc r2dbc, int count) {
-		r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR")
-				.mapRow(row -> row.get(0)))
-				.cast(Number.class)
-				.map(Number::intValue)
-				.as(StepVerifier::create)
-				.expectNext(count)
-				.verifyComplete();
+		r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR").mapRow(row -> row.get(0))).cast(Number.class)
+				.map(Number::intValue).as(StepVerifier::create).expectNext(count).verifyComplete();
 	}
 
 	@Test
@@ -84,7 +80,8 @@ public class ConnectionFactoryInitializerTests {
 		given(metadata.getName()).willReturn("MySQL");
 		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 		given(connectionFactory.getMetadata()).willReturn(metadata);
-		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer(connectionFactory, new R2dbcProperties());
+		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer(connectionFactory,
+				new R2dbcProperties());
 		assertThat(initializer.createSchema()).isFalse();
 		verify(connectionFactory, never()).create();
 	}
