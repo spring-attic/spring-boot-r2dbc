@@ -16,14 +16,13 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties.ConnectionFactoryBeanCreationException;
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-
-import static org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties.ConnectionFactoryBeanCreationException;
 
 /**
  * An {@link AbstractFailureAnalyzer} for failures caused by a

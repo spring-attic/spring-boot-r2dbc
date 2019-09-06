@@ -65,7 +65,7 @@ public final class ConnectionFactoryBuilder {
 		}
 		T value = valueSupplier.get();
 		if (setIf.test(value)) {
-			builder.option(option, value);
+			this.builder.option(option, value);
 		}
 	}
 

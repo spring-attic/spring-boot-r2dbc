@@ -54,12 +54,12 @@ class R2dbcTestIntegrationTests {
 
 	@Test
 	void testDatabaseClient() {
-		databaseClient.execute("SELECT * FROM example").fetch().all().as(StepVerifier::create).verifyComplete();
+		this.databaseClient.execute("SELECT * FROM example").fetch().all().as(StepVerifier::create).verifyComplete();
 	}
 
 	@Test
 	void testR2dbcClient() {
-		r2dbc.withHandle(h -> h.createQuery("SELECT * FROM example").mapRow(row -> row.get(0))).as(StepVerifier::create)
+		this.r2dbc.withHandle((h) -> h.createQuery("SELECT * FROM example").mapRow((row) -> row.get(0))).as(StepVerifier::create)
 				.verifyComplete();
 	}
 

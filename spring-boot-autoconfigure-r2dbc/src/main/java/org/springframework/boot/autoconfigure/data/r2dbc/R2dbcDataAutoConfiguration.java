@@ -52,7 +52,7 @@ public class R2dbcDataAutoConfiguration extends AbstractR2dbcConfiguration {
 
 	@Override
 	public ConnectionFactory connectionFactory() {
-		return connectionFactory;
+		return this.connectionFactory;
 	}
 
 	@Bean

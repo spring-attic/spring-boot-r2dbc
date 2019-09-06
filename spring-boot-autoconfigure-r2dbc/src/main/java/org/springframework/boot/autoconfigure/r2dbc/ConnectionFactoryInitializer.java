@@ -77,7 +77,7 @@ class ConnectionFactoryInitializer {
 		this(connectionFactory, properties, null);
 	}
 
-	public ConnectionFactory getConnectionFactory() {
+	ConnectionFactory getConnectionFactory() {
 		return this.connectionFactory;
 	}
 
@@ -86,7 +86,7 @@ class ConnectionFactoryInitializer {
 	 * @return {@code true} if the schema was created
 	 * @see R2dbcProperties#getSchema()
 	 */
-	public boolean createSchema() {
+	boolean createSchema() {
 		List<Resource> scripts = getScripts("spring.r2dbc.schema", this.properties.getSchema(), "schema");
 		if (!scripts.isEmpty()) {
 			if (!isEnabled()) {
@@ -104,7 +104,7 @@ class ConnectionFactoryInitializer {
 	 * Initialize the schema if necessary.
 	 * @see R2dbcProperties#getData()
 	 */
-	public void initSchema() {
+	void initSchema() {
 		List<Resource> scripts = getScripts("spring.r2dbc.data", this.properties.getData(), "data");
 		if (!scripts.isEmpty()) {
 			if (!isEnabled()) {

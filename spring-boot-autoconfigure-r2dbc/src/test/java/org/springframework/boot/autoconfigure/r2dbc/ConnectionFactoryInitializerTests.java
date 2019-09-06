@@ -61,8 +61,8 @@ class ConnectionFactoryInitializerTests {
 	}
 
 	private void assertNumberOfRows(R2dbc r2dbc, int count) {
-		r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR").mapRow(row -> row.get(0))).cast(Number.class)
-				.map(Number::intValue).as(StepVerifier::create).expectNext(count).verifyComplete();
+		r2dbc.withHandle((h) -> h.createQuery("SELECT COUNT(*) from BAR").mapRow((row) -> row.get(0)))
+				.cast(Number.class).map(Number::intValue).as(StepVerifier::create).expectNext(count).verifyComplete();
 	}
 
 	@Test

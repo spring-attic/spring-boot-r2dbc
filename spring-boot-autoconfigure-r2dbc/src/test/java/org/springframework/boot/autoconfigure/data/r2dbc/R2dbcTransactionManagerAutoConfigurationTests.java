@@ -35,8 +35,8 @@ import org.springframework.transaction.reactive.TransactionSynchronizationManage
 import org.springframework.transaction.reactive.TransactionalOperator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link R2dbcTransactionManager}.
@@ -52,23 +52,20 @@ class R2dbcTransactionManagerAutoConfigurationTests {
 
 	@Test
 	void noTransactionManager() {
-		contextRunner.run(context -> {
-			assertThat(context).doesNotHaveBean(ReactiveTransactionManager.class);
-		});
+		this.contextRunner.run((context) -> assertThat(context).doesNotHaveBean(ReactiveTransactionManager.class));
 	}
 
 	@Test
 	void singleTransactionManager() {
-		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class).run(context -> {
-			assertThat(context).hasSingleBean(TransactionalOperator.class)
-					.hasSingleBean(ReactiveTransactionManager.class);
-		});
+		this.contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class)
+				.run((context) -> assertThat(context).hasSingleBean(TransactionalOperator.class)
+						.hasSingleBean(ReactiveTransactionManager.class));
 	}
 
 	@Test
 	void transactionManagerEnabled() {
-		contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class, BaseConfiguration.class)
-				.run(context -> {
+		this.contextRunner.withUserConfiguration(SingleConnectionFactoryConfiguration.class, BaseConfiguration.class)
+				.run((context) -> {
 					TransactionalService bean = context.getBean(TransactionalService.class);
 					bean.isTransactionActive().as(StepVerifier::create).expectNext(true).verifyComplete();
 				});
@@ -81,10 +78,10 @@ class R2dbcTransactionManagerAutoConfigurationTests {
 		ConnectionFactory connectionFactory() {
 			ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 			Connection connection = mock(Connection.class);
-			when(connectionFactory.create()).thenAnswer(invocation -> Mono.just(connection));
-			when(connection.beginTransaction()).thenReturn(Mono.empty());
-			when(connection.commitTransaction()).thenReturn(Mono.empty());
-			when(connection.close()).thenReturn(Mono.empty());
+			given(connectionFactory.create()).willAnswer((invocation) -> Mono.just(connection));
+			given(connection.beginTransaction()).willReturn(Mono.empty());
+			given(connection.commitTransaction()).willReturn(Mono.empty());
+			given(connection.close()).willReturn(Mono.empty());
 			return connectionFactory;
 		}
 
@@ -95,7 +92,7 @@ class R2dbcTransactionManagerAutoConfigurationTests {
 	static class BaseConfiguration {
 
 		@Bean
-		public TransactionalService transactionalService() {
+		TransactionalService transactionalService() {
 			return new TransactionalServiceImpl();
 		}
 

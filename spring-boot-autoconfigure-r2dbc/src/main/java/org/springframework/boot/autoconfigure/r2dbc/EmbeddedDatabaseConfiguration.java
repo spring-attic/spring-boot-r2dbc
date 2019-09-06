@@ -113,15 +113,15 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 		}
 
 		String getName() {
-			return name;
+			return this.name;
 		}
 
 		String getUsername() {
-			return username;
+			return this.username;
 		}
 
 		String getPassword() {
-			return password;
+			return this.password;
 		}
 
 	}

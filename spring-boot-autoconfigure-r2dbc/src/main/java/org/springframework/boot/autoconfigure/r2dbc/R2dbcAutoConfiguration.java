@@ -46,7 +46,7 @@ public class R2dbcAutoConfiguration {
 
 	@Bean
 	public R2dbc r2dbc() {
-		return new R2dbc(connectionFactory);
+		return new R2dbc(this.connectionFactory);
 	}
 
 }

@@ -46,7 +46,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.util.ClassUtils;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link ConnectionFactoryInitializerInvoker}.
@@ -96,7 +96,7 @@ class ConnectionFactoryInitializerInvokerTests {
 	private void assertConnectionFactoryIsInitialized(ConnectionFactory connectionFactory, String sql,
 			int expectation) {
 		R2dbc r2dbc = new R2dbc(connectionFactory);
-		r2dbc.withHandle(h -> h.createQuery(sql).mapRow(row -> row.get(0))).cast(Number.class).map(Number::intValue)
+		r2dbc.withHandle((h) -> h.createQuery(sql).mapRow((row) -> row.get(0))).cast(Number.class).map(Number::intValue)
 				.as(StepVerifier::create).expectNext(expectation).verifyComplete();
 	}
 
@@ -134,12 +134,14 @@ class ConnectionFactoryInitializerInvokerTests {
 					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
 					R2dbc r2dbc = new R2dbc(connectionFactory);
-					r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR").mapRow(row -> row.get(0)))
+					r2dbc.withHandle((h) -> h.createQuery("SELECT COUNT(*) from BAR").mapRow((row) -> row.get(0)))
 							.cast(Number.class).map(Number::intValue).as(StepVerifier::create).expectNext(2)
 							.verifyComplete();
-					r2dbc.withHandle(h -> h.createQuery("SELECT name from BAR WHERE id=1").mapRow(row -> row.get(0)))
+					r2dbc.withHandle(
+							(h) -> h.createQuery("SELECT name from BAR WHERE id=1").mapRow((row) -> row.get(0)))
 							.as(StepVerifier::create).expectNext("bar").verifyComplete();
-					r2dbc.withHandle(h -> h.createQuery("SELECT name from BAR WHERE id=2").mapRow(row -> row.get(0)))
+					r2dbc.withHandle(
+							(h) -> h.createQuery("SELECT name from BAR WHERE id=2").mapRow((row) -> row.get(0)))
 							.as(StepVerifier::create).expectNext("ばー").verifyComplete();
 				});
 	}
@@ -156,7 +158,7 @@ class ConnectionFactoryInitializerInvokerTests {
 						AutoConfigurations.of(EmbeddedDatabaseConfiguration.class, DataSourceAutoConfiguration.class))
 				.withPropertyValues("spring.r2dbc.url:", "spring.datasource.driver-class-name:org.h2.Driver",
 						"spring.r2dbc.initialization-mode:embedded", "spring.datasource.initialization-mode:embedded")
-				.run(context -> {
+				.run((context) -> {
 					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
 					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from BAR", 1);
@@ -186,8 +188,8 @@ class ConnectionFactoryInitializerInvokerTests {
 
 	private void assertConnectionFactoryNotInitialized(ConnectionFactory connectionFactory) {
 		R2dbc r2dbc = new R2dbc(connectionFactory);
-		r2dbc.withHandle(h -> h.createQuery("SELECT COUNT(*) from BAR").mapRow(row -> row.get(0)))
-				.as(StepVerifier::create).expectErrorSatisfies(throwable -> {
+		r2dbc.withHandle((h) -> h.createQuery("SELECT COUNT(*) from BAR").mapRow((row) -> row.get(0)))
+				.as(StepVerifier::create).expectErrorSatisfies((throwable) -> {
 					assertThat(throwable).isInstanceOf(RuntimeException.class);
 					SQLException ex = (SQLException) throwable.getCause();
 					int expectedCode = 42102; // object not found

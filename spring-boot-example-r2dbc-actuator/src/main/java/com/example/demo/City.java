@@ -43,7 +43,7 @@ public class City {
 	}
 
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
 	public String getName() {

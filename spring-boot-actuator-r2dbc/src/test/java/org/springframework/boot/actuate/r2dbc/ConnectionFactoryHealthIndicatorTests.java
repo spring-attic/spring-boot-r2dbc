@@ -46,7 +46,7 @@ class ConnectionFactoryHealthIndicatorTests {
 
 	@BeforeEach
 	void init() {
-		connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
+		this.connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
 				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1").build());
 	}
 
@@ -63,8 +63,8 @@ class ConnectionFactoryHealthIndicatorTests {
 	@Test
 	void healthIndicatorWithCustomValidationQuery() {
 		String customValidationQuery = "SELECT COUNT(*) from FOO";
-		new R2dbc(connectionFactory)
-				.useHandle(h -> h.createQuery("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)")
+		new R2dbc(this.connectionFactory)
+				.useHandle((h) -> h.createQuery("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)")
 						.mapResult(Result::getRowsUpdated))
 				.as(StepVerifier::create).expectNextCount(0).verifyComplete();
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory, customValidationQuery);

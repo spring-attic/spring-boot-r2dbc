@@ -48,7 +48,7 @@ public class R2dbcTransactionManagerAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean(ReactiveTransactionManager.class)
-		public R2dbcTransactionManager connectionFactoryTransactionManager(ConnectionFactory connectionFactory) {
+		R2dbcTransactionManager connectionFactoryTransactionManager(ConnectionFactory connectionFactory) {
 			return new R2dbcTransactionManager(connectionFactory);
 		}
 

@@ -351,7 +351,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 	}
 
 	public Map<String, String> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public void setProperties(Map<String, String> properties) {
@@ -359,7 +359,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 	}
 
 	public Pool getPool() {
-		return pool;
+		return this.pool;
 	}
 
 	public void setPool(Pool pool) {
@@ -377,7 +377,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 				this.embeddedDatabaseConnection);
 	}
 
-	static class DataSourceBeanCreationException extends BeanCreationException {
+	public static class DataSourceBeanCreationException extends BeanCreationException {
 
 		private final R2dbcProperties properties;
 
@@ -400,7 +400,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	}
 
-	static class Pool {
+	public static class Pool {
 
 		/**
 		 * Configure a idle {@link Duration timeout}. Defaults to 30 minutes.
@@ -423,7 +423,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		private String validationQuery;
 
 		public Duration getMaxIdleTime() {
-			return maxIdleTime;
+			return this.maxIdleTime;
 		}
 
 		public void setMaxIdleTime(Duration maxIdleTime) {
@@ -431,7 +431,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		}
 
 		public int getInitialSize() {
-			return initialSize;
+			return this.initialSize;
 		}
 
 		public void setInitialSize(int initialSize) {
@@ -439,7 +439,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		}
 
 		public int getMaxSize() {
-			return maxSize;
+			return this.maxSize;
 		}
 
 		public void setMaxSize(int maxSize) {
@@ -447,7 +447,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		}
 
 		public String getValidationQuery() {
-			return validationQuery;
+			return this.validationQuery;
 		}
 
 		public void setValidationQuery(String validationQuery) {
@@ -470,7 +470,7 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		}
 
 		EmbeddedDatabaseConnection getEmbeddedDatabaseConnection() {
-			return embeddedDatabaseConnection;
+			return this.embeddedDatabaseConnection;
 		}
 
 		R2dbcProperties getProperties() {

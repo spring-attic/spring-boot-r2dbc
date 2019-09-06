@@ -82,11 +82,8 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	}
 
 	private Mono<Object> runValidationQuery(String validationQuery) {
-		return Mono.usingWhen(this.connectionFactory.create(), conn -> {
-			return Flux.from(conn.createStatement(validationQuery).execute()).flatMap(it -> it.map(this::extractResult))
-					.next();
-
-		}, Connection::close, Connection::close, Connection::close);
+		return Mono.usingWhen(this.connectionFactory.create(), conn -> Flux.from(conn.createStatement(validationQuery).execute()).flatMap(it -> it.map(this::extractResult))
+				.next(), Connection::close, Connection::close, Connection::close);
 	}
 
 	private Object extractResult(Row row, RowMetadata metadata) {
@@ -94,7 +91,7 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	}
 
 	private String getProduct() {
-		return connectionFactory.getMetadata().getName();
+		return this.connectionFactory.getMetadata().getName();
 	}
 
 	protected String getValidationQuery(String product) {

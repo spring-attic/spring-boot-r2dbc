@@ -36,7 +36,7 @@ import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link ConnectionFactoryAutoConfiguration}.
@@ -47,10 +47,10 @@ class ConnectionFactoryAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
-			.withInitializer(configurableApplicationContext -> {
+			.withInitializer((context) -> {
 				ConditionEvaluationReportLoggingListener l = new ConditionEvaluationReportLoggingListener(
 						LogLevel.INFO);
-				l.initialize(configurableApplicationContext);
+				l.initialize(context);
 			});
 
 	@Test

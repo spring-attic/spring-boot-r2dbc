@@ -40,9 +40,6 @@ public enum EmbeddedDatabaseConnection {
 	H2("H2", "io.r2dbc.h2.H2ConnectionFactoryProvider", "h2",
 			"r2dbc:h2:mem://in-memory/%s?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
 
-	/**
-	 * @see EmbeddedDatabaseType
-	 */
 	private final String type;
 
 	private final String driverClassName;

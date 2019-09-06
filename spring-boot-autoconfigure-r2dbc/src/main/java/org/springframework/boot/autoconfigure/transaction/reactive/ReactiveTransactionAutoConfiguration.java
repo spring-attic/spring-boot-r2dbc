@@ -43,7 +43,7 @@ public class ReactiveTransactionAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
+		TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
 			return TransactionalOperator.create(transactionManager);
 		}
 

@@ -16,11 +16,9 @@
 
 package org.springframework.boot.autoconfigure.data.r2dbc;
 
-import static org.assertj.core.api.Assertions.*;
-
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
@@ -34,6 +32,8 @@ import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.r2dbc.repository.config.R2dbcRepositoryConfigurationExtension;
 import org.springframework.data.repository.Repository;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link R2dbcRepositoriesAutoConfiguration}.
@@ -81,9 +81,8 @@ class R2dbcRepositoriesAutoConfigurationTests {
 		this.contextRunner
 				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
 						EmbeddedDatabaseConfiguration.class))
-				.withUserConfiguration(EmptyConfiguration.class).run((context) -> {
-					assertThat(context).doesNotHaveBean(Repository.class);
-				});
+				.withUserConfiguration(EmptyConfiguration.class)
+				.run((context) -> assertThat(context).doesNotHaveBean(Repository.class));
 	}
 
 	@Test

@@ -26,19 +26,22 @@ import io.r2dbc.spi.ConnectionFactory;
  *
  * @author Mark Paluch
  */
-class TestConnectionFactory {
+final class TestConnectionFactory {
+
+	private TestConnectionFactory() {
+	}
 
 	/**
 	 * Create an in-memory database with a random name.
 	 */
-	public static ConnectionFactory get() {
+	static ConnectionFactory get() {
 		return get(UUID.randomUUID().toString());
 	}
 
 	/**
 	 * Create an in-memory database with a given name.
 	 */
-	public static ConnectionFactory get(String name) {
+	static ConnectionFactory get(String name) {
 		return ConnectionFactories
 				.get(String.format("r2dbc:h2:mem:///%s?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE", name));
 	}
