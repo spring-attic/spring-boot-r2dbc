@@ -31,7 +31,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
 /**
- * Base class for configuration of R2DBC.
+ * Configuration properties for R2DBC.
  *
  * @author Mark Paluch
  */
@@ -403,22 +403,22 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 	public static class Pool {
 
 		/**
-		 * Configure a idle {@link Duration timeout}. Defaults to 30 minutes.
+		 * Idle timeout.
 		 */
 		private Duration maxIdleTime = Duration.ofMinutes(30);
 
 		/**
-		 * Configure the initial connection pool size. Defaults to {@code 10}.
+		 * Initial connection pool size.
 		 */
 		private int initialSize = 10;
 
 		/**
-		 * Configure the maximal connection pool size. Defaults to {@code 10}.
+		 * Maximal connection pool size.
 		 */
 		private int maxSize = 10;
 
 		/**
-		 * Configure a validation query.
+		 * Validation query.
 		 */
 		private String validationQuery;
 
