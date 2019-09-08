@@ -20,13 +20,11 @@ import java.util.Map;
 
 import io.r2dbc.spi.ConnectionFactory;
 
-import org.springframework.boot.actuate.autoconfigure.health.CompositeReactiveHealthIndicatorConfiguration;
+import org.springframework.boot.actuate.autoconfigure.health.CompositeReactiveHealthContributorConfiguration;
 import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
-import org.springframework.boot.actuate.autoconfigure.health.HealthIndicatorAutoConfiguration;
-import org.springframework.boot.actuate.health.ReactiveHealthIndicator;
+import org.springframework.boot.actuate.health.ReactiveHealthContributor;
 import org.springframework.boot.actuate.r2dbc.ConnectionFactoryHealthIndicator;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -36,7 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for *
+ * {@link EnableAutoConfiguration Auto-configuration} for
  * {@link ConnectionFactoryHealthIndicator}.
  *
  * @author Mark Paluch
@@ -45,21 +43,21 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(ConnectionFactory.class)
 @ConditionalOnBean(ConnectionFactory.class)
 @ConditionalOnEnabledHealthIndicator("r2dbc")
-@AutoConfigureBefore(HealthIndicatorAutoConfiguration.class)
 @AutoConfigureAfter(ConnectionFactoryAutoConfiguration.class)
-public class ConnectionFactoryHealthIndicatorAutoConfiguration
-		extends CompositeReactiveHealthIndicatorConfiguration<ConnectionFactoryHealthIndicator, ConnectionFactory> {
+public class ConnectionFactoryHealthContributorAutoConfiguration
+		extends CompositeReactiveHealthContributorConfiguration<ConnectionFactoryHealthIndicator, ConnectionFactory> {
 
 	private final Map<String, ConnectionFactory> connectionFactory;
 
-	ConnectionFactoryHealthIndicatorAutoConfiguration(Map<String, ConnectionFactory> connectionFactory) {
+	ConnectionFactoryHealthContributorAutoConfiguration(Map<String, ConnectionFactory> connectionFactory) {
 		this.connectionFactory = connectionFactory;
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(name = "r2dbcConnectionFactoryHealthIndicator")
-	public ReactiveHealthIndicator r2dbcConnectionFactoryHealthIndicator() {
-		return this.createHealthIndicator(this.connectionFactory);
+	@ConditionalOnMissingBean(
+			name = { "r2dbcConnectionFactoryHealthIndicator", "r2dbcConnectionFactoryHealthContributor" })
+	public ReactiveHealthContributor r2dbcConnectionFactoryHealthContributor() {
+		return createContributor(this.connectionFactory);
 	}
 
 }
