@@ -21,10 +21,12 @@ import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.data.r2dbc.connectionfactory.init.DatabasePopulator;
 
 /**
  * Configures {@link ConnectionFactory} initialization.
@@ -32,6 +34,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * @author Mark Paluch
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnClass(DatabasePopulator.class)
 @Import({ ConnectionFactoryInitializerInvoker.class, ConnectionFactoryInitializationConfiguration.Registrar.class })
 class ConnectionFactoryInitializationConfiguration {
 
