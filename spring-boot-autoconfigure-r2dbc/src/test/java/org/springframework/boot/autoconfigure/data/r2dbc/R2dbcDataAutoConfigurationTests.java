@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Mark Paluch
  */
-public class R2dbcDataAutoConfigurationTests {
+class R2dbcDataAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(
 			AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, R2dbcDataAutoConfiguration.class));

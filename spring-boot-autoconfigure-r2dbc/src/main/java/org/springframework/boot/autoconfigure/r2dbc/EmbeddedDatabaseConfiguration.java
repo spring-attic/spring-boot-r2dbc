@@ -18,8 +18,6 @@ package org.springframework.boot.autoconfigure.r2dbc;
 
 import java.sql.Connection;
 
-import javax.annotation.PreDestroy;
-
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -46,8 +44,6 @@ import org.springframework.util.StringUtils;
 @ConditionalOnClass({ Connection.class, ConnectionFactory.class, EmbeddedDatabaseType.class })
 @EnableConfigurationProperties(R2dbcProperties.class)
 public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
-
-	private EmbeddedDatabase database;
 
 	private ClassLoader classLoader;
 
@@ -89,13 +85,6 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 			builder.option(ConnectionFactoryOptions.PASSWORD, embedded.getPassword());
 		}
 		return ConnectionFactories.get(builder.build());
-	}
-
-	@PreDestroy
-	public void close() {
-		if (this.database != null) {
-			this.database.shutdown();
-		}
 	}
 
 	static class EmbeddedDatabaseConnectionInformation {

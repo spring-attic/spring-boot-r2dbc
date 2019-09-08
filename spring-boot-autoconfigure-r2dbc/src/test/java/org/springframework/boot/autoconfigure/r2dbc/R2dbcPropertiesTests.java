@@ -36,7 +36,6 @@ class R2dbcPropertiesTests {
 	@Test
 	void shouldReportEmbeddedDatabase() {
 		this.contextRunner.run((context) -> {
-
 			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
 			assertThat(properties.determineUsername()).isEqualTo("sa");
 			assertThat(properties.determinePassword()).isEqualTo("");
@@ -47,7 +46,6 @@ class R2dbcPropertiesTests {
 	@Test
 	void shouldReportCustomDriver() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url=r2dbc:simple://:pool:").run((context) -> {
-
 			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
 			assertThat(properties.determineUsername()).isNull();
 			assertThat(properties.determinePassword()).isNull();

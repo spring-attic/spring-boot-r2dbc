@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link ConnectionFactoryBuilder}.
+ * Tests for {@link ConnectionFactoryBuilder}.
  *
  * @author Mark Paluch
  * @author Tadaya Tsuyukubo
  */
-class ConnectionFactoryBuilderUnitTests {
+class ConnectionFactoryBuilderTests {
 
 	@Test
 	void shouldApplyProperties() {

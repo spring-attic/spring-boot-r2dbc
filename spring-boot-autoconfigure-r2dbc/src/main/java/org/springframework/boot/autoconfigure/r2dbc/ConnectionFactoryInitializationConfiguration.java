@@ -16,6 +16,8 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import io.r2dbc.spi.ConnectionFactory;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;

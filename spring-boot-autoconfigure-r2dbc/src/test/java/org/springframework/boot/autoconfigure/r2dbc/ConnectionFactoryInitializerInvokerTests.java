@@ -25,8 +25,6 @@ import java.util.UUID;
 
 import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
@@ -61,18 +59,6 @@ class ConnectionFactoryInitializerInvokerTests {
 					"spring.r2dbc.url:r2dbc:h2:mem:///init-" + UUID.randomUUID()
 							+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
 					"spring.datasource.initialization-mode:never");
-
-	@BeforeEach
-	void before() {
-		System.setProperty("h2.delayWrongPasswordMin", "0");
-		System.setProperty("h2.delayWrongPasswordMax", "1");
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-		System.clearProperty("h2.delayWrongPasswordMin");
-		System.clearProperty("h2.delayWrongPasswordMax");
-	}
 
 	@Test
 	void connectionFactoryInitialized() {
@@ -198,8 +184,8 @@ class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	@Test
-	void connectionFactoryInitializedWithSchemaCredentials() {
-		this.contextRunner
+	void connectionFactoryInitializedWithInvalidSchemaCredentials() {
+		this.contextRunner.withSystemProperties("h2.delayWrongPasswordMin:0", "h2.delayWrongPasswordMax:1")
 				.withPropertyValues("spring.r2dbc.initialization-mode:always", "spring.r2dbc.sqlScriptEncoding:UTF-8",
 						"spring.r2dbc.schema:" + getRelativeLocationFor("encoding-schema.sql"),
 						"spring.r2dbc.data:" + getRelativeLocationFor("encoding-data.sql"),

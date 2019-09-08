@@ -29,9 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener;
 import org.springframework.boot.autoconfigure.r2dbc.SimpleConnectionFactoryProvider.TestConnectionFactory;
-import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -46,12 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConnectionFactoryAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
-			.withInitializer((context) -> {
-				ConditionEvaluationReportLoggingListener l = new ConditionEvaluationReportLoggingListener(
-						LogLevel.INFO);
-				l.initialize(context);
-			});
+			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class));
 
 	@Test
 	void testDefaultPooledConnectionFactoryExists() {
