@@ -93,4 +93,18 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<h2.delayWrongPasswordMin>0</h2.delayWrongPasswordMin>
+						<h2.delayWrongPasswordMax>0</h2.delayWrongPasswordMax>
+					</systemProperties>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
