@@ -15,6 +15,6 @@
  */
 
 /**
- * Metrics actuator support for R2DBC.
+ * Auto-configuration for R2DBC pool metrics.
  */
-package org.springframework.boot.actuate.r2dbc.metrics;
+package org.springframework.boot.actuate.autoconfigure.metrics.r2dbc;

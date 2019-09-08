@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.actuate.autoconfigure.r2dbc.metrics.pool;
+package org.springframework.boot.actuate.autoconfigure.metrics.r2dbc;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ import io.r2dbc.pool.ConnectionPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration;
-import org.springframework.boot.actuate.r2dbc.metrics.ConnectionPoolMetrics;
+import org.springframework.boot.actuate.metrics.r2dbc.ConnectionPoolMetrics;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

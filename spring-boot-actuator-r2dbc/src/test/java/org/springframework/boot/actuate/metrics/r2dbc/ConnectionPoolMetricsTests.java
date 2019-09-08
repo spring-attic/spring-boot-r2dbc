@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.actuate.r2dbc.metrics;
+package org.springframework.boot.actuate.metrics.r2dbc;
 
 import java.util.Random;
 
@@ -41,9 +41,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ConnectionPoolMetricsTests {
 
-	Tag fooTag = Tag.of("foo", "FOO");
+	private static final Tag fooTag = Tag.of("foo", "FOO");
 
-	Tag barTag = Tag.of("bar", "BAR");
+	private static final Tag barTag = Tag.of("bar", "BAR");
 
 	private ConnectionFactory connectionFactory;
 
@@ -59,8 +59,7 @@ class ConnectionPoolMetricsTests {
 		ConnectionPool connectionPool = new ConnectionPool(
 				ConnectionPoolConfiguration.builder(this.connectionFactory).initialSize(3).maxSize(7).build());
 
-		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool",
-				Tags.of(this.fooTag, this.barTag));
+		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool", Tags.of(fooTag, barTag));
 		metrics.bindTo(registry);
 		// acquire two connections
 		connectionPool.create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
@@ -76,8 +75,7 @@ class ConnectionPoolMetricsTests {
 	private void assertGauge(SimpleMeterRegistry registry, String metric, int expectedValue) {
 		Gauge gauge = registry.get(metric).gauge();
 		assertThat(gauge.value()).isEqualTo(expectedValue);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), this.fooTag,
-				this.barTag);
+		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
 	}
 
 }

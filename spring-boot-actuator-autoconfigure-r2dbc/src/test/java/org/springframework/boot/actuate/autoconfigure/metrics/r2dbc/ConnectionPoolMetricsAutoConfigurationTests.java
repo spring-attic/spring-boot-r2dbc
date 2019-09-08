@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.actuate.autoconfigure.r2dbc.metrics.pool;
+package org.springframework.boot.actuate.autoconfigure.metrics.r2dbc;
 
 import java.util.Random;
 
