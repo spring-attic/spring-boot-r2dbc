@@ -42,7 +42,7 @@ public class ConnectionPoolMetrics implements MeterBinder {
 
 	@Override
 	public void bindTo(MeterRegistry registry) {
-		this.pool.getMetrics().ifPresent(poolMetrics -> {
+		this.pool.getMetrics().ifPresent((poolMetrics) -> {
 			Gauge.builder("r2dbc.pool.acquired", poolMetrics, PoolMetrics::acquiredSize).tags(this.tags)
 					.description("Size of successfully acquired connections which are in active use")
 					.baseUnit("connections").register(registry);

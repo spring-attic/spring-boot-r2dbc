@@ -31,7 +31,7 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.jdbc.DatabaseDriver;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.entry;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * Tests for {@link ConnectionFactoryHealthIndicator}.

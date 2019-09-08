@@ -51,7 +51,7 @@ class ConnectionPoolMetricsAutoConfigurationTests {
 		this.contextRunner.run((context) -> {
 			MeterRegistry registry = context.getBean(MeterRegistry.class);
 			assertThat(registry.find("r2dbc.pool.acquired").gauges()).extracting(Meter::getId)
-					.extracting(id -> id.getTag("name")).containsExactlyInAnyOrder("firstPool", "secondPool");
+					.extracting((id) -> id.getTag("name")).containsExactlyInAnyOrder("firstPool", "secondPool");
 		});
 	}
 

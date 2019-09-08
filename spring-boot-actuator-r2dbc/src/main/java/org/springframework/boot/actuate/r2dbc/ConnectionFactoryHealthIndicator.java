@@ -72,7 +72,7 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 		if (StringUtils.hasText(validationQuery)) {
 			builder.withDetail("validationQuery", validationQuery);
 			Mono<Object> result = runValidationQuery(validationQuery);
-			return result.map(it -> {
+			return result.map((it) -> {
 				builder.withDetail("result", it);
 				return builder.build();
 			}).defaultIfEmpty(builder.build()).onErrorResume(Exception.class,
@@ -83,8 +83,8 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 
 	private Mono<Object> runValidationQuery(String validationQuery) {
 		return Mono.usingWhen(this.connectionFactory.create(),
-				conn -> Flux.from(conn.createStatement(validationQuery).execute())
-						.flatMap(it -> it.map(this::extractResult)).next(),
+				(conn) -> Flux.from(conn.createStatement(validationQuery).execute())
+						.flatMap((it) -> it.map(this::extractResult)).next(),
 				Connection::close, Connection::close, Connection::close);
 	}
 

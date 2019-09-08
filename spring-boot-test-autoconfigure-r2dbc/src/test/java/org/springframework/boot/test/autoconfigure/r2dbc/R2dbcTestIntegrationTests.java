@@ -27,7 +27,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * Integration tests for {@link R2dbcTest}.
