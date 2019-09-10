@@ -17,6 +17,7 @@
 package org.springframework.boot.autoconfigure.r2dbc;
 
 import java.sql.Connection;
+import java.util.List;
 
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
@@ -74,7 +75,8 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 	}
 
 	@Bean
-	public ConnectionFactory connectionFactory(EmbeddedDatabaseConnectionInformation embedded) {
+	public ConnectionFactory connectionFactory(EmbeddedDatabaseConnectionInformation embedded,
+			List<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
 		EmbeddedDatabaseConnection connection = EmbeddedDatabaseConnection.get(this.classLoader);
 		ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions.parse(connection.getUrl(embedded.getName()))
 				.mutate();
@@ -83,6 +85,11 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 		}
 		if (StringUtils.hasText(embedded.getUsername())) {
 			builder.option(ConnectionFactoryOptions.PASSWORD, embedded.getPassword());
+		}
+		if (customizers != null) {
+			for (ConnectionFactoryOptionsBuilderCustomizer customizer : customizers) {
+				customizer.customize(builder);
+			}
 		}
 		return ConnectionFactories.get(builder.build());
 	}

@@ -33,7 +33,7 @@ public class SimpleConnectionFactoryProvider implements ConnectionFactoryProvide
 
 	@Override
 	public ConnectionFactory create(ConnectionFactoryOptions connectionFactoryOptions) {
-		return new TestConnectionFactory(connectionFactoryOptions);
+		return new SimpleTestConnectionFactory(connectionFactoryOptions);
 	}
 
 	@Override
@@ -46,11 +46,11 @@ public class SimpleConnectionFactoryProvider implements ConnectionFactoryProvide
 		return "simple";
 	}
 
-	static class TestConnectionFactory implements ConnectionFactory {
+	public static class SimpleTestConnectionFactory implements ConnectionFactory {
 
 		ConnectionFactoryOptions options;
 
-		TestConnectionFactory(ConnectionFactoryOptions options) {
+		SimpleTestConnectionFactory(ConnectionFactoryOptions options) {
 			this.options = options;
 		}
 
@@ -61,7 +61,11 @@ public class SimpleConnectionFactoryProvider implements ConnectionFactoryProvide
 
 		@Override
 		public ConnectionFactoryMetadata getMetadata() {
-			throw new UnsupportedOperationException();
+			return SimpleConnectionFactoryProvider.class::getName;
+		}
+
+		public ConnectionFactoryOptions getOptions() {
+			return this.options;
 		}
 
 	}

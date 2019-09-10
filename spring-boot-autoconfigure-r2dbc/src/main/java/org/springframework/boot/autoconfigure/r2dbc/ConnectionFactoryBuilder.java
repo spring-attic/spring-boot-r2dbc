@@ -16,6 +16,7 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -95,6 +96,15 @@ public final class ConnectionFactoryBuilder {
 
 	public ConnectionFactoryBuilder database(String database) {
 		this.builder.option(ConnectionFactoryOptions.DATABASE, database);
+		return this;
+	}
+
+	public ConnectionFactoryBuilder customize(List<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
+		if (customizers != null) {
+			for (ConnectionFactoryOptionsBuilderCustomizer customizer : customizers) {
+				customizer.customize(this.builder);
+			}
+		}
 		return this;
 	}
 

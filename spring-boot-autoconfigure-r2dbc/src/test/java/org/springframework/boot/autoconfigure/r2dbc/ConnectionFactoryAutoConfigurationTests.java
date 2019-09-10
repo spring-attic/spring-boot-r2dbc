@@ -29,9 +29,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.r2dbc.SimpleConnectionFactoryProvider.TestConnectionFactory;
+import org.springframework.boot.autoconfigure.r2dbc.SimpleConnectionFactoryProvider.SimpleTestConnectionFactory;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,6 +82,34 @@ class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
+	void appliesCustomizationToGenericConnectionFactory() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://host/database")
+				.withClassLoader(new FilteredClassLoader("io.r2dbc.pool"))
+				.withUserConfiguration(CustomizerConfiguration.class).run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class);
+					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
+					assertThat(bean).isExactlyInstanceOf(SimpleTestConnectionFactory.class);
+					SimpleTestConnectionFactory connectionFactory = (SimpleTestConnectionFactory) bean;
+					assertThat(connectionFactory.getOptions().getRequiredValue(Option.<Boolean>valueOf("customized")))
+							.isTrue();
+				});
+	}
+
+	@Test
+	void appliesCustomizationToPooledConnectionFactory() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://host/database")
+				.withUserConfiguration(CustomizerConfiguration.class).run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class);
+					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
+					assertThat(bean).isExactlyInstanceOf(ConnectionPool.class);
+					SimpleTestConnectionFactory connectionFactory = ((Wrapped<SimpleTestConnectionFactory>) bean)
+							.unwrap();
+					assertThat(connectionFactory.getOptions().getRequiredValue(Option.<Boolean>valueOf("customized")))
+							.isTrue();
+				});
+	}
+
+	@Test
 	void testBadUrl() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:not-going-to-work")
 				.withClassLoader(new DisableEmbeddedDatabaseClassLoader())
@@ -93,7 +123,7 @@ class ConnectionFactoryAutoConfigurationTests {
 				.run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
 					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
-					assertThat(connectionFactory).isInstanceOf(TestConnectionFactory.class);
+					assertThat(connectionFactory).isInstanceOf(SimpleTestConnectionFactory.class);
 				});
 	}
 
@@ -102,7 +132,8 @@ class ConnectionFactoryAutoConfigurationTests {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",
 				"spring.r2dbc.properties.key=value", "spring.r2dbc.pool.initial-size=0").run((context) -> {
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
-					TestConnectionFactory testConnectionFactory = ((Wrapped<TestConnectionFactory>) bean).unwrap();
+					SimpleTestConnectionFactory testConnectionFactory = ((Wrapped<SimpleTestConnectionFactory>) bean)
+							.unwrap();
 					assertThat((Object) testConnectionFactory.options.getRequiredValue(Option.valueOf("key")))
 							.isEqualTo("value");
 				});
@@ -122,6 +153,16 @@ class ConnectionFactoryAutoConfigurationTests {
 				}
 			}
 			return super.loadClass(name, resolve);
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	private static class CustomizerConfiguration {
+
+		@Bean
+		ConnectionFactoryOptionsBuilderCustomizer customizer() {
+			return (builder) -> builder.option(Option.valueOf("customized"), true);
 		}
 
 	}

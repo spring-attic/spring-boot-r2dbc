@@ -16,6 +16,8 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
+import java.util.List;
+
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.spi.ConnectionFactory;
@@ -36,8 +38,10 @@ public class ConnectionFactoryConfiguration {
 	protected static class ConnectionPoolConnectionFactoryConfiguration {
 
 		@Bean(destroyMethod = "dispose")
-		ConnectionPool connectionFactory(R2dbcProperties properties) {
-			ConnectionFactory connectionFactory = ConnectionFactoryBuilder.create(properties).build();
+		ConnectionPool connectionFactory(R2dbcProperties properties,
+				List<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
+			ConnectionFactory connectionFactory = ConnectionFactoryBuilder.create(properties).customize(customizers)
+					.build();
 			R2dbcProperties.Pool pool = properties.getPool();
 			ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory)
 					.maxSize(pool.getMaxSize()).initialSize(pool.getInitialSize()).maxIdleTime(pool.getMaxIdleTime());
@@ -54,8 +58,9 @@ public class ConnectionFactoryConfiguration {
 	protected static class Generic {
 
 		@Bean
-		ConnectionFactory connectionFactory(R2dbcProperties properties) {
-			return ConnectionFactoryBuilder.create(properties).build();
+		ConnectionFactory connectionFactory(R2dbcProperties properties,
+				List<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
+			return ConnectionFactoryBuilder.create(properties).customize(customizers).build();
 		}
 
 	}
