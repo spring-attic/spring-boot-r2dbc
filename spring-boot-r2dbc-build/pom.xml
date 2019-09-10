@@ -122,39 +122,39 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<inherited>true</inherited>
+				<executions>
+					<execution>
+						<!-- Tidy up all POMs before they are published -->
+						<id>flatten</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+						<configuration>
+							<updatePomFile>true</updatePomFile>
+							<flattenMode>oss</flattenMode>
+							<pomElements>
+								<parent>expand</parent>
+								<distributionManagement>remove</distributionManagement>
+								<repositories>remove</repositories>
+							</pomElements>
+						</configuration>
+					</execution>
+					<execution>
+						<id>flatten-clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>repositories</id>
-			<activation>
-				<property>
-					<name>!skip-repositories</name>
-				</property>
-			</activation>
-			<repositories>
-				<repository>
-					<id>spring-snapshots</id>
-					<url>https://repo.spring.io/snapshot</url>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</repository>
-				<repository>
-					<id>oss-jfrog-snapshots</id>
-					<url>https://oss.jfrog.org/libs-snapshot</url>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</repository>
-				<repository>
-					<id>spring-milestone</id>
-					<url>https://repo.spring.io/milestone</url>
-				</repository>
-			</repositories>
-		</profile>
-	</profiles>
 
 	<repositories>
 		<repository>
@@ -167,6 +167,13 @@
 		<repository>
 			<id>jcenter</id>
 			<url>https://jcenter.bintray.com/</url>
+		</repository>
+		<repository>
+			<id>oss-jfrog-snapshots</id>
+			<url>https://oss.jfrog.org/libs-snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>jitpack.io</id>
