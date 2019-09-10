@@ -8,10 +8,10 @@
 		<relativePath/>
 	</parent>
 	<groupId>org.springframework.boot.experimental</groupId>
-	<artifactId>spring-boot-dependencies-r2dbc</artifactId>
+	<artifactId>spring-boot-bom-r2dbc</artifactId>
 	<version>0.1.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Spring Boot R2DBC Dependencies</name>
+	<name>Spring Boot R2DBC Bill of Materials</name>
 	<description>Spring Boot R2DBC Dependency Management</description>
 	<url>https://projects.spring.io/spring-boot/</url>
 	<organization>
@@ -22,6 +22,10 @@
 	<properties>
 		<spring-javaformat.version>0.0.15</spring-javaformat.version>
 		<disable.checks>false</disable.checks>
+		<cloud-spanner-r2dbc.version>0.1.0-SNAPSHOT</cloud-spanner-r2dbc.version>
+		<jasync-r2dbc-mysql.version>1.0.6</jasync-r2dbc-mysql.version>
+		<r2dbc-mysql.version>0.3.0.BUILD-SNAPSHOT</r2dbc-mysql.version>
+		<r2dbc-releasetrain.version>Arabba-BUILD-SNAPSHOT</r2dbc-releasetrain.version>
 	</properties>
 
 	<dependencyManagement>
@@ -64,12 +68,22 @@
 			<dependency>
 				<groupId>com.github.jasync-sql</groupId>
 				<artifactId>jasync-r2dbc-mysql</artifactId>
-				<version>1.0.6</version>
+				<version>${jasync-r2dbc-mysql.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.mirromutth</groupId>
+				<artifactId>r2dbc-mysql</artifactId>
+				<version>${r2dbc-mysql.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.cloud</groupId>
+				<artifactId>cloud-spanner-r2dbc</artifactId>
+				<version>${cloud-spanner-r2dbc.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.r2dbc</groupId>
 				<artifactId>r2dbc-bom</artifactId>
-				<version>Arabba-BUILD-SNAPSHOT</version>
+				<version>${r2dbc-releasetrain.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -172,6 +186,13 @@
 		<repository>
 			<id>jcenter</id>
 			<url>https://jcenter.bintray.com/</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 

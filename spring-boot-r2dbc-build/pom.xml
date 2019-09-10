@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot.experimental</groupId>
-		<artifactId>spring-boot-dependencies-r2dbc</artifactId>
+		<artifactId>spring-boot-bom-r2dbc</artifactId>
 		<version>0.1.0.BUILD-SNAPSHOT</version>
-		<relativePath>../spring-boot-dependencies-r2dbc</relativePath>
+		<relativePath>../spring-boot-bom-r2dbc</relativePath>
 	</parent>
 	<artifactId>spring-boot-r2dbc-build</artifactId>
 	<packaging>pom</packaging>
