@@ -23,12 +23,12 @@ import io.r2dbc.h2.H2ConnectionConfiguration;
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.ValidationDepth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.boot.jdbc.DatabaseDriver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -55,8 +55,8 @@ class ConnectionFactoryHealthIndicatorTests {
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory);
 		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.UP);
-			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("result", 1),
-					entry("validationQuery", DatabaseDriver.H2.getValidationQuery()));
+			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("valid", true),
+					entry("validationDepth", ValidationDepth.REMOTE));
 		}).verifyComplete();
 	}
 

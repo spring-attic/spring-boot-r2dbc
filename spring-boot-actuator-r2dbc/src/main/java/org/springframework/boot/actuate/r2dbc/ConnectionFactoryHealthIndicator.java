@@ -20,14 +20,13 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
+import io.r2dbc.spi.ValidationDepth;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.boot.actuate.health.AbstractReactiveHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Health indicator for R2DBC ConnectionFactory.
@@ -36,11 +35,11 @@ import org.springframework.util.StringUtils;
  */
 public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndicator {
 
-	private static final String DEFAULT_QUERY = "SELECT 1";
-
 	private final ConnectionFactory connectionFactory;
 
-	private String query;
+	private final ValidationDepth validationDepth;
+
+	private final String query;
 
 	/**
 	 * Create a new {@link ConnectionFactoryHealthIndicator} using the specified
@@ -48,7 +47,21 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	 * @param connectionFactory the connection factory
 	 */
 	public ConnectionFactoryHealthIndicator(ConnectionFactory connectionFactory) {
-		this(connectionFactory, null);
+		this(connectionFactory, ValidationDepth.REMOTE);
+	}
+
+	/**
+	 * Create a new {@link ConnectionFactoryHealthIndicator} using the specified
+	 * {@link ConnectionFactory} and validation query.
+	 * @param connectionFactory the connection factory
+	 * @param validationDepth the {@link ValidationDepth} to use for health checking.
+	 */
+	public ConnectionFactoryHealthIndicator(ConnectionFactory connectionFactory, ValidationDepth validationDepth) {
+		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
+		Assert.notNull(validationDepth, "ValidationDepth must not be null");
+		this.connectionFactory = connectionFactory;
+		this.validationDepth = validationDepth;
+		this.query = null;
 	}
 
 	/**
@@ -59,7 +72,9 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	 */
 	public ConnectionFactoryHealthIndicator(ConnectionFactory connectionFactory, String query) {
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
+		Assert.hasText(query, "Validation query must not be empty");
 		this.connectionFactory = connectionFactory;
+		this.validationDepth = null;
 		this.query = query;
 	}
 
@@ -67,24 +82,36 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	protected Mono<Health> doHealthCheck(Health.Builder builder) {
 		String product = getProduct();
 		builder.up().withDetail("database", product);
-		String validationQuery = getValidationQuery(product);
-		if (StringUtils.hasText(validationQuery)) {
-			builder.withDetail("validationQuery", validationQuery);
-			Mono<Object> result = runValidationQuery(validationQuery);
+		if (this.validationDepth != null) {
+			builder.withDetail("validationDepth", this.validationDepth);
+			Mono<Boolean> result = validate(this.validationDepth);
+			return result.map((it) -> {
+				builder.withDetail("valid", it);
+				return builder.build();
+			}).defaultIfEmpty(builder.build()).onErrorResume(Exception.class,
+					(e) -> Mono.just(builder.down(e).build()));
+		}
+		else {
+			builder.withDetail("validationQuery", this.query);
+			Mono<Object> result = runValidationQuery(this.query);
 			return result.map((it) -> {
 				builder.withDetail("result", it);
 				return builder.build();
 			}).defaultIfEmpty(builder.build()).onErrorResume(Exception.class,
 					(e) -> Mono.just(builder.down(e).build()));
 		}
-		return Mono.just(builder.build());
+	}
+
+	private Mono<Boolean> validate(ValidationDepth validationDepth) {
+		return Mono.usingWhen(this.connectionFactory.create(), (conn) -> Mono.from(conn.validate(validationDepth)),
+				Connection::close, (o, throwable) -> o.close(), Connection::close);
 	}
 
 	private Mono<Object> runValidationQuery(String validationQuery) {
 		return Mono.usingWhen(this.connectionFactory.create(),
 				(conn) -> Flux.from(conn.createStatement(validationQuery).execute())
 						.flatMap((it) -> it.map(this::extractResult)).next(),
-				Connection::close, Connection::close, Connection::close);
+				Connection::close, (o, throwable) -> o.close(), Connection::close);
 	}
 
 	private Object extractResult(Row row, RowMetadata metadata) {
@@ -93,35 +120,6 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 
 	private String getProduct() {
 		return this.connectionFactory.getMetadata().getName();
-	}
-
-	protected String getValidationQuery(String product) {
-		String query = this.query;
-		if (!StringUtils.hasText(query)) {
-			DatabaseDriver specific = DatabaseDriver.fromProductName(product);
-			query = specific.getValidationQuery();
-		}
-		if (!StringUtils.hasText(query)) {
-			query = DEFAULT_QUERY;
-		}
-		return query;
-	}
-
-	/**
-	 * Set a specific validation query to use to validate a connection. If none is set, a
-	 * default validation query is used.
-	 * @param query the query
-	 */
-	public void setQuery(String query) {
-		this.query = query;
-	}
-
-	/**
-	 * Return the validation query or {@code null}.
-	 * @return the query
-	 */
-	public String getQuery() {
-		return this.query;
 	}
 
 }
