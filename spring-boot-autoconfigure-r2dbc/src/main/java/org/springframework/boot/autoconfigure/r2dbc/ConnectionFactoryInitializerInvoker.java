@@ -26,8 +26,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceInitializationMode;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -42,6 +41,10 @@ class ConnectionFactoryInitializerInvoker
 		implements ApplicationListener<ConnectionFactorySchemaCreatedEvent>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(ConnectionFactoryInitializerInvoker.class);
+
+	private static final boolean SPRING_JDBC_PRESENT = ClassUtils.isPresent(
+			"org.springframework.boot.jdbc.DataSourceBuilder",
+			ConnectionFactoryInitializerInvoker.class.getClassLoader());
 
 	private final ObjectProvider<ConnectionFactory> connectionFactory;
 
@@ -81,20 +84,27 @@ class ConnectionFactoryInitializerInvoker
 	}
 
 	private boolean wouldJdbcAndR2DbcInitializeDatabases() {
-		DataSourceProperties dataSourceProperties = getDataSourceProperties();
-		if (dataSourceProperties == null
-				|| dataSourceProperties.getInitializationMode() != DataSourceInitializationMode.EMBEDDED) {
-			return false;
+
+		if (SPRING_JDBC_PRESENT) {
+			if (wouldJdbcInitializeDatabase()) {
+				return false;
+			}
 		}
+
 		if (this.properties.getInitializationMode() != ConnectionFactoryInitializationMode.EMBEDDED) {
 			return false;
 		}
 		return true;
 	}
 
-	@Nullable
-	private DataSourceProperties getDataSourceProperties() {
-		return this.applicationContext.getBeanProvider(DataSourceProperties.class).getIfAvailable();
+	private boolean wouldJdbcInitializeDatabase() {
+		DataSourceProperties dataSourceProperties = this.applicationContext.getBeanProvider(DataSourceProperties.class)
+				.getIfAvailable();
+		if (dataSourceProperties == null
+				|| dataSourceProperties.getInitializationMode() != DataSourceInitializationMode.EMBEDDED) {
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isR2dbcEmbedded() {
@@ -105,7 +115,17 @@ class ConnectionFactoryInitializerInvoker
 	}
 
 	private boolean isJdbcEmbedded() {
-		return this.applicationContext.getBeanNamesForType(EmbeddedDatabase.class).length > 0;
+		if (SPRING_JDBC_PRESENT) {
+			try {
+				Class<?> embeddedDatabase = ClassUtils.forName(
+						"org.springframework.jdbc.datasource.embedded.EmbeddedDatabase", getClass().getClassLoader());
+				return this.applicationContext.getBeanNamesForType(embeddedDatabase).length > 0;
+			}
+			catch (ClassNotFoundException ex) {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	private void initialize(ConnectionFactoryInitializer initializer) {

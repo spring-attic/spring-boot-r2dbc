@@ -24,15 +24,15 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.StringUtils;
 
 /**
@@ -42,36 +42,17 @@ import org.springframework.util.StringUtils;
  * @see ConnectionFactoryAutoConfiguration
  */
 @Configuration
-@ConditionalOnClass({ Connection.class, ConnectionFactory.class, EmbeddedDatabaseType.class })
+@ConditionalOnClass({ Connection.class, ConnectionFactory.class })
 @EnableConfigurationProperties(R2dbcProperties.class)
+@Import({ EmbeddedDatabaseConfiguration.WithSpringJdbcConfiguration.class,
+		EmbeddedDatabaseConfiguration.NoSpringJdbcConfiguration.class })
 public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 
 	private ClassLoader classLoader;
 
-	private final R2dbcProperties properties;
-
-	public EmbeddedDatabaseConfiguration(R2dbcProperties properties) {
-		this.properties = properties;
-	}
-
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
-	}
-
-	@Bean
-	@ConditionalOnMissingBean({ EmbeddedDatabase.class, EmbeddedDatabaseConnectionInformation.class })
-	public EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromR2dbc() {
-		return new EmbeddedDatabaseConnectionInformation(this.properties.determineDatabaseName(),
-				this.properties.determineUsername(), this.properties.determinePassword());
-	}
-
-	@Bean
-	@ConditionalOnMissingBean(EmbeddedDatabaseConnectionInformation.class)
-	@ConditionalOnBean({ EmbeddedDatabase.class, DataSourceProperties.class })
-	public EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromJdbc(DataSourceProperties jdbcProperties) {
-		return new EmbeddedDatabaseConnectionInformation(jdbcProperties.determineDatabaseName(),
-				jdbcProperties.determineUsername(), jdbcProperties.determinePassword());
 	}
 
 	@Bean
@@ -92,6 +73,33 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 			}
 		}
 		return ConnectionFactories.get(builder.build());
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass(EmbeddedDatabase.class)
+	@EnableConfigurationProperties(DataSourceProperties.class)
+	static class WithSpringJdbcConfiguration {
+
+		@Bean
+		@ConditionalOnMissingBean
+		EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromJdbc(DataSourceProperties jdbcProperties) {
+			return new EmbeddedDatabaseConnectionInformation(jdbcProperties.determineDatabaseName(),
+					jdbcProperties.determineUsername(), jdbcProperties.determinePassword());
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnMissingClass("org.springframework.jdbc.datasource.embedded.EmbeddedDatabase")
+	static class NoSpringJdbcConfiguration {
+
+		@Bean
+		@ConditionalOnMissingBean
+		EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromR2dbc(R2dbcProperties properties) {
+			return new EmbeddedDatabaseConnectionInformation(properties.determineDatabaseName(),
+					properties.determineUsername(), properties.determinePassword());
+		}
+
 	}
 
 	static class EmbeddedDatabaseConnectionInformation {

@@ -18,12 +18,11 @@ package org.springframework.boot.autoconfigure.r2dbc;
 
 import io.r2dbc.spi.ConnectionFactory;
 
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Connection details for {@link EmbeddedDatabaseType embedded databases}.
+ * Connection details for embedded databases.
  *
  * @author Mark Paluch
  */

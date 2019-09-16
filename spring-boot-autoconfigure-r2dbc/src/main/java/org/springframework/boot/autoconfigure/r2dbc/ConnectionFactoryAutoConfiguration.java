@@ -37,7 +37,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.StringUtils;
 
 /**
@@ -52,7 +51,6 @@ import org.springframework.util.StringUtils;
 public class ConnectionFactoryAutoConfiguration {
 
 	@Configuration
-	@ConditionalOnClass(EmbeddedDatabaseType.class)
 	@Conditional(EmbeddedDatabaseCondition.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
 	@Import(EmbeddedDatabaseConfiguration.class)

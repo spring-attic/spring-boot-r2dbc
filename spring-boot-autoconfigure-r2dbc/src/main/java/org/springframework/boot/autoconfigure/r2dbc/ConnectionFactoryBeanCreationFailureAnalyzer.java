@@ -66,8 +66,7 @@ class ConnectionFactoryBeanCreationFailureAnalyzer
 		StringBuilder action = new StringBuilder();
 		action.append(String.format("Consider the following:%n"));
 		if (EmbeddedDatabaseConnection.NONE == cause.getEmbeddedDatabaseConnection()) {
-			action.append(String.format(
-					"\tIf you want an embedded database (H2), please put it on the classpath along with Spring JDBC.%n"));
+			action.append(String.format("\tIf you want an embedded database (H2), please put it on the classpath.%n"));
 		}
 		else {
 			action.append(String.format("\tReview the configuration of %s%n.", cause.getEmbeddedDatabaseConnection()));

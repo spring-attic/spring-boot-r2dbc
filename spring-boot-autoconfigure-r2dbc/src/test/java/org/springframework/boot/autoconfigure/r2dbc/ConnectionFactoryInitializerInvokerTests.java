@@ -31,6 +31,7 @@ import reactor.test.StepVerifier;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.test.context.runner.ContextConsumer;
@@ -67,6 +68,16 @@ class ConnectionFactoryInitializerInvokerTests {
 			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 			assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from BAR", 1);
 		});
+	}
+
+	@Test
+	void connectionFactoryInitializedWithoutJdbc() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.initialization-mode:embedded")
+				.withClassLoader(new FilteredClassLoader("org.springframework.jdbc")).run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+					assertConnectionFactoryIsInitialized(connectionFactory, "SELECT COUNT(*) from BAR", 1);
+				});
 	}
 
 	@Test

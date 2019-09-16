@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import io.r2dbc.spi.ConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,8 +52,8 @@ class ConnectionFactoryInitializer {
 	private final ResourceLoader resourceLoader;
 
 	/**
-	 * Create a new instance with the {@link DataSource} to initialize and its matching
-	 * {@link R2dbcProperties configuration}.
+	 * Create a new instance with the {@link ConnectionFactory} to initialize and its
+	 * matching {@link R2dbcProperties configuration}.
 	 * @param connectionFactory the connection factory to initialize
 	 * @param properties the matching configuration
 	 * @param resourceLoader the resource loader to use (can be null)

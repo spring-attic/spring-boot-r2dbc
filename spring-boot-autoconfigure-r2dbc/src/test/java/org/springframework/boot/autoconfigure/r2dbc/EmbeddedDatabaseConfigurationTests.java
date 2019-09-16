@@ -23,6 +23,7 @@ import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,6 +50,12 @@ class EmbeddedDatabaseConfigurationTests {
 			assertThat(connectionFactory).isExactlyInstanceOf(H2ConnectionFactory.class);
 			assertThat(context).doesNotHaveBean(DataSource.class);
 		});
+	}
+
+	@Test
+	void testWithoutSpringJdbc() {
+		this.contextRunner.withClassLoader(new FilteredClassLoader("org.springframework.jdbc"))
+				.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class));
 	}
 
 }
