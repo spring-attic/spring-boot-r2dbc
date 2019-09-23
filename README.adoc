@@ -54,18 +54,18 @@ spring.r2dbc.password=…
 
 === MySQL
 
-Dependencies (pulled from jitpack.io):
+Dependencies (pulled from Sonatype Snapshots):
 
 [source,xml]
 ----
 <dependency>
-  <groupId>com.github.mirromutth</groupId>
+  <groupId>dev.miku</groupId>
   <artifactId>r2dbc-mysql</artifactId>
 </dependency>
 
 <repository>
-  <id>jitpack.io</id>
-  <url>https://jitpack.io</url>
+  <id>oss-sonatype-snapshots</id>
+  <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 </repository>
 ----
 
