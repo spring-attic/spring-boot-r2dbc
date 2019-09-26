@@ -130,7 +130,7 @@ The following example shows a typical Spring Data repository interface definitio
 
 	import org.springframework.data.domain.*;
 	import org.springframework.data.repository.*;
-	import reactor.core.publisher.Mono.
+	import reactor.core.publisher.Mono;
 
 	public interface CityRepository extends Repository<City, Long> {
 
@@ -161,6 +161,36 @@ The following example shows how to define a data source in a bean:
 	}
 ----
 
+[[howto-customize-connections]]
+=== Customize connection parameters
+To customize the connections created by a `ConnectionFactory`, i.e., set specific
+parameters that you do not want (or cannot) configure in your central database
+configuration, you can use a `ConnectionFactoryOptionsBuilderCustomizer` `@Bean`.
+
+The following example shows how to manually override the database port while
+the rest of the options is taken from the application configuration:
+
+[source,java,indent=0]
+----
+    @Bean
+    public ConnectionFactoryOptionsBuilderCustomizer customizer() {
+        return (builder) -> builder.option(PORT, 5432);
+    }
+----
+
+The following examples shows how to set some PostgreSQL connection options:
+
+[source,java,indent=0]
+----
+    @Bean
+    public ConnectionFactoryOptionsBuilderCustomizer customizer() {
+        Map<String, String> options = new HashMap<>();
+        options.put("lock_timeout", "30s");
+        options.put("statement_timeout", "60s");
+
+        return (builder) -> builder.option(OPTIONS, options);
+    }
+----
 
 [[howto-database-initialization]]
 == Database Initialization
