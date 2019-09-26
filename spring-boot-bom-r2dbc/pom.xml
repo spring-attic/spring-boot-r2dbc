@@ -19,7 +19,7 @@
 		<cloud-spanner-r2dbc.version>0.1.0-SNAPSHOT</cloud-spanner-r2dbc.version>
 		<jasync-r2dbc-mysql.version>1.0.6</jasync-r2dbc-mysql.version>
 		<r2dbc-mysql.version>0.3.0.BUILD-SNAPSHOT</r2dbc-mysql.version>
-		<r2dbc-releasetrain.version>Arabba-BUILD-SNAPSHOT</r2dbc-releasetrain.version>
+		<r2dbc-releasetrain.version>Arabba-RC1</r2dbc-releasetrain.version>
 	</properties>
 
 	<dependencyManagement>
