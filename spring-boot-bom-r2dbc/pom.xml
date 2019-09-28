@@ -18,7 +18,7 @@
 	<properties>
 		<cloud-spanner-r2dbc.version>0.1.0-SNAPSHOT</cloud-spanner-r2dbc.version>
 		<jasync-r2dbc-mysql.version>1.0.6</jasync-r2dbc-mysql.version>
-		<r2dbc-mysql.version>0.3.0.BUILD-SNAPSHOT</r2dbc-mysql.version>
+		<r2dbc-mysql.version>0.8.0.RC1</r2dbc-mysql.version>
 		<r2dbc-releasetrain.version>Arabba-RC1</r2dbc-releasetrain.version>
 	</properties>
 
@@ -143,13 +143,6 @@
 		<repository>
 			<id>oss-jfrog-snapshots</id>
 			<url>https://oss.jfrog.org/libs-snapshot</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>oss-sonatype-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
