@@ -20,7 +20,7 @@
 		<spring-data-r2dbc.version>1.0.0.RC1</spring-data-r2dbc.version>
 		<jasync-r2dbc-mysql.version>1.0.6</jasync-r2dbc-mysql.version>
 		<r2dbc-mysql.version>0.8.0.RC1</r2dbc-mysql.version>
-		<r2dbc-releasetrain.version>Arabba-RC1</r2dbc-releasetrain.version>
+		<r2dbc-releasetrain.version>Arabba-BUILD-SNAPSHOT</r2dbc-releasetrain.version>
 	</properties>
 
 	<dependencyManagement>
