@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
-	<version>0.1.0.M2</version>
+	<version>0.1.0.BUILD-SNAPSHOT</version>
 	<name>Spring Boot Example using R2DBC Repositories with H2</name>
 	<description>Example project for Spring Boot R2DBC using H2</description>
 
@@ -22,7 +22,7 @@
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-bom-r2dbc</artifactId>
-				<version>0.1.0.M2</version>
+				<version>0.1.0.BUILD-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -90,8 +90,4 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
-  <scm>
-    <tag>0.1.0.M2</tag>
-  </scm>
 </project>
