@@ -403,6 +403,11 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 	public static class Pool {
 
 		/**
+		 * Is pooling enabled?
+		 */
+		private boolean enabled = true;
+
+		/**
 		 * Idle timeout.
 		 */
 		private Duration maxIdleTime = Duration.ofMinutes(30);
@@ -421,6 +426,14 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		 * Validation query.
 		 */
 		private String validationQuery;
+
+		public boolean getEnabled() {
+			return this.enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
 
 		public Duration getMaxIdleTime() {
 			return this.maxIdleTime;

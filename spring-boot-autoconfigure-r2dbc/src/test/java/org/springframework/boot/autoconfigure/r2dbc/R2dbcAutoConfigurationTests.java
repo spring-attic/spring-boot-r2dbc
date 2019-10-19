@@ -17,6 +17,8 @@
 package org.springframework.boot.autoconfigure.r2dbc;
 
 import io.r2dbc.client.R2dbc;
+import io.r2dbc.pool.ConnectionPool;
+import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -38,6 +40,51 @@ class R2dbcAutoConfigurationTests {
 	@Test
 	void testDefaultConnectionFactoryExists() {
 		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(R2dbc.class));
+	}
+
+	@Test
+	void shouldCreateConnectionPoolByDefault() {
+		this.contextRunner
+				.withPropertyValues("spring.r2dbc.url=r2dbc:simple://simpledb")
+				.run((context) -> {
+					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+
+					assertThat(properties.getPool().getEnabled()).isTrue();
+					assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
+				});
+	}
+
+
+	@Test
+	void shouldCreateConnectionPoolIfPoolingIsEnabled() {
+		this.contextRunner
+				.withPropertyValues(
+						"spring.r2dbc.pool.enabled=true",
+						"spring.r2dbc.url=r2dbc:simple://simpledb")
+				.run((context) -> {
+					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+
+					assertThat(properties.getPool().getEnabled()).isTrue();
+					assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
+				});
+	}
+
+
+	@Test
+	void shouldNotCreateConnectionPoolIPoolingIsfDisabled() {
+		this.contextRunner
+				.withPropertyValues(
+						"spring.r2dbc.pool.enabled=false",
+						"spring.r2dbc.url=r2dbc:simple://simpledb")
+				.run((context) -> {
+					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+
+					assertThat(properties.getPool().getEnabled()).isFalse();
+					assertThat(connectionFactory).isNotInstanceOf(ConnectionPool.class);
+				});
 	}
 
 }
