@@ -67,9 +67,10 @@ public class ConnectionFactoryAutoConfiguration {
 	}
 
 	@Configuration
-	@Conditional({UnpooledConnectionUrlCondition.class, ConnectionPoolEnabledCondition.class})
+	@Conditional({ UnpooledConnectionUrlCondition.class })
 	@ConditionalOnClass(ConnectionPool.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
+	@ConditionalOnProperty(prefix = "spring.r2dbc.pool", value = "enabled", matchIfMissing = true)
 	@Import(ConnectionFactoryConfiguration.ConnectionPoolConnectionFactoryConfiguration.class)
 	protected static class PooledConnectionFactoryConfiguration {
 
@@ -193,25 +194,6 @@ public class ConnectionFactoryAutoConfiguration {
 				return ConditionOutcome.match("R2DBC Connection URL contains pooling configuration");
 			}
 			return ConditionOutcome.noMatch("R2DBC Connection URL does not contain pooling configuration");
-		}
-
-	}
-
-	/**
-	 * {@link Condition} to test if the connection pool is enabled by {@code spring.r2dbc.pool.enabled}
-	 */
-	static class ConnectionPoolEnabledCondition extends SpringBootCondition {
-
-		@Override
-		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
-			Boolean isEnabled = context.getEnvironment().getProperty("spring.r2dbc.pool.enabled", Boolean.class);
-			if (isEnabled == null) {
-				return ConditionOutcome.match("R2DBC Connection pooling flag is not set in the configuration, so TRUE is assumed");
-			}
-			if (isEnabled) {
-				return ConditionOutcome.match("R2DBC Connection pooling is enabled by configuration");
-			}
-			return ConditionOutcome.noMatch("R2DBC Connection pooling is disabled by configuration");
 		}
 
 	}

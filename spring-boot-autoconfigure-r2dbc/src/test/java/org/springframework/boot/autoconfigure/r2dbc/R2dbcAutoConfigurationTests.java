@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link R2dbcDataAutoConfiguration}.
  *
  * @author Mark Paluch
+ * @author Andreas Killaitis
  */
 class R2dbcAutoConfigurationTests {
 
@@ -44,24 +45,19 @@ class R2dbcAutoConfigurationTests {
 
 	@Test
 	void shouldCreateConnectionPoolByDefault() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.url=r2dbc:simple://simpledb")
-				.run((context) -> {
-					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
-					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+		this.contextRunner.withPropertyValues("spring.r2dbc.url=r2dbc:simple://simpledb").run((context) -> {
+			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 
-					assertThat(properties.getPool().getEnabled()).isTrue();
-					assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
-				});
+			assertThat(properties.getPool().getEnabled()).isTrue();
+			assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
+		});
 	}
-
 
 	@Test
 	void shouldCreateConnectionPoolIfPoolingIsEnabled() {
 		this.contextRunner
-				.withPropertyValues(
-						"spring.r2dbc.pool.enabled=true",
-						"spring.r2dbc.url=r2dbc:simple://simpledb")
+				.withPropertyValues("spring.r2dbc.pool.enabled=true", "spring.r2dbc.url=r2dbc:simple://simpledb")
 				.run((context) -> {
 					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
 					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
@@ -71,13 +67,10 @@ class R2dbcAutoConfigurationTests {
 				});
 	}
 
-
 	@Test
 	void shouldNotCreateConnectionPoolIPoolingIsfDisabled() {
 		this.contextRunner
-				.withPropertyValues(
-						"spring.r2dbc.pool.enabled=false",
-						"spring.r2dbc.url=r2dbc:simple://simpledb")
+				.withPropertyValues("spring.r2dbc.pool.enabled=false", "spring.r2dbc.url=r2dbc:simple://simpledb")
 				.run((context) -> {
 					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
 					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);

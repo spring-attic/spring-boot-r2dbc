@@ -34,6 +34,7 @@ import org.springframework.util.StringUtils;
  * Configuration properties for R2DBC.
  *
  * @author Mark Paluch
+ * @author Andreas Killaitis
  */
 @ConfigurationProperties(prefix = "spring.r2dbc")
 public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {

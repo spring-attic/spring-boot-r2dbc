@@ -40,7 +40,8 @@ import org.springframework.context.annotation.Configuration;
  * @author Tadaya Tsuyukubo
  */
 @Configuration(proxyBeanMethods = false)
-@AutoConfigureAfter({ MetricsAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class, ConnectionFactoryAutoConfiguration.class })
+@AutoConfigureAfter({ MetricsAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class,
+		ConnectionFactoryAutoConfiguration.class })
 @ConditionalOnClass({ ConnectionPool.class, MeterRegistry.class })
 @ConditionalOnBean({ ConnectionPool.class, MeterRegistry.class })
 public class ConnectionPoolMetricsAutoConfiguration {
