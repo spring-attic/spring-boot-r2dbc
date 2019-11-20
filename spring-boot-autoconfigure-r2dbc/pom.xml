@@ -37,11 +37,6 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>io.r2dbc</groupId>
-			<artifactId>r2dbc-client</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 			<optional>true</optional>

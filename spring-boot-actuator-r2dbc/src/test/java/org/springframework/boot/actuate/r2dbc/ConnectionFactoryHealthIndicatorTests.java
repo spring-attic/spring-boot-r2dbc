@@ -18,7 +18,6 @@ package org.springframework.boot.actuate.r2dbc;
 
 import java.util.Random;
 
-import io.r2dbc.client.R2dbc;
 import io.r2dbc.h2.H2ConnectionConfiguration;
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
@@ -26,6 +25,8 @@ import io.r2dbc.spi.Result;
 import io.r2dbc.spi.ValidationDepth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import org.springframework.boot.actuate.health.Status;
@@ -63,10 +64,11 @@ class ConnectionFactoryHealthIndicatorTests {
 	@Test
 	void healthIndicatorWithCustomValidationQuery() {
 		String customValidationQuery = "SELECT COUNT(*) from FOO";
-		new R2dbc(this.connectionFactory)
-				.useHandle((h) -> h.createQuery("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)")
-						.mapResult(Result::getRowsUpdated))
-				.as(StepVerifier::create).expectNextCount(0).verifyComplete();
+		Mono.from(this.connectionFactory.create())
+				.flatMapMany((it) -> Flux
+						.from(it.createStatement("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)").execute())
+						.flatMap(Result::getRowsUpdated).thenMany(it.close()))
+				.as(StepVerifier::create).verifyComplete();
 		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory, customValidationQuery);
 		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.UP);

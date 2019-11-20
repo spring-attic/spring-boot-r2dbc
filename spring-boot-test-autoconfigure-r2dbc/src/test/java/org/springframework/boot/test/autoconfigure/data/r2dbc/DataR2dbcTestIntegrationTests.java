@@ -16,7 +16,6 @@
 
 package org.springframework.boot.test.autoconfigure.data.r2dbc;
 
-import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
@@ -43,9 +42,6 @@ class DataR2dbcTestIntegrationTests {
 	private DatabaseClient databaseClient;
 
 	@Autowired
-	private R2dbc r2dbc;
-
-	@Autowired
 	private ConnectionFactory connectionFactory;
 
 	@Autowired
@@ -54,12 +50,6 @@ class DataR2dbcTestIntegrationTests {
 	@Test
 	void testDatabaseClient() {
 		this.databaseClient.execute("SELECT * FROM example").fetch().all().as(StepVerifier::create).verifyComplete();
-	}
-
-	@Test
-	void testR2dbcClient() {
-		this.r2dbc.withHandle((h) -> h.createQuery("SELECT * FROM example").mapRow((row) -> row.get(0)))
-				.as(StepVerifier::create).verifyComplete();
 	}
 
 	@Test

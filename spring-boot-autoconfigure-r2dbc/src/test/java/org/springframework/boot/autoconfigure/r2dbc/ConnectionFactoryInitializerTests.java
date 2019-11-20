@@ -16,11 +16,12 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
-import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
+
+import org.springframework.data.r2dbc.core.DatabaseClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -40,11 +41,10 @@ class ConnectionFactoryInitializerTests {
 		ConnectionFactory connectionFactory = createConnectionFactory();
 		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer(connectionFactory,
 				new R2dbcProperties());
-		R2dbc r2dbc = new R2dbc(connectionFactory);
 		assertThat(initializer.createSchema()).isTrue();
-		assertNumberOfRows(r2dbc, 0);
+		assertNumberOfRows(connectionFactory, 0);
 		initializer.initSchema();
-		assertNumberOfRows(r2dbc, 1);
+		assertNumberOfRows(connectionFactory, 1);
 	}
 
 	@Test
@@ -53,16 +53,16 @@ class ConnectionFactoryInitializerTests {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setInitializationMode(ConnectionFactoryInitializationMode.ALWAYS);
 		ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer(connectionFactory, properties);
-		R2dbc r2dbc = new R2dbc(connectionFactory);
 		assertThat(initializer.createSchema()).isTrue();
-		assertNumberOfRows(r2dbc, 0);
+		assertNumberOfRows(connectionFactory, 0);
 		initializer.initSchema();
-		assertNumberOfRows(r2dbc, 1);
+		assertNumberOfRows(connectionFactory, 1);
 	}
 
-	private void assertNumberOfRows(R2dbc r2dbc, int count) {
-		r2dbc.withHandle((h) -> h.createQuery("SELECT COUNT(*) from BAR").mapRow((row) -> row.get(0)))
-				.cast(Number.class).map(Number::intValue).as(StepVerifier::create).expectNext(count).verifyComplete();
+	private void assertNumberOfRows(ConnectionFactory connectionFactory, int count) {
+		DatabaseClient databaseClient = DatabaseClient.create(connectionFactory);
+		databaseClient.execute("SELECT COUNT(*) from BAR").map((row) -> row.get(0)).all().cast(Number.class)
+				.map(Number::intValue).as(StepVerifier::create).expectNext(count).verifyComplete();
 	}
 
 	@Test

@@ -30,8 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class R2dbcPropertiesTests {
 
-	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner().withConfiguration(
-			AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class, R2dbcAutoConfiguration.class));
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class));
 
 	@Test
 	void shouldReportEmbeddedDatabase() {

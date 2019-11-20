@@ -21,10 +21,6 @@
 		</dependency>
 		<dependency>
 			<groupId>io.r2dbc</groupId>
-			<artifactId>r2dbc-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-spi</artifactId>
 		</dependency>
 		<dependency>

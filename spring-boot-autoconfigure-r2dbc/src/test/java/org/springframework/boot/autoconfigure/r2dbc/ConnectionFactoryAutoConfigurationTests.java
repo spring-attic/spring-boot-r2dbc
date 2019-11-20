@@ -139,6 +139,43 @@ class ConnectionFactoryAutoConfigurationTests {
 				});
 	}
 
+	@Test
+	void shouldCreateConnectionPoolByDefault() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.url=r2dbc:simple://simpledb").run((context) -> {
+			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+
+			assertThat(properties.getPool().getEnabled()).isTrue();
+			assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
+		});
+	}
+
+	@Test
+	void shouldCreateConnectionPoolIfPoolingIsEnabled() {
+		this.contextRunner
+				.withPropertyValues("spring.r2dbc.pool.enabled=true", "spring.r2dbc.url=r2dbc:simple://simpledb")
+				.run((context) -> {
+					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+
+					assertThat(properties.getPool().getEnabled()).isTrue();
+					assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
+				});
+	}
+
+	@Test
+	void shouldNotCreateConnectionPoolIPoolingIsfDisabled() {
+		this.contextRunner
+				.withPropertyValues("spring.r2dbc.pool.enabled=false", "spring.r2dbc.url=r2dbc:simple://simpledb")
+				.run((context) -> {
+					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
+					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+
+					assertThat(properties.getPool().getEnabled()).isFalse();
+					assertThat(connectionFactory).isNotInstanceOf(ConnectionPool.class);
+				});
+	}
+
 	private static class DisableEmbeddedDatabaseClassLoader extends URLClassLoader {
 
 		DisableEmbeddedDatabaseClassLoader() {

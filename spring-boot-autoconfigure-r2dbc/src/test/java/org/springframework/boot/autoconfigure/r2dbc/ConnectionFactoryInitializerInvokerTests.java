@@ -17,14 +17,13 @@
 package org.springframework.boot.autoconfigure.r2dbc;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 import java.util.UUID;
 
-import io.r2dbc.client.R2dbc;
 import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.R2dbcBadGrammarException;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
@@ -43,6 +42,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternUtils;
+import org.springframework.data.r2dbc.BadSqlGrammarException;
+import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.util.ClassUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,8 +93,8 @@ class ConnectionFactoryInitializerInvokerTests {
 
 	private void assertConnectionFactoryIsInitialized(ConnectionFactory connectionFactory, String sql,
 			int expectation) {
-		R2dbc r2dbc = new R2dbc(connectionFactory);
-		r2dbc.withHandle((h) -> h.createQuery(sql).mapRow((row) -> row.get(0))).cast(Number.class).map(Number::intValue)
+		DatabaseClient databaseClient = DatabaseClient.create(connectionFactory);
+		databaseClient.execute(sql).map((row) -> row.get(0)).all().cast(Number.class).map(Number::intValue)
 				.as(StepVerifier::create).expectNext(expectation).verifyComplete();
 	}
 
@@ -130,15 +131,10 @@ class ConnectionFactoryInitializerInvokerTests {
 				.run((context) -> {
 					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isNotNull();
-					R2dbc r2dbc = new R2dbc(connectionFactory);
-					r2dbc.withHandle((h) -> h.createQuery("SELECT COUNT(*) from BAR").mapRow((row) -> row.get(0)))
-							.cast(Number.class).map(Number::intValue).as(StepVerifier::create).expectNext(2)
-							.verifyComplete();
-					r2dbc.withHandle(
-							(h) -> h.createQuery("SELECT name from BAR WHERE id=1").mapRow((row) -> row.get(0)))
-							.as(StepVerifier::create).expectNext("bar").verifyComplete();
-					r2dbc.withHandle(
-							(h) -> h.createQuery("SELECT name from BAR WHERE id=2").mapRow((row) -> row.get(0)))
+					DatabaseClient client = DatabaseClient.create(connectionFactory);
+					client.execute("SELECT COUNT(*) from BAR").map((row) -> row.get(0)).all().cast(Number.class)
+							.map(Number::intValue).as(StepVerifier::create).expectNext(2).verifyComplete();
+					client.execute("SELECT name from BAR WHERE id=2").map((row) -> row.get(0)).all()
 							.as(StepVerifier::create).expectNext("ばー").verifyComplete();
 				});
 	}
@@ -184,11 +180,11 @@ class ConnectionFactoryInitializerInvokerTests {
 	}
 
 	private void assertConnectionFactoryNotInitialized(ConnectionFactory connectionFactory) {
-		R2dbc r2dbc = new R2dbc(connectionFactory);
-		r2dbc.withHandle((h) -> h.createQuery("SELECT COUNT(*) from BAR").mapRow((row) -> row.get(0)))
-				.as(StepVerifier::create).expectErrorSatisfies((throwable) -> {
-					assertThat(throwable).isInstanceOf(RuntimeException.class);
-					SQLException ex = (SQLException) throwable.getCause();
+		DatabaseClient databaseClient = DatabaseClient.create(connectionFactory);
+		databaseClient.execute("SELECT COUNT(*) from BAR").map((row) -> row.get(0)).all().as(StepVerifier::create)
+				.expectErrorSatisfies((throwable) -> {
+					assertThat(throwable).isInstanceOf(BadSqlGrammarException.class);
+					R2dbcBadGrammarException ex = (R2dbcBadGrammarException) throwable.getCause();
 					int expectedCode = 42102; // object not found
 					assertThat(ex.getErrorCode()).isEqualTo(expectedCode);
 				}).verify();
