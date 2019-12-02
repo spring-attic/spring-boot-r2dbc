@@ -17,8 +17,7 @@
 		<cloud-spanner-r2dbc.version>0.1.0-SNAPSHOT</cloud-spanner-r2dbc.version>
 		<spring-data-r2dbc.version>1.0.0.BUILD-SNAPSHOT</spring-data-r2dbc.version>
 		<jasync-r2dbc-mysql.version>1.0.6</jasync-r2dbc-mysql.version>
-		<r2dbc-mysql.version>0.8.0.BUILD-SNAPSHOT</r2dbc-mysql.version>
-		<r2dbc-releasetrain.version>Arabba-BUILD-SNAPSHOT</r2dbc-releasetrain.version>
+		<r2dbc-releasetrain.version>Arabba-RELEASE</r2dbc-releasetrain.version>
 	</properties>
 
 	<dependencyManagement>
@@ -62,11 +61,6 @@
 				<groupId>com.github.jasync-sql</groupId>
 				<artifactId>jasync-r2dbc-mysql</artifactId>
 				<version>${jasync-r2dbc-mysql.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>dev.miku</groupId>
-				<artifactId>r2dbc-mysql</artifactId>
-				<version>${r2dbc-mysql.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.cloud</groupId>
