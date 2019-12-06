@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>demo-actuator</artifactId>
-	<version>0.1.0.BUILD-SNAPSHOT</version>
+	<version>0.1.0.M3</version>
 	<name>Spring Boot Example using R2DBC actuator</name>
 	<description>Example project for Spring Boot R2DBC actuator</description>
 
@@ -22,7 +22,7 @@
 			<dependency>
 				<groupId>org.springframework.boot.experimental</groupId>
 				<artifactId>spring-boot-bom-r2dbc</artifactId>
-				<version>0.1.0.BUILD-SNAPSHOT</version>
+				<version>0.1.0.M3</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -98,4 +98,8 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+
+  <scm>
+    <tag>0.1.0.M3</tag>
+  </scm>
 </project>
