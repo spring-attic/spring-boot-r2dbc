@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>org.springframework.boot.experimental</groupId>
 	<artifactId>spring-boot-r2dbc-build</artifactId>
-	<version>0.1.0.M3</version>
+	<version>0.1.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Boot R2DBC Build</name>
 
@@ -193,8 +193,4 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
-  <scm>
-    <tag>0.1.0.M3</tag>
-  </scm>
 </project>
