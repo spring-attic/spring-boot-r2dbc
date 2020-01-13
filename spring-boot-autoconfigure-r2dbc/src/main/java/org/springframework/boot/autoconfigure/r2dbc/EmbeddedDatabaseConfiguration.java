@@ -41,7 +41,7 @@ import org.springframework.util.StringUtils;
  * @author Mark Paluch
  * @see ConnectionFactoryAutoConfiguration
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ Connection.class, ConnectionFactory.class })
 @EnableConfigurationProperties(R2dbcProperties.class)
 @Import({ EmbeddedDatabaseConfiguration.WithSpringJdbcConfiguration.class,

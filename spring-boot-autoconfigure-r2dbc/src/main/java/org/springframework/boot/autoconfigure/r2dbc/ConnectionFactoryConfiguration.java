@@ -34,7 +34,7 @@ import org.springframework.util.StringUtils;
  */
 public class ConnectionFactoryConfiguration {
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class ConnectionPoolConnectionFactoryConfiguration {
 
 		@Bean(destroyMethod = "dispose")
@@ -53,7 +53,7 @@ public class ConnectionFactoryConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@AutoConfigureAfter(EmbeddedDatabaseConfiguration.class)
 	protected static class Generic {
 

@@ -105,7 +105,7 @@ class R2dbcRepositoriesAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class EmptyConfiguration {
 
 	}
