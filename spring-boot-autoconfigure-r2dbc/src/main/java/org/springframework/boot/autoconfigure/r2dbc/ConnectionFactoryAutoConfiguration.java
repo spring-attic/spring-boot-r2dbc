@@ -44,13 +44,13 @@ import org.springframework.util.StringUtils;
  *
  * @author Mark Paluch
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ConnectionFactory.class)
 @EnableConfigurationProperties(R2dbcProperties.class)
 @Import(ConnectionFactoryInitializationConfiguration.class)
 public class ConnectionFactoryAutoConfiguration {
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Conditional(EmbeddedDatabaseCondition.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
 	@Import(EmbeddedDatabaseConfiguration.class)
@@ -58,7 +58,7 @@ public class ConnectionFactoryAutoConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Conditional(GenericCondition.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
 	@Import(ConnectionFactoryConfiguration.Generic.class)
@@ -66,7 +66,7 @@ public class ConnectionFactoryAutoConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Conditional({ UnpooledConnectionUrlCondition.class })
 	@ConditionalOnClass(ConnectionPool.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)

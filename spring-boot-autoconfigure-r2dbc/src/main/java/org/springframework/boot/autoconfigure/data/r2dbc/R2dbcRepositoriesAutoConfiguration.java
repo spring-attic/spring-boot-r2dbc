@@ -38,7 +38,7 @@ import org.springframework.data.r2dbc.repository.support.R2dbcRepositoryFactoryB
  * @author Mark Paluch
  * @see EnableR2dbcRepositories
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ ConnectionFactory.class, R2dbcRepository.class })
 @ConditionalOnBean(DatabaseClient.class)
 @ConditionalOnRepositoryType(store = "r2dbc", type = RepositoryType.REACTIVE)
