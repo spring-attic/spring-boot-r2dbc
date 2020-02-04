@@ -17,7 +17,7 @@
 		<cloud-spanner-r2dbc.version>0.1.0-SNAPSHOT</cloud-spanner-r2dbc.version>
 		<spring-data-r2dbc.version>1.0.0.RELEASE</spring-data-r2dbc.version>
 		<jasync-r2dbc-mysql.version>1.0.12</jasync-r2dbc-mysql.version>
-		<r2dbc-releasetrain.version>Arabba-RELEASE</r2dbc-releasetrain.version>
+		<r2dbc-releasetrain.version>Arabba-SR2</r2dbc-releasetrain.version>
 	</properties>
 
 	<dependencyManagement>
