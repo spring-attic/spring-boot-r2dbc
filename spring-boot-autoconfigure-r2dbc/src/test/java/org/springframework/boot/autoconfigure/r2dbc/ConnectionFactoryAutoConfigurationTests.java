@@ -24,7 +24,6 @@ import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Option;
-import io.r2dbc.spi.Wrapped;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -100,7 +99,7 @@ class ConnectionFactoryAutoConfigurationTests {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
 					assertThat(bean).isExactlyInstanceOf(ConnectionPool.class);
-					SimpleTestConnectionFactory connectionFactory = ((Wrapped<SimpleTestConnectionFactory>) bean)
+					SimpleTestConnectionFactory connectionFactory = (SimpleTestConnectionFactory) ((ConnectionPool) bean)
 							.unwrap();
 					assertThat(connectionFactory.getOptions().getRequiredValue(Option.<Boolean>valueOf("customized")))
 							.isTrue();
@@ -130,9 +129,9 @@ class ConnectionFactoryAutoConfigurationTests {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",
 				"spring.r2dbc.properties.key=value", "spring.r2dbc.pool.initial-size=0").run((context) -> {
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
-					SimpleTestConnectionFactory testConnectionFactory = ((Wrapped<SimpleTestConnectionFactory>) bean)
+					SimpleTestConnectionFactory connectionFactory = (SimpleTestConnectionFactory) ((ConnectionPool) bean)
 							.unwrap();
-					assertThat((Object) testConnectionFactory.options.getRequiredValue(Option.valueOf("key")))
+					assertThat((Object) connectionFactory.options.getRequiredValue(Option.valueOf("key")))
 							.isEqualTo("value");
 				});
 	}

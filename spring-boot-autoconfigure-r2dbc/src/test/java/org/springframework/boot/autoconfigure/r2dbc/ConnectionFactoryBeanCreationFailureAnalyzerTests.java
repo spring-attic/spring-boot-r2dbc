@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class ConnectionFactoryBeanCreationFailureAnalyzerTests {
 	void failureAnalysisIsPerformed() {
 		FailureAnalysis failureAnalysis = performAnalysis(TestConfiguration.class);
 		assertThat(failureAnalysis.getDescription()).contains("'url' attribute is not specified",
-				"no embedded datasource could be configured");
+				"no embedded database could be configured");
 		assertThat(failureAnalysis.getAction()).contains(
 				"If you want an embedded database (H2), please put it on the classpath",
 				"If you have database settings to be loaded from a particular profile you may need to activate it",

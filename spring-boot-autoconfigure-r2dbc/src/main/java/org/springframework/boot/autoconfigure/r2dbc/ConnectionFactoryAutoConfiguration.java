@@ -137,7 +137,7 @@ public class ConnectionFactoryAutoConfiguration {
 	 */
 	static class EmbeddedDatabaseCondition extends SpringBootCondition {
 
-		EmbeddedOptOutCondition pooledCondition = new EmbeddedOptOutCondition();
+		final EmbeddedOptOutCondition pooledCondition = new EmbeddedOptOutCondition();
 
 		@Override
 		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {

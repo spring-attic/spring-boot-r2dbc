@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ class ConnectionFactoryBeanCreationFailureAnalyzer
 		if (!StringUtils.hasText(cause.getProperties().getUrl())) {
 			description.append("'url' attribute is not specified and ");
 		}
-		description.append(String.format("no embedded datasource could be configured.%n"));
+		description.append(String.format("no embedded database could be configured.%n"));
 		description.append(String.format("%nReason: %s%n", cause.getMessage()));
 		return description.toString();
 	}

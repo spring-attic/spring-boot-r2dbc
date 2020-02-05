@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package org.springframework.boot.autoconfigure.data.r2dbc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import io.r2dbc.spi.ConnectionFactory;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -73,10 +73,10 @@ public class R2dbcDataAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public R2dbcMappingContext r2dbcMappingContext(Optional<NamingStrategy> namingStrategy,
+	public R2dbcMappingContext r2dbcMappingContext(ObjectProvider<NamingStrategy> namingStrategy,
 			R2dbcCustomConversions r2dbcCustomConversions) {
 		R2dbcMappingContext relationalMappingContext = new R2dbcMappingContext(
-				namingStrategy.orElse(NamingStrategy.INSTANCE));
+				namingStrategy.getIfAvailable(() -> NamingStrategy.INSTANCE));
 		relationalMappingContext.setSimpleTypeHolder(r2dbcCustomConversions.getSimpleTypeHolder());
 		return relationalMappingContext;
 	}
