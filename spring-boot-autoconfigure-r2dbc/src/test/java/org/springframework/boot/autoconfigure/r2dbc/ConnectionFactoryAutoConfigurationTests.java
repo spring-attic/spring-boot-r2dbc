@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -75,7 +74,6 @@ class ConnectionFactoryAutoConfigurationTests {
 						+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
 				.withClassLoader(new FilteredClassLoader("io.r2dbc.pool")).run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
-					assertThat(context).doesNotHaveBean(EmbeddedDatabase.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
 					assertThat(bean).isExactlyInstanceOf(H2ConnectionFactory.class);
 				});

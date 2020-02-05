@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import reactor.test.StepVerifier;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.EmbeddedDataSourceConfiguration;
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.r2dbc.EmbeddedDatabaseConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -62,13 +60,12 @@ class R2dbcRepositoriesAutoConfigurationTests {
 
 	@Test
 	void basicAutoConfiguration() {
-
 		this.contextRunner
-				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
-						DataSourceAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
-				.withUserConfiguration(TestConfiguration.class, EmbeddedDataSourceConfiguration.class)
-				.withPropertyValues("spring.datasource.schema=classpath:data-r2dbc-schema.sql",
-						"spring.datasource.data=classpath:city.sql", "spring.datasource.generate-unique-name:true")
+				.withConfiguration(AutoConfigurations
+						.of(ConnectionFactoryAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
+				.withUserConfiguration(TestConfiguration.class)
+				.withPropertyValues("spring.r2dbc.schema=classpath:data-r2dbc-schema.sql",
+						"spring.r2dbc.data=classpath:city.sql", "spring.r2dbc.generate-unique-name:true")
 				.run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);
 					context.getBean(CityRepository.class).findById(2000L).as(StepVerifier::create).expectNextCount(1)
@@ -88,11 +85,11 @@ class R2dbcRepositoriesAutoConfigurationTests {
 	@Test
 	void honorsUsersEnableR2dbcRepositoriesConfiguration() {
 		this.contextRunner
-				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
-						DataSourceAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
-				.withUserConfiguration(EnableRepositoriesConfiguration.class, EmbeddedDataSourceConfiguration.class)
-				.withPropertyValues("spring.datasource.schema=classpath:data-r2dbc-schema.sql",
-						"spring.datasource.data=classpath:city.sql", "spring.datasource.generate-unique-name:true")
+				.withConfiguration(AutoConfigurations
+						.of(ConnectionFactoryAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
+				.withUserConfiguration(EnableRepositoriesConfiguration.class)
+				.withPropertyValues("spring.r2dbc.schema=classpath:data-r2dbc-schema.sql",
+						"spring.r2dbc.data=classpath:city.sql", "spring.r2dbc.generate-unique-name:true")
 				.run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);
 					context.getBean(CityRepository.class).findById(2000L).as(StepVerifier::create).expectNextCount(1)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,9 @@ import io.r2dbc.spi.ConnectionFactoryOptions;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.util.StringUtils;
 
 /**
@@ -44,8 +39,6 @@ import org.springframework.util.StringUtils;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ Connection.class, ConnectionFactory.class })
 @EnableConfigurationProperties(R2dbcProperties.class)
-@Import({ EmbeddedDatabaseConfiguration.WithSpringJdbcConfiguration.class,
-		EmbeddedDatabaseConfiguration.NoSpringJdbcConfiguration.class })
 public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 
 	private ClassLoader classLoader;
@@ -56,16 +49,18 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 	}
 
 	@Bean
-	public ConnectionFactory connectionFactory(EmbeddedDatabaseConnectionInformation embedded,
+	public ConnectionFactory connectionFactory(R2dbcProperties properties,
 			List<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
 		EmbeddedDatabaseConnection connection = EmbeddedDatabaseConnection.get(this.classLoader);
-		ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions.parse(connection.getUrl(embedded.getName()))
-				.mutate();
-		if (StringUtils.hasText(embedded.getUsername())) {
-			builder.option(ConnectionFactoryOptions.USER, embedded.getUsername());
+		ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions
+				.parse(connection.getUrl(properties.determineDatabaseName())).mutate();
+		String username = properties.determineUsername();
+		if (StringUtils.hasText(username)) {
+			builder.option(ConnectionFactoryOptions.USER, username);
 		}
-		if (StringUtils.hasText(embedded.getUsername())) {
-			builder.option(ConnectionFactoryOptions.PASSWORD, embedded.getPassword());
+		String password = properties.determinePassword();
+		if (StringUtils.hasText(password)) {
+			builder.option(ConnectionFactoryOptions.PASSWORD, password);
 		}
 		if (customizers != null) {
 			for (ConnectionFactoryOptionsBuilderCustomizer customizer : customizers) {
@@ -73,61 +68,6 @@ public class EmbeddedDatabaseConfiguration implements BeanClassLoaderAware {
 			}
 		}
 		return ConnectionFactories.get(builder.build());
-	}
-
-	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnClass(EmbeddedDatabase.class)
-	@EnableConfigurationProperties(DataSourceProperties.class)
-	static class WithSpringJdbcConfiguration {
-
-		@Bean
-		@ConditionalOnMissingBean
-		EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromJdbc(DataSourceProperties jdbcProperties) {
-			return new EmbeddedDatabaseConnectionInformation(jdbcProperties.determineDatabaseName(),
-					jdbcProperties.determineUsername(), jdbcProperties.determinePassword());
-		}
-
-	}
-
-	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnMissingClass("org.springframework.jdbc.datasource.embedded.EmbeddedDatabase")
-	static class NoSpringJdbcConfiguration {
-
-		@Bean
-		@ConditionalOnMissingBean
-		EmbeddedDatabaseConnectionInformation embeddedDatabaseNameFromR2dbc(R2dbcProperties properties) {
-			return new EmbeddedDatabaseConnectionInformation(properties.determineDatabaseName(),
-					properties.determineUsername(), properties.determinePassword());
-		}
-
-	}
-
-	static class EmbeddedDatabaseConnectionInformation {
-
-		final String name;
-
-		final String username;
-
-		final String password;
-
-		EmbeddedDatabaseConnectionInformation(String name, String username, String password) {
-			this.name = name;
-			this.username = username;
-			this.password = password;
-		}
-
-		String getName() {
-			return this.name;
-		}
-
-		String getUsername() {
-			return this.username;
-		}
-
-		String getPassword() {
-			return this.password;
-		}
-
 	}
 
 }
