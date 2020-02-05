@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class ConnectionFactoryBuilderTests {
 		properties.setUrl("r2dbc:h2://foo");
 		properties.setUsername("user");
 		properties.setPassword("pass");
-		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).getOptions();
+		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).buildOptions();
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER)).isEqualTo("h2");
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST)).isEqualTo("foo");
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER)).isEqualTo("user");
@@ -47,7 +47,7 @@ class ConnectionFactoryBuilderTests {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://foo");
 		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).username("user").password("pass")
-				.getOptions();
+				.buildOptions();
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER)).isEqualTo("h2");
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST)).isEqualTo("foo");
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER)).isEqualTo("user");
@@ -59,7 +59,7 @@ class ConnectionFactoryBuilderTests {
 		R2dbcProperties properties = new R2dbcProperties();
 		properties.setUrl("r2dbc:h2://user:pass@local/mydb");
 		properties.setUsername("someone-else");
-		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).getOptions();
+		ConnectionFactoryOptions options = ConnectionFactoryBuilder.create(properties).buildOptions();
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.DRIVER)).isEqualTo("h2");
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.HOST)).isEqualTo("local");
 		assertThat(options.getRequiredValue(ConnectionFactoryOptions.USER)).isEqualTo("user");

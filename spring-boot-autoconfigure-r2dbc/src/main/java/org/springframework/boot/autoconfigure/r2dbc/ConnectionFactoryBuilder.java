@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
+import io.r2dbc.spi.ConnectionFactoryOptions.Builder;
 import io.r2dbc.spi.Option;
 
 import org.springframework.util.StringUtils;
@@ -33,20 +34,27 @@ import org.springframework.util.StringUtils;
  *
  * @author Mark Paluch
  * @author Tadaya Tsuyukubo
+ * @author Stephane Nicoll
  */
 public final class ConnectionFactoryBuilder {
 
-	private final ConnectionFactoryOptions.Builder builder;
+	private final ConnectionFactoryOptions.Builder optionsBuilder;
+
+	private ConnectionFactoryBuilder(ConnectionFactoryOptions.Builder optionsBuilder) {
+		this.optionsBuilder = optionsBuilder;
+	}
 
 	public static ConnectionFactoryBuilder create(R2dbcProperties properties) {
-		ConnectionFactoryOptions options = ConnectionFactoryOptions.parse(properties.determineUrl());
-		ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder(options.mutate());
-		builder.applyIf(options, ConnectionFactoryOptions.USER, properties::determineUsername, Objects::nonNull);
-		builder.applyIf(options, ConnectionFactoryOptions.PASSWORD, properties::determinePassword, Objects::nonNull);
-		builder.applyIf(options, ConnectionFactoryOptions.DATABASE, properties::determineDatabaseName,
+		ConnectionFactoryOptions urlOptions = ConnectionFactoryOptions.parse(properties.determineUrl());
+		ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder(urlOptions.mutate());
+		builder.configureIf(urlOptions, ConnectionFactoryOptions.USER, properties::determineUsername, Objects::nonNull);
+		builder.configureIf(urlOptions, ConnectionFactoryOptions.PASSWORD, properties::determinePassword,
+				Objects::nonNull);
+		builder.configureIf(urlOptions, ConnectionFactoryOptions.DATABASE, properties::determineDatabaseName,
 				StringUtils::hasText);
 		if (properties.getProperties() != null) {
-			properties.getProperties().forEach((key, value) -> builder.option(Option.valueOf(key), value));
+			builder.configure((options) -> properties.getProperties()
+					.forEach((key, value) -> options.option(Option.valueOf(key), value)));
 		}
 		return builder;
 	}
@@ -55,65 +63,48 @@ public final class ConnectionFactoryBuilder {
 		return new ConnectionFactoryBuilder(ConnectionFactoryOptions.builder());
 	}
 
-	private ConnectionFactoryBuilder(ConnectionFactoryOptions.Builder builder) {
-		this.builder = builder;
+	public ConnectionFactoryBuilder configure(Consumer<Builder> options) {
+		options.accept(this.optionsBuilder);
+		return this;
 	}
 
-	private <T extends CharSequence> void applyIf(ConnectionFactoryOptions options, Option<T> option,
+	public ConnectionFactoryBuilder hostname(String host) {
+		return configure((options) -> options.option(ConnectionFactoryOptions.HOST, host));
+	}
+
+	public ConnectionFactoryBuilder port(int port) {
+		return configure((options) -> options.option(ConnectionFactoryOptions.PORT, port));
+	}
+
+	public ConnectionFactoryBuilder database(String database) {
+		return configure((options) -> options.option(ConnectionFactoryOptions.DATABASE, database));
+	}
+
+	public ConnectionFactoryBuilder username(String username) {
+		return configure((options) -> options.option(ConnectionFactoryOptions.USER, username));
+	}
+
+	public ConnectionFactoryBuilder password(String password) {
+		return configure((options) -> options.option(ConnectionFactoryOptions.PASSWORD, password));
+	}
+
+	public ConnectionFactory build() {
+		return ConnectionFactories.get(buildOptions());
+	}
+
+	ConnectionFactoryOptions buildOptions() {
+		return this.optionsBuilder.build();
+	}
+
+	private <T extends CharSequence> void configureIf(ConnectionFactoryOptions options, Option<T> option,
 			Supplier<T> valueSupplier, Predicate<T> setIf) {
 		if (options.hasOption(option)) {
 			return;
 		}
 		T value = valueSupplier.get();
 		if (setIf.test(value)) {
-			this.builder.option(option, value);
+			this.optionsBuilder.option(option, value);
 		}
-	}
-
-	private void option(Option<String> option, String value) {
-		this.builder.option(option, value);
-	}
-
-	public ConnectionFactoryBuilder username(String username) {
-		this.builder.option(ConnectionFactoryOptions.USER, username);
-		return this;
-	}
-
-	public ConnectionFactoryBuilder password(String password) {
-		this.builder.option(ConnectionFactoryOptions.PASSWORD, password);
-		return this;
-	}
-
-	public ConnectionFactoryBuilder hostname(String host) {
-		this.builder.option(ConnectionFactoryOptions.HOST, host);
-		return this;
-	}
-
-	public ConnectionFactoryBuilder port(int port) {
-		this.builder.option(ConnectionFactoryOptions.PORT, port);
-		return this;
-	}
-
-	public ConnectionFactoryBuilder database(String database) {
-		this.builder.option(ConnectionFactoryOptions.DATABASE, database);
-		return this;
-	}
-
-	public ConnectionFactoryBuilder customize(List<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
-		if (customizers != null) {
-			for (ConnectionFactoryOptionsBuilderCustomizer customizer : customizers) {
-				customizer.customize(this.builder);
-			}
-		}
-		return this;
-	}
-
-	public ConnectionFactory build() {
-		return ConnectionFactories.get(getOptions());
-	}
-
-	ConnectionFactoryOptions getOptions() {
-		return this.builder.build();
 	}
 
 }
