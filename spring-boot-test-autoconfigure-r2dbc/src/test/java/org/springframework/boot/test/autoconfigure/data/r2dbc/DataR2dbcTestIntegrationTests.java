@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,13 @@ import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
 import org.springframework.data.r2dbc.core.DatabaseClient;
-import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,9 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mark Paluch
  */
 @DataR2dbcTest
-@TestPropertySource(
-		properties = { "spring.r2dbc.schema=classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql",
-				"spring.r2dbc.initialization-mode=always" })
 class DataR2dbcTestIntegrationTests {
 
 	@Autowired
@@ -61,6 +62,19 @@ class DataR2dbcTestIntegrationTests {
 	@Test
 	void registersExampleRepository() {
 		assertThat(this.applicationContext.getBeanNamesForType(ExampleRepository.class)).isNotEmpty();
+	}
+
+	@TestConfiguration
+	static class DatabaseInitializationConfiguration {
+
+		@Autowired
+		void initializeDatabase(ConnectionFactory connectionFactory) {
+			ResourceLoader resourceLoader = new DefaultResourceLoader();
+			Resource[] scripts = new Resource[] { resourceLoader
+					.getResource("classpath:org/springframework/boot/test/autoconfigure/r2dbc/schema.sql") };
+			new ResourceDatabasePopulator(scripts).execute(connectionFactory).block();
+		}
+
 	}
 
 }

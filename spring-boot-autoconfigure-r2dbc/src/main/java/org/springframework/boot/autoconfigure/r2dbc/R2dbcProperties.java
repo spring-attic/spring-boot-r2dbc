@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
-import java.nio.charset.Charset;
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -65,62 +63,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 	 * Login password of the database.
 	 */
 	private String password;
-
-	/**
-	 * Initialize the datasource with available DDL and DML scripts.
-	 */
-	private ConnectionFactoryInitializationMode initializationMode = ConnectionFactoryInitializationMode.EMBEDDED;
-
-	/**
-	 * Platform to use in the DDL or DML scripts (such as schema-${platform}.sql or
-	 * data-${platform}.sql).
-	 */
-	private String platform = "all";
-
-	/**
-	 * Schema (DDL) script resource references.
-	 */
-	private List<String> schema;
-
-	/**
-	 * Username of the database to execute DDL scripts (if different).
-	 */
-	private String schemaUsername;
-
-	/**
-	 * Password of the database to execute DDL scripts (if different).
-	 */
-	private String schemaPassword;
-
-	/**
-	 * Data (DML) script resource references.
-	 */
-	private List<String> data;
-
-	/**
-	 * Username of the database to execute DML scripts (if different).
-	 */
-	private String dataUsername;
-
-	/**
-	 * Password of the database to execute DML scripts (if different).
-	 */
-	private String dataPassword;
-
-	/**
-	 * Whether to stop if an error occurs while initializing the database.
-	 */
-	private boolean continueOnError = false;
-
-	/**
-	 * Statement separator in SQL initialization scripts.
-	 */
-	private String separator = ";";
-
-	/**
-	 * SQL scripts encoding.
-	 */
-	private Charset sqlScriptEncoding;
 
 	/**
 	 * Extended R2DBC properties.
@@ -247,94 +189,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public ConnectionFactoryInitializationMode getInitializationMode() {
-		return this.initializationMode;
-	}
-
-	public void setInitializationMode(ConnectionFactoryInitializationMode initializationMode) {
-		this.initializationMode = initializationMode;
-	}
-
-	public String getPlatform() {
-		return this.platform;
-	}
-
-	public void setPlatform(String platform) {
-		this.platform = platform;
-	}
-
-	public List<String> getSchema() {
-		return this.schema;
-	}
-
-	public void setSchema(List<String> schema) {
-		this.schema = schema;
-	}
-
-	public String getSchemaUsername() {
-		return this.schemaUsername;
-	}
-
-	public void setSchemaUsername(String schemaUsername) {
-		this.schemaUsername = schemaUsername;
-	}
-
-	public String getSchemaPassword() {
-		return this.schemaPassword;
-	}
-
-	public void setSchemaPassword(String schemaPassword) {
-		this.schemaPassword = schemaPassword;
-	}
-
-	public List<String> getData() {
-		return this.data;
-	}
-
-	public void setData(List<String> data) {
-		this.data = data;
-	}
-
-	public String getDataUsername() {
-		return this.dataUsername;
-	}
-
-	public void setDataUsername(String dataUsername) {
-		this.dataUsername = dataUsername;
-	}
-
-	public String getDataPassword() {
-		return this.dataPassword;
-	}
-
-	public void setDataPassword(String dataPassword) {
-		this.dataPassword = dataPassword;
-	}
-
-	public boolean isContinueOnError() {
-		return this.continueOnError;
-	}
-
-	public void setContinueOnError(boolean continueOnError) {
-		this.continueOnError = continueOnError;
-	}
-
-	public String getSeparator() {
-		return this.separator;
-	}
-
-	public void setSeparator(String separator) {
-		this.separator = separator;
-	}
-
-	public Charset getSqlScriptEncoding() {
-		return this.sqlScriptEncoding;
-	}
-
-	public void setSqlScriptEncoding(Charset sqlScriptEncoding) {
-		this.sqlScriptEncoding = sqlScriptEncoding;
 	}
 
 	/**

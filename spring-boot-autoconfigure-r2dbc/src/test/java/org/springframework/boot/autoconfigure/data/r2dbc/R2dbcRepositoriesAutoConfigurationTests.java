@@ -16,9 +16,11 @@
 
 package org.springframework.boot.autoconfigure.data.r2dbc;
 
+import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
@@ -26,6 +28,10 @@ import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfigu
 import org.springframework.boot.autoconfigure.r2dbc.EmbeddedDatabaseConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
 import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.r2dbc.repository.config.R2dbcRepositoryConfigurationExtension;
@@ -61,12 +67,10 @@ class R2dbcRepositoriesAutoConfigurationTests {
 	@Test
 	void basicAutoConfiguration() {
 		this.contextRunner
-				.withConfiguration(AutoConfigurations
-						.of(ConnectionFactoryAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
-				.withUserConfiguration(TestConfiguration.class)
-				.withPropertyValues("spring.r2dbc.schema=classpath:data-r2dbc-schema.sql",
-						"spring.r2dbc.data=classpath:city.sql", "spring.r2dbc.generate-unique-name:true")
-				.run((context) -> {
+				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
+						R2dbcDataAutoConfiguration.class))
+				.withUserConfiguration(DatabaseInitializationConfiguration.class, TestConfiguration.class)
+				.withPropertyValues("spring.r2dbc.generate-unique-name:true").run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);
 					context.getBean(CityRepository.class).findById(2000L).as(StepVerifier::create).expectNextCount(1)
 							.verifyComplete();
@@ -85,30 +89,43 @@ class R2dbcRepositoriesAutoConfigurationTests {
 	@Test
 	void honorsUsersEnableR2dbcRepositoriesConfiguration() {
 		this.contextRunner
-				.withConfiguration(AutoConfigurations
-						.of(ConnectionFactoryAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
-				.withUserConfiguration(EnableRepositoriesConfiguration.class)
-				.withPropertyValues("spring.r2dbc.schema=classpath:data-r2dbc-schema.sql",
-						"spring.r2dbc.data=classpath:city.sql", "spring.r2dbc.generate-unique-name:true")
-				.run((context) -> {
+				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
+						R2dbcDataAutoConfiguration.class))
+				.withUserConfiguration(DatabaseInitializationConfiguration.class, EnableRepositoriesConfiguration.class)
+				.withPropertyValues("spring.r2dbc.generate-unique-name:true").run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);
 					context.getBean(CityRepository.class).findById(2000L).as(StepVerifier::create).expectNextCount(1)
 							.verifyComplete();
 				});
 	}
 
-	@TestAutoConfigurationPackage(City.class)
-	private static class TestConfiguration {
+	@Configuration(proxyBeanMethods = false)
+	static class DatabaseInitializationConfiguration {
+
+		@Autowired
+		void initializeDatabase(ConnectionFactory connectionFactory) {
+			ResourceLoader resourceLoader = new DefaultResourceLoader();
+			Resource[] scripts = new Resource[] { resourceLoader.getResource("classpath:data-r2dbc-schema.sql"),
+					resourceLoader.getResource("classpath:city.sql") };
+			new ResourceDatabasePopulator(scripts).execute(connectionFactory).block();
+		}
 
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	protected static class EmptyConfiguration {
+	@TestAutoConfigurationPackage(City.class)
+	static class TestConfiguration {
 
 	}
 
+	@Configuration(proxyBeanMethods = false)
+	static class EmptyConfiguration {
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
 	@EnableR2dbcRepositories(basePackageClasses = City.class)
-	private static class EnableRepositoriesConfiguration {
+	static class EnableRepositoriesConfiguration {
 
 	}
 
