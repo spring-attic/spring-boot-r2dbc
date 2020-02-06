@@ -25,7 +25,6 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
-import org.springframework.boot.autoconfigure.r2dbc.EmbeddedDatabaseConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -57,8 +56,8 @@ class R2dbcRepositoriesAutoConfigurationTests {
 
 	@Test
 	void backsOffWithNoDatabaseClientOperations() {
-		this.contextRunner.withUserConfiguration(EmbeddedDatabaseConfiguration.class, TestConfiguration.class)
-				.run((context) -> {
+		this.contextRunner.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
+				.withUserConfiguration(TestConfiguration.class).run((context) -> {
 					assertThat(context).doesNotHaveBean(DatabaseClient.class);
 					assertThat(context).doesNotHaveBean(R2dbcRepositoryConfigurationExtension.class);
 				});
@@ -79,9 +78,7 @@ class R2dbcRepositoriesAutoConfigurationTests {
 
 	@Test
 	void autoConfigurationWithNoRepositories() {
-		this.contextRunner
-				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
-						EmbeddedDatabaseConfiguration.class))
+		this.contextRunner.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
 				.withUserConfiguration(EmptyConfiguration.class)
 				.run((context) -> assertThat(context).doesNotHaveBean(Repository.class));
 	}

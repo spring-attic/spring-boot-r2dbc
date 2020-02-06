@@ -24,35 +24,37 @@ import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.spi.ConnectionFactory;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
 /**
- * Configurations for pooled and unpooled {@link ConnectionFactory} beans.
+ * Actual {@link ConnectionFactory} configurations imported by
+ * {@link ConnectionFactoryAutoConfiguration}.
  *
  * @author Mark Paluch
  * @author Stephane Nicoll
  */
-abstract class ConnectionFactoryConfiguration {
+abstract class ConnectionFactoryConfigurations {
 
-	protected static ConnectionFactory createConnectionFactory(R2dbcProperties properties,
+	protected static ConnectionFactory createConnectionFactory(R2dbcProperties properties, ClassLoader classLoader,
 			List<ConnectionFactoryOptionsBuilderCustomizer> optionsCustomizers) {
-		return ConnectionFactoryBuilder.create(properties).configure((options) -> {
-			for (ConnectionFactoryOptionsBuilderCustomizer optionsCustomizer : optionsCustomizers) {
-				optionsCustomizer.customize(options);
-			}
-		}).build();
+		return ConnectionFactoryBuilder.of(properties, () -> EmbeddedDatabaseConnection.get(classLoader))
+				.configure((options) -> {
+					for (ConnectionFactoryOptionsBuilderCustomizer optionsCustomizer : optionsCustomizers) {
+						optionsCustomizer.customize(options);
+					}
+				}).build();
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	protected static class ConnectionPoolConnectionFactoryConfiguration {
+	static class Pool {
 
 		@Bean(destroyMethod = "dispose")
-		ConnectionPool connectionFactory(R2dbcProperties properties,
+		ConnectionPool connectionFactory(R2dbcProperties properties, ResourceLoader resourceLoader,
 				ObjectProvider<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
-			ConnectionFactory connectionFactory = createConnectionFactory(properties,
+			ConnectionFactory connectionFactory = createConnectionFactory(properties, resourceLoader.getClassLoader(),
 					customizers.orderedStream().collect(Collectors.toList()));
 			R2dbcProperties.Pool pool = properties.getPool();
 			ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory)
@@ -66,13 +68,13 @@ abstract class ConnectionFactoryConfiguration {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@AutoConfigureAfter(EmbeddedDatabaseConfiguration.class)
-	protected static class Generic {
+	static class Generic {
 
 		@Bean
-		ConnectionFactory connectionFactory(R2dbcProperties properties,
+		ConnectionFactory connectionFactory(R2dbcProperties properties, ResourceLoader resourceLoader,
 				ObjectProvider<ConnectionFactoryOptionsBuilderCustomizer> customizers) {
-			return createConnectionFactory(properties, customizers.orderedStream().collect(Collectors.toList()));
+			return createConnectionFactory(properties, resourceLoader.getClassLoader(),
+					customizers.orderedStream().collect(Collectors.toList()));
 		}
 
 	}

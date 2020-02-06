@@ -17,73 +17,59 @@
 package org.springframework.boot.autoconfigure.r2dbc;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import io.r2dbc.spi.ConnectionFactoryOptions;
-
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.util.StringUtils;
 
 /**
  * Configuration properties for R2DBC.
  *
  * @author Mark Paluch
  * @author Andreas Killaitis
+ * @author Stephane Nicoll
+ * @since 2.3.0
  */
 @ConfigurationProperties(prefix = "spring.r2dbc")
-public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
-
-	private ClassLoader classLoader;
+public class R2dbcProperties {
 
 	/**
-	 * Name of the connectionfactory. Default to "testdb" when using an embedded database.
+	 * Database name. Set if no name is specified in the url. Default to "testdb" when
+	 * using an embedded database.
 	 */
 	private String name;
 
 	/**
-	 * Whether to generate a random datasource name.
+	 * Whether to generate a random database name. Ignore any configured name when
+	 * enabled.
 	 */
 	private boolean generateUniqueName;
 
 	/**
-	 * R2DBC URL of the database.
+	 * R2DBC URL of the database. database name, username and port specified in the url
+	 * take precedence over individual options.
 	 */
 	private String url;
 
 	/**
-	 * Login username of the database.
+	 * Login username of the database. Set if no username is specified in the url.
 	 */
 	private String username;
 
 	/**
-	 * Login password of the database.
+	 * Login password of the database. Set if no password is specified in the url.
 	 */
 	private String password;
 
 	/**
-	 * Extended R2DBC properties.
+	 * Additional R2DBC options.
 	 */
-	private Map<String, String> properties;
+	private final Map<String, String> properties = new LinkedHashMap<>();
 
-	private Pool pool = new Pool();
-
-	private EmbeddedDatabaseConnection embeddedDatabaseConnection = EmbeddedDatabaseConnection.NONE;
+	private final Pool pool = new Pool();
 
 	private String uniqueName;
-
-	@Override
-	public void setBeanClassLoader(ClassLoader classLoader) {
-		this.classLoader = classLoader;
-	}
-
-	@Override
-	public void afterPropertiesSet() {
-		this.embeddedDatabaseConnection = EmbeddedDatabaseConnection.get(this.classLoader);
-	}
 
 	public String getName() {
 		return this.name;
@@ -101,11 +87,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		this.generateUniqueName = generateUniqueName;
 	}
 
-	/**
-	 * Return the configured url or {@code null} if none was configured.
-	 * @return the configured url
-	 * @see #determineUrl()
-	 */
 	public String getUrl() {
 		return this.url;
 	}
@@ -114,48 +95,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		this.url = url;
 	}
 
-	/**
-	 * Determine the url to use based on this configuration and the environment.
-	 * @return the url to use
-	 */
-	public String determineUrl() {
-		if (StringUtils.hasText(this.url)) {
-			return this.url;
-		}
-		String databaseName = determineDatabaseName();
-		String url = (databaseName != null) ? this.embeddedDatabaseConnection.getUrl(databaseName) : null;
-		if (!StringUtils.hasText(url)) {
-			throw new ConnectionFactoryBeanCreationException("Failed to determine a suitable R2DBC Connection URL",
-					this, this.embeddedDatabaseConnection);
-		}
-		return url;
-	}
-
-	/**
-	 * Determine the name to used based on this configuration.
-	 * @return the database name to use or {@code null}
-	 */
-	public String determineDatabaseName() {
-		if (this.generateUniqueName) {
-			if (this.uniqueName == null) {
-				this.uniqueName = UUID.randomUUID().toString();
-			}
-			return this.uniqueName;
-		}
-		if (StringUtils.hasLength(this.name)) {
-			return this.name;
-		}
-		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {
-			return "testdb";
-		}
-		return null;
-	}
-
-	/**
-	 * Return the configured username or {@code null} if none was configured.
-	 * @return the configured username
-	 * @see #determineUsername()
-	 */
 	public String getUsername() {
 		return this.username;
 	}
@@ -164,25 +103,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		this.username = username;
 	}
 
-	/**
-	 * Determine the username to use based on this configuration and the environment.
-	 * @return the username to use
-	 */
-	public String determineUsername() {
-		if (StringUtils.hasText(this.username)) {
-			return this.username;
-		}
-		if (EmbeddedDatabaseConnection.isEmbedded(determineDriverName())) {
-			return "sa";
-		}
-		return this.username;
-	}
-
-	/**
-	 * Return the configured password or {@code null} if none was configured.
-	 * @return the configured password
-	 * @see #determinePassword()
-	 */
 	public String getPassword() {
 		return this.password;
 	}
@@ -191,74 +111,30 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 		this.password = password;
 	}
 
-	/**
-	 * Determine the password to use based on this configuration and the environment.
-	 * @return the password to use
-	 */
-	public String determinePassword() {
-		if (StringUtils.hasText(this.password)) {
-			return this.password;
-		}
-		if (EmbeddedDatabaseConnection.isEmbedded(determineDriverName())) {
-			return "";
-		}
-		return this.password;
-	}
-
 	public Map<String, String> getProperties() {
 		return this.properties;
-	}
-
-	public void setProperties(Map<String, String> properties) {
-		this.properties = properties;
 	}
 
 	public Pool getPool() {
 		return this.pool;
 	}
 
-	public void setPool(Pool pool) {
-		this.pool = pool;
-	}
-
-	String determineDriverName() {
-		if (StringUtils.hasText(this.url)) {
-			return ConnectionFactoryOptions.parse(this.url).getRequiredValue(ConnectionFactoryOptions.DRIVER);
+	/**
+	 * Provide a unique name specific to this instance. Calling this method several times
+	 * return the same unique name.
+	 * @return a unique name for this instance
+	 */
+	public String determineUniqueName() {
+		if (this.uniqueName == null) {
+			this.uniqueName = UUID.randomUUID().toString();
 		}
-		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {
-			return this.embeddedDatabaseConnection.getType().toLowerCase();
-		}
-		throw new DataSourceBeanCreationException("Failed to determine a suitable driver", this,
-				this.embeddedDatabaseConnection);
-	}
-
-	public static class DataSourceBeanCreationException extends BeanCreationException {
-
-		private final R2dbcProperties properties;
-
-		private final EmbeddedDatabaseConnection connection;
-
-		DataSourceBeanCreationException(String message, R2dbcProperties properties,
-				EmbeddedDatabaseConnection connection) {
-			super(message);
-			this.properties = properties;
-			this.connection = connection;
-		}
-
-		public R2dbcProperties getProperties() {
-			return this.properties;
-		}
-
-		public EmbeddedDatabaseConnection getConnection() {
-			return this.connection;
-		}
-
+		return this.uniqueName;
 	}
 
 	public static class Pool {
 
 		/**
-		 * Is pooling enabled?
+		 * Whether pooling is enabled.
 		 */
 		private boolean enabled = true;
 
@@ -320,29 +196,6 @@ public class R2dbcProperties implements BeanClassLoaderAware, InitializingBean {
 
 		public void setValidationQuery(String validationQuery) {
 			this.validationQuery = validationQuery;
-		}
-
-	}
-
-	static class ConnectionFactoryBeanCreationException extends BeanCreationException {
-
-		private final R2dbcProperties properties;
-
-		private final EmbeddedDatabaseConnection embeddedDatabaseConnection;
-
-		ConnectionFactoryBeanCreationException(String message, R2dbcProperties properties,
-				EmbeddedDatabaseConnection embeddedDatabaseConnection) {
-			super(message);
-			this.properties = properties;
-			this.embeddedDatabaseConnection = embeddedDatabaseConnection;
-		}
-
-		EmbeddedDatabaseConnection getEmbeddedDatabaseConnection() {
-			return this.embeddedDatabaseConnection;
-		}
-
-		R2dbcProperties getProperties() {
-			return this.properties;
 		}
 
 	}

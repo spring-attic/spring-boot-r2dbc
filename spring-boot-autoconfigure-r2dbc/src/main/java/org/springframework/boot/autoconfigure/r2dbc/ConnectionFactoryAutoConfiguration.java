@@ -43,6 +43,7 @@ import org.springframework.util.StringUtils;
  * {@link EnableAutoConfiguration Auto-configuration} for {@link ConnectionFactory}.
  *
  * @author Mark Paluch
+ * @author Stephane Nicoll
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ConnectionFactory.class)
@@ -52,7 +53,7 @@ public class ConnectionFactoryAutoConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(EmbeddedDatabaseCondition.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
-	@Import(EmbeddedDatabaseConfiguration.class)
+	@Import(ConnectionFactoryConfigurations.Generic.class)
 	protected static class EmbeddedConfiguration {
 
 	}
@@ -60,7 +61,7 @@ public class ConnectionFactoryAutoConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(GenericCondition.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
-	@Import(ConnectionFactoryConfiguration.Generic.class)
+	@Import(ConnectionFactoryConfigurations.Generic.class)
 	protected static class GenericConnectionFactoryConfiguration {
 
 	}
@@ -70,7 +71,7 @@ public class ConnectionFactoryAutoConfiguration {
 	@ConditionalOnClass(ConnectionPool.class)
 	@ConditionalOnMissingBean(ConnectionFactory.class)
 	@ConditionalOnProperty(prefix = "spring.r2dbc.pool", value = "enabled", matchIfMissing = true)
-	@Import(ConnectionFactoryConfiguration.ConnectionPoolConnectionFactoryConfiguration.class)
+	@Import(ConnectionFactoryConfigurations.Pool.class)
 	protected static class PooledConnectionFactoryConfiguration {
 
 	}

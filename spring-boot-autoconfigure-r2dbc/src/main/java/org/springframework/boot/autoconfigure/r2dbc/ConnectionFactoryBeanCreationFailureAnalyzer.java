@@ -16,7 +16,7 @@
 
 package org.springframework.boot.autoconfigure.r2dbc;
 
-import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties.ConnectionFactoryBeanCreationException;
+import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryBuilder.ConnectionFactoryBeanCreationException;
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 import org.springframework.context.EnvironmentAware;
