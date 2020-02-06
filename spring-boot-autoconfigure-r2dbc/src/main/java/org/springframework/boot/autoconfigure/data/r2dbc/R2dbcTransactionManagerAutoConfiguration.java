@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,23 +35,19 @@ import org.springframework.transaction.ReactiveTransactionManager;
  * {@link EnableAutoConfiguration Auto-configuration} for {@link R2dbcTransactionManager}.
  *
  * @author Mark Paluch
+ * @since 2.3.0
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ R2dbcTransactionManager.class, ReactiveTransactionManager.class })
+@ConditionalOnSingleCandidate(ConnectionFactory.class)
 @AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 @AutoConfigureBefore(TransactionAutoConfiguration.class)
 public class R2dbcTransactionManagerAutoConfiguration {
 
-	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnSingleCandidate(ConnectionFactory.class)
-	static class ConnectionFactoryTransactionManagerConfiguration {
-
-		@Bean
-		@ConditionalOnMissingBean(ReactiveTransactionManager.class)
-		R2dbcTransactionManager connectionFactoryTransactionManager(ConnectionFactory connectionFactory) {
-			return new R2dbcTransactionManager(connectionFactory);
-		}
-
+	@Bean
+	@ConditionalOnMissingBean(ReactiveTransactionManager.class)
+	public R2dbcTransactionManager connectionFactoryTransactionManager(ConnectionFactory connectionFactory) {
+		return new R2dbcTransactionManager(connectionFactory);
 	}
 
 }

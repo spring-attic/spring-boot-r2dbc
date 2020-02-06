@@ -25,9 +25,9 @@ import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,11 +49,12 @@ import org.springframework.data.relational.core.mapping.NamingStrategy;
  *
  * @author Mark Paluch
  * @author Oliver Drotbohm
+ * @since 2.3.0
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(DatabaseClient.class)
 @ConditionalOnMissingBean(DatabaseClient.class)
-@ConditionalOnBean(ConnectionFactory.class)
+@ConditionalOnSingleCandidate(ConnectionFactory.class)
 @AutoConfigureAfter(ConnectionFactoryAutoConfiguration.class)
 public class R2dbcDataAutoConfiguration {
 
@@ -65,6 +66,7 @@ public class R2dbcDataAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	// FIXME: rename to r2dbcDatabaseClient
 	public DatabaseClient databaseClient(ReactiveDataAccessStrategy dataAccessStrategy,
 			R2dbcExceptionTranslator exceptionTranslator) {
 		return DatabaseClient.builder().connectionFactory(this.connectionFactory).dataAccessStrategy(dataAccessStrategy)
@@ -102,7 +104,7 @@ public class R2dbcDataAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public R2dbcExceptionTranslator exceptionTranslator() {
+	public R2dbcExceptionTranslator r2dbcExceptionTranslator() {
 		return new R2dbcExceptionSubclassTranslator();
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,22 +31,18 @@ import org.springframework.transaction.reactive.TransactionalOperator;
  * {@link EnableAutoConfiguration Auto-configuration} for reactive Spring transaction.
  *
  * @author Mark Paluch
+ * @since 2.3.0
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ReactiveTransactionManager.class)
+@ConditionalOnSingleCandidate(ReactiveTransactionManager.class)
 @AutoConfigureAfter(R2dbcTransactionManagerAutoConfiguration.class)
 public class ReactiveTransactionAutoConfiguration {
 
-	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnSingleCandidate(ReactiveTransactionManager.class)
-	static class TransactionalOperatorConfiguration {
-
-		@Bean
-		@ConditionalOnMissingBean
-		TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
-			return TransactionalOperator.create(transactionManager);
-		}
-
+	@Bean
+	@ConditionalOnMissingBean
+	public TransactionalOperator transactionalOperator(ReactiveTransactionManager transactionManager) {
+		return TransactionalOperator.create(transactionManager);
 	}
 
 }
