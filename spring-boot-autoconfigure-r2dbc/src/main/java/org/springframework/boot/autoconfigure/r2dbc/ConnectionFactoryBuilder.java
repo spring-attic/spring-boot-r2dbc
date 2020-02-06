@@ -85,7 +85,7 @@ public final class ConnectionFactoryBuilder {
 	 * @param password the connection factory password
 	 * @return this for method chaining
 	 */
-	public ConnectionFactoryBuilder password(String password) {
+	public ConnectionFactoryBuilder password(CharSequence password) {
 		return configure((options) -> options.option(ConnectionFactoryOptions.PASSWORD, password));
 	}
 
