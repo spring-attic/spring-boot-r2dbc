@@ -66,8 +66,7 @@ public class R2dbcDataAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	// FIXME: rename to r2dbcDatabaseClient
-	public DatabaseClient databaseClient(ReactiveDataAccessStrategy dataAccessStrategy,
+	public DatabaseClient r2dbcDatabaseClient(ReactiveDataAccessStrategy dataAccessStrategy,
 			R2dbcExceptionTranslator exceptionTranslator) {
 		return DatabaseClient.builder().connectionFactory(this.connectionFactory).dataAccessStrategy(dataAccessStrategy)
 				.exceptionTranslator(exceptionTranslator).build();
