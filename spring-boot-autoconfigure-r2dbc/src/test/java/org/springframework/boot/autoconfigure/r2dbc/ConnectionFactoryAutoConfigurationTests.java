@@ -20,6 +20,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Random;
 
+import javax.sql.DataSource;
+
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.spi.ConnectionFactory;
@@ -40,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link ConnectionFactoryAutoConfiguration}.
  *
  * @author Mark Paluch
+ * @author Stephane Nicoll
  */
 class ConnectionFactoryAutoConfigurationTests {
 
@@ -171,6 +174,26 @@ class ConnectionFactoryAutoConfigurationTests {
 					assertThat(properties.getPool().getEnabled()).isFalse();
 					assertThat(connectionFactory).isNotInstanceOf(ConnectionPool.class);
 				});
+	}
+
+	@Test
+	void embeddedDataSourceCanBeConfigured() {
+		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class));
+	}
+
+	@Test
+	void embeddedDataSourceIsCreatedWhenNoUrlIsSpecified() {
+		this.contextRunner.run((context) -> {
+			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+			assertThat(connectionFactory).isExactlyInstanceOf(H2ConnectionFactory.class);
+			assertThat(context).doesNotHaveBean(DataSource.class);
+		});
+	}
+
+	@Test
+	void embeddedDataSourceCanBeCreatedWithoutSpringJdbc() {
+		this.contextRunner.withClassLoader(new FilteredClassLoader("org.springframework.jdbc"))
+				.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class));
 	}
 
 	private static class DisableEmbeddedDatabaseClassLoader extends URLClassLoader {
