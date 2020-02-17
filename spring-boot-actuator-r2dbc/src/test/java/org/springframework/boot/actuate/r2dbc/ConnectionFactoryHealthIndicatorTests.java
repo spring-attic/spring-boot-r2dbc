@@ -16,16 +16,12 @@
 
 package org.springframework.boot.actuate.r2dbc;
 
-import java.util.Random;
+import java.util.UUID;
 
 import io.r2dbc.h2.H2ConnectionConfiguration;
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.Result;
-import io.r2dbc.spi.ValidationDepth;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -33,6 +29,8 @@ import org.springframework.boot.actuate.health.Status;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link ConnectionFactoryHealthIndicator}.
@@ -41,51 +39,28 @@ import static org.assertj.core.api.Assertions.entry;
  */
 class ConnectionFactoryHealthIndicatorTests {
 
-	private ConnectionFactoryHealthIndicator healthIndicator;
-
-	private ConnectionFactory connectionFactory;
-
-	@BeforeEach
-	void init() {
-		this.connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
-				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1").build());
-	}
-
 	@Test
-	void healthIndicatorWithDefaultSettings() {
-		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory);
-		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
+	void healthIndicatorWithDatabaseUp() {
+		ConnectionFactory connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
+				.inMemory("db-" + UUID.randomUUID()).option("DB_CLOSE_DELAY=-1").build());
+		ConnectionFactoryHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory);
+		healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.UP);
-			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("valid", true),
-					entry("validationDepth", ValidationDepth.REMOTE));
+			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("valid", true));
 		}).verifyComplete();
 	}
 
 	@Test
-	void healthIndicatorWithCustomValidationQuery() {
-		String customValidationQuery = "SELECT COUNT(*) from FOO";
-		Mono.from(this.connectionFactory.create())
-				.flatMapMany((it) -> Flux
-						.from(it.createStatement("CREATE TABLE FOO (id INTEGER IDENTITY PRIMARY KEY)").execute())
-						.flatMap(Result::getRowsUpdated).thenMany(it.close()))
-				.as(StepVerifier::create).verifyComplete();
-		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory, customValidationQuery);
-		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
-			assertThat(actual.getStatus()).isEqualTo(Status.UP);
-			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("result", 0L),
-					entry("validationQuery", customValidationQuery));
-		}).verifyComplete();
-	}
-
-	@Test
-	void healthIndicatorWithInvalidValidationQuery() {
-		String invalidValidationQuery = "SELECT COUNT(*) from BAR";
-		this.healthIndicator = new ConnectionFactoryHealthIndicator(this.connectionFactory, invalidValidationQuery);
-		this.healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
+	void healthIndicatorWithDatabaseDown() {
+		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+		given(connectionFactory.getMetadata()).willReturn(() -> "mock");
+		RuntimeException exception = new RuntimeException("test");
+		given(connectionFactory.create()).willReturn(Mono.error(exception));
+		ConnectionFactoryHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory);
+		healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.DOWN);
-			assertThat(actual.getDetails()).contains(entry("database", "H2"),
-					entry("validationQuery", invalidValidationQuery));
-			assertThat(actual.getDetails()).containsOnlyKeys("database", "error", "validationQuery");
+			assertThat(actual.getDetails()).containsOnly(entry("database", "mock"),
+					entry("error", "java.lang.RuntimeException: test"));
 		}).verifyComplete();
 	}
 
