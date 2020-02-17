@@ -16,7 +16,7 @@
 
 package org.springframework.boot.actuate.metrics.r2dbc;
 
-import java.util.Random;
+import java.util.UUID;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Tag;
@@ -41,25 +41,25 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ConnectionPoolMetricsTests {
 
-	private static final Tag fooTag = Tag.of("foo", "FOO");
+	private static final Tag testTag = Tag.of("test", "yes");
 
-	private static final Tag barTag = Tag.of("bar", "BAR");
+	private static final Tag regionTag = Tag.of("region", "eu-2");
 
 	private ConnectionFactory connectionFactory;
 
 	@BeforeEach
 	void init() {
 		this.connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
-				.inMemory("db-" + new Random().nextInt()).option("DB_CLOSE_DELAY=-1").build());
+				.inMemory("db-" + UUID.randomUUID()).option("DB_CLOSE_DELAY=-1").build());
 	}
 
 	@Test
-	void metrics() {
+	void connectionFactoryIsInstrumented() {
 		SimpleMeterRegistry registry = new SimpleMeterRegistry();
 		ConnectionPool connectionPool = new ConnectionPool(
 				ConnectionPoolConfiguration.builder(this.connectionFactory).initialSize(3).maxSize(7).build());
-
-		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "my-pool", Tags.of(fooTag, barTag));
+		ConnectionPoolMetrics metrics = new ConnectionPoolMetrics(connectionPool, "test-pool",
+				Tags.of(testTag, regionTag));
 		metrics.bindTo(registry);
 		// acquire two connections
 		connectionPool.create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
@@ -75,7 +75,7 @@ class ConnectionPoolMetricsTests {
 	private void assertGauge(SimpleMeterRegistry registry, String metric, int expectedValue) {
 		Gauge gauge = registry.get(metric).gauge();
 		assertThat(gauge.value()).isEqualTo(expectedValue);
-		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "my-pool"), fooTag, barTag);
+		assertThat(gauge.getId().getTags()).containsExactlyInAnyOrder(Tag.of("name", "test-pool"), testTag, regionTag);
 	}
 
 }
