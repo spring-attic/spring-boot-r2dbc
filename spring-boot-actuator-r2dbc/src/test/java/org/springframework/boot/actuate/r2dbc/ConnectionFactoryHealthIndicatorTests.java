@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,20 @@
 
 package org.springframework.boot.actuate.r2dbc;
 
+import java.util.Collections;
 import java.util.UUID;
 
-import io.r2dbc.h2.H2ConnectionConfiguration;
+import io.r2dbc.h2.CloseableConnectionFactory;
 import io.r2dbc.h2.H2ConnectionFactory;
+import io.r2dbc.h2.H2ConnectionOption;
 import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.Result;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import org.springframework.boot.actuate.health.ReactiveHealthIndicator;
 import org.springframework.boot.actuate.health.Status;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,22 +41,27 @@ import static org.mockito.Mockito.mock;
  * Tests for {@link ConnectionFactoryHealthIndicator}.
  *
  * @author Mark Paluch
+ * @author Stephane Nicoll
  */
 class ConnectionFactoryHealthIndicatorTests {
 
 	@Test
-	void healthIndicatorWithDatabaseUp() {
-		ConnectionFactory connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
-				.inMemory("db-" + UUID.randomUUID()).option("DB_CLOSE_DELAY=-1").build());
-		ConnectionFactoryHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory);
-		healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
-			assertThat(actual.getStatus()).isEqualTo(Status.UP);
-			assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("valid", true));
-		}).verifyComplete();
+	void healthIndicatorWhenDatabaseUpWithConnectionValidation() {
+		CloseableConnectionFactory connectionFactory = createTestDatabase();
+		try {
+			ConnectionFactoryHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory);
+			healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
+				assertThat(actual.getStatus()).isEqualTo(Status.UP);
+				assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("valid", true));
+			}).verifyComplete();
+		}
+		finally {
+			connectionFactory.close();
+		}
 	}
 
 	@Test
-	void healthIndicatorWithDatabaseDown() {
+	void healthIndicatorWhenDatabaseDownWithConnectionValidation() {
 		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 		given(connectionFactory.getMetadata()).willReturn(() -> "mock");
 		RuntimeException exception = new RuntimeException("test");
@@ -62,6 +72,52 @@ class ConnectionFactoryHealthIndicatorTests {
 			assertThat(actual.getDetails()).containsOnly(entry("database", "mock"),
 					entry("error", "java.lang.RuntimeException: test"));
 		}).verifyComplete();
+	}
+
+	@Test
+	void healthIndicatorWhenDatabaseUpWithSuccessValidationQuery() {
+		CloseableConnectionFactory connectionFactory = createTestDatabase();
+		try {
+			String customValidationQuery = "SELECT COUNT(*) from HEALTH_TEST";
+			Mono.from(connectionFactory.create()).flatMapMany((it) -> Flux
+					.from(it.createStatement("CREATE TABLE HEALTH_TEST (id INTEGER IDENTITY PRIMARY KEY)").execute())
+					.flatMap(Result::getRowsUpdated).thenMany(it.close())).as(StepVerifier::create).verifyComplete();
+			ReactiveHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory,
+					customValidationQuery);
+			healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
+				assertThat(actual.getStatus()).isEqualTo(Status.UP);
+				assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("result", 0L),
+						entry("validationQuery", customValidationQuery));
+			}).verifyComplete();
+		}
+		finally {
+			connectionFactory.close();
+		}
+
+	}
+
+	@Test
+	void healthIndicatorWhenDatabaseUpWithFailureValidationQuery() {
+		CloseableConnectionFactory connectionFactory = createTestDatabase();
+		try {
+			String invalidValidationQuery = "SELECT COUNT(*) from DOES_NOT_EXIST";
+			ReactiveHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory,
+					invalidValidationQuery);
+			healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
+				assertThat(actual.getStatus()).isEqualTo(Status.DOWN);
+				assertThat(actual.getDetails()).contains(entry("database", "H2"),
+						entry("validationQuery", invalidValidationQuery));
+				assertThat(actual.getDetails()).containsOnlyKeys("database", "error", "validationQuery");
+			}).verifyComplete();
+		}
+		finally {
+			connectionFactory.close();
+		}
+	}
+
+	private CloseableConnectionFactory createTestDatabase() {
+		return H2ConnectionFactory.inMemory("db-" + UUID.randomUUID(), "sa", "",
+				Collections.singletonMap(H2ConnectionOption.DB_CLOSE_DELAY, "-1"));
 	}
 
 }
