@@ -54,9 +54,8 @@ public class ConnectionFactoryHealthContributorAutoConfiguration
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(
-			name = { "r2dbcConnectionFactoryHealthIndicator", "r2dbcConnectionFactoryHealthContributor" })
-	public ReactiveHealthContributor r2dbcConnectionFactoryHealthContributor() {
+	@ConditionalOnMissingBean(name = { "r2dbcHealthIndicator", "r2dbcHealthContributor" })
+	public ReactiveHealthContributor r2dbcHealthContributor() {
 		return createContributor(this.connectionFactory);
 	}
 
