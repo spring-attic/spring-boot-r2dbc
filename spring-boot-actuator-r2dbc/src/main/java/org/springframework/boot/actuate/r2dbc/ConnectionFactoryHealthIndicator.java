@@ -41,7 +41,7 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 
 	private final ConnectionFactory connectionFactory;
 
-	private String validationQuery;
+	private final String validationQuery;
 
 	/**
 	 * Create a new {@link ConnectionFactoryHealthIndicator} using the specified
@@ -63,15 +63,6 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	public ConnectionFactoryHealthIndicator(ConnectionFactory connectionFactory, String validationQuery) {
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
 		this.connectionFactory = connectionFactory;
-		this.validationQuery = validationQuery;
-	}
-
-	/**
-	 * Set the validation query to use or {@code null} to
-	 * {@linkplain Connection#validate(ValidationDepth) validate the connection} instead.
-	 * @param validationQuery the validation query to use or {@code null}
-	 */
-	public void setValidationQuery(String validationQuery) {
 		this.validationQuery = validationQuery;
 	}
 
