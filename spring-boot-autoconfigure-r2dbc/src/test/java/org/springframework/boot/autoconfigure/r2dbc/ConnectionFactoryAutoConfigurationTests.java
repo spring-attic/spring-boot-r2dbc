@@ -18,12 +18,12 @@ package org.springframework.boot.autoconfigure.r2dbc;
 
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Random;
-
-import javax.sql.DataSource;
+import java.util.UUID;
+import java.util.function.Function;
 
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.pool.ConnectionPool;
+import io.r2dbc.pool.PoolMetrics;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Option;
 import org.junit.jupiter.api.Test;
@@ -50,31 +50,57 @@ class ConnectionFactoryAutoConfigurationTests {
 			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class));
 
 	@Test
-	void testDefaultPooledConnectionFactoryExists() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-" + new Random().nextInt())
-				.run((context) -> {
-					assertThat(context).hasSingleBean(ConnectionFactory.class);
-					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
-					assertThat(bean).isExactlyInstanceOf(ConnectionPool.class);
+	void configureWithUrlCreateConnectionPoolByDefault() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///" + randomDatabaseName())
+				.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class)
+						.hasSingleBean(ConnectionPool.class));
+	}
+
+	@Test
+	void configureWithUrlAndPoolPropertiesApplyProperties() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///" + randomDatabaseName(),
+				"spring.r2dbc.pool.max-size=15").run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class).hasSingleBean(ConnectionPool.class);
+					PoolMetrics poolMetrics = context.getBean(ConnectionPool.class).getMetrics().get();
+					assertThat(poolMetrics.getMaxAllocatedSize()).isEqualTo(15);
 				});
 	}
 
 	@Test
-	void testDefaultPooledUrlConnectionFactoryExists() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:pool:h2:mem:///testdb-" + new Random().nextInt())
-				.run((context) -> {
-					assertThat(context).hasSingleBean(ConnectionFactory.class);
-					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
-					assertThat(bean).isExactlyInstanceOf(ConnectionPool.class);
-				});
-	}
-
-	@Test
-	void testDefaultGenericConnectionFactoryExists() {
+	void configureWithUrlPoolAndPoolPropertiesApplyUrlPoolOptions() {
 		this.contextRunner
-				.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-" + new Random().nextInt()
-						+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
-				.withClassLoader(new FilteredClassLoader("io.r2dbc.pool")).run((context) -> {
+				.withPropertyValues("spring.r2dbc.url:r2dbc:pool:h2:mem:///" + randomDatabaseName() + "?maxSize=12",
+						"spring.r2dbc.pool.max-size=15")
+				.run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class).hasSingleBean(ConnectionPool.class);
+					PoolMetrics poolMetrics = context.getBean(ConnectionPool.class).getMetrics().get();
+					assertThat(poolMetrics.getMaxAllocatedSize()).isEqualTo(12);
+				});
+	}
+
+	@Test
+	void configureWithPoolEnabledCreateConnectionPool() {
+		this.contextRunner
+				.withPropertyValues("spring.r2dbc.pool.enabled=true",
+						"spring.r2dbc.url:r2dbc:h2:mem:///" + randomDatabaseName()
+								+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
+				.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class)
+						.hasSingleBean(ConnectionPool.class));
+	}
+
+	@Test
+	void configureWithPoolDisabledCreateGenericConnectionFactory() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.pool.enabled=false", "spring.r2dbc.url:r2dbc:h2:mem:///"
+				+ randomDatabaseName() + "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE").run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class).doesNotHaveBean(ConnectionPool.class);
+					assertThat(context.getBean(ConnectionFactory.class)).isExactlyInstanceOf(H2ConnectionFactory.class);
+				});
+	}
+
+	@Test
+	void configureWithoutR2dbcPoolCreateGenericConnectionFactory() {
+		this.contextRunner.with(hideConnectionPool()).withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///"
+				+ randomDatabaseName() + "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE").run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
 					assertThat(bean).isExactlyInstanceOf(H2ConnectionFactory.class);
@@ -82,11 +108,20 @@ class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	void appliesCustomizationToGenericConnectionFactory() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://host/database")
-				.withClassLoader(new FilteredClassLoader("io.r2dbc.pool"))
+	void configureWithoutR2dbcPoolAndPoolEnabledDoesNotCreateConnectionFactory() {
+		this.contextRunner.with(hideConnectionPool())
+				.withPropertyValues("spring.r2dbc.pool.enabled=true",
+						"spring.r2dbc.url:r2dbc:h2:mem:///" + randomDatabaseName()
+								+ "?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
+				.run((context) -> assertThat(context).doesNotHaveBean(ConnectionFactory.class));
+	}
+
+	@Test
+	void configureWithoutPoolInvokeOptionCustomizer() {
+		this.contextRunner
+				.withPropertyValues("spring.r2dbc.pool.enabled=false", "spring.r2dbc.url:r2dbc:simple://host/database")
 				.withUserConfiguration(CustomizerConfiguration.class).run((context) -> {
-					assertThat(context).hasSingleBean(ConnectionFactory.class);
+					assertThat(context).hasSingleBean(ConnectionFactory.class).doesNotHaveBean(ConnectionPool.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
 					assertThat(bean).isExactlyInstanceOf(SimpleTestConnectionFactory.class);
 					SimpleTestConnectionFactory connectionFactory = (SimpleTestConnectionFactory) bean;
@@ -96,12 +131,11 @@ class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	void appliesCustomizationToPooledConnectionFactory() {
+	void configureWithPoolInvokeOptionCustomizer() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://host/database")
 				.withUserConfiguration(CustomizerConfiguration.class).run((context) -> {
-					assertThat(context).hasSingleBean(ConnectionFactory.class);
+					assertThat(context).hasSingleBean(ConnectionFactory.class).hasSingleBean(ConnectionPool.class);
 					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
-					assertThat(bean).isExactlyInstanceOf(ConnectionPool.class);
 					SimpleTestConnectionFactory connectionFactory = (SimpleTestConnectionFactory) ((ConnectionPool) bean)
 							.unwrap();
 					assertThat(connectionFactory.getOptions().getRequiredValue(Option.<Boolean>valueOf("customized")))
@@ -110,17 +144,15 @@ class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	void testBadUrl() {
+	void configureWithInvalidUrlThrowsAppropriateException() {
 		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:not-going-to-work")
-				.withClassLoader(new DisableEmbeddedDatabaseClassLoader())
 				.run((context) -> assertThat(context).getFailure().isInstanceOf(BeanCreationException.class));
 	}
 
 	@Test
-	void testUrlConfigurationWithoutSpringJdbc() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo")
-				.withClassLoader(new FilteredClassLoader("org.springframework.jdbc", "io.r2dbc.pool"))
-				.run((context) -> {
+	void configureWithoutSpringJdbcCreateConnectionFactory() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.pool.enabled=false", "spring.r2dbc.url:r2dbc:simple://foo")
+				.withClassLoader(new FilteredClassLoader("org.springframework.jdbc")).run((context) -> {
 					assertThat(context).hasSingleBean(ConnectionFactory.class);
 					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
 					assertThat(connectionFactory).isInstanceOf(SimpleTestConnectionFactory.class);
@@ -128,72 +160,67 @@ class ConnectionFactoryAutoConfigurationTests {
 	}
 
 	@Test
-	void testAdditionalOptions() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",
-				"spring.r2dbc.properties.key=value", "spring.r2dbc.pool.initial-size=0").run((context) -> {
-					ConnectionFactory bean = context.getBean(ConnectionFactory.class);
-					SimpleTestConnectionFactory connectionFactory = (SimpleTestConnectionFactory) ((ConnectionPool) bean)
-							.unwrap();
-					assertThat((Object) connectionFactory.options.getRequiredValue(Option.valueOf("key")))
+	void configureWithoutPoolShouldApplyAdditionalProperties() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.pool.enabled=false", "spring.r2dbc.url:r2dbc:simple://foo",
+				"spring.r2dbc.properties.test=value", "spring.r2dbc.properties.another=2").run((context) -> {
+					SimpleTestConnectionFactory connectionFactory = context.getBean(SimpleTestConnectionFactory.class);
+					assertThat((Object) connectionFactory.options.getRequiredValue(Option.valueOf("test")))
 							.isEqualTo("value");
+					assertThat((Object) connectionFactory.options.getRequiredValue(Option.valueOf("another")))
+							.isEqualTo("2");
 				});
 	}
 
 	@Test
-	void shouldCreateConnectionPoolByDefault() {
-		this.contextRunner.withPropertyValues("spring.r2dbc.url=r2dbc:simple://simpledb").run((context) -> {
-			R2dbcProperties properties = context.getBean(R2dbcProperties.class);
-			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
+	void configureWithPoolShouldApplyAdditionalProperties() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.url:r2dbc:simple://foo",
+				"spring.r2dbc.properties.test=value", "spring.r2dbc.properties.another=2").run((context) -> {
+					assertThat(context).hasSingleBean(ConnectionFactory.class).hasSingleBean(ConnectionPool.class);
+					SimpleTestConnectionFactory connectionFactory = (SimpleTestConnectionFactory) context
+							.getBean(ConnectionPool.class).unwrap();
+					assertThat((Object) connectionFactory.options.getRequiredValue(Option.valueOf("test")))
+							.isEqualTo("value");
+					assertThat((Object) connectionFactory.options.getRequiredValue(Option.valueOf("another")))
+							.isEqualTo("2");
+				});
+	}
 
-			assertThat(properties.getPool().getEnabled()).isTrue();
-			assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
+	@Test
+	void configureWithoutUrlShouldCreateEmbeddedConnectionPoolByDefault() {
+		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class)
+				.hasSingleBean(ConnectionPool.class));
+	}
+
+	@Test
+	void configureWithoutUrlAndPollPoolDisabledCreateGenericConnectionFactory() {
+		this.contextRunner.withPropertyValues("spring.r2dbc.pool.enabled=false").run((context) -> {
+			assertThat(context).hasSingleBean(ConnectionFactory.class).doesNotHaveBean(ConnectionPool.class);
+			assertThat(context.getBean(ConnectionFactory.class)).isExactlyInstanceOf(H2ConnectionFactory.class);
 		});
 	}
 
 	@Test
-	void shouldCreateConnectionPoolIfPoolingIsEnabled() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.pool.enabled=true", "spring.r2dbc.url=r2dbc:simple://simpledb")
-				.run((context) -> {
-					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
-					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
-
-					assertThat(properties.getPool().getEnabled()).isTrue();
-					assertThat(connectionFactory).isInstanceOf(ConnectionPool.class);
-				});
-	}
-
-	@Test
-	void shouldNotCreateConnectionPoolIPoolingIsfDisabled() {
-		this.contextRunner
-				.withPropertyValues("spring.r2dbc.pool.enabled=false", "spring.r2dbc.url=r2dbc:simple://simpledb")
-				.run((context) -> {
-					R2dbcProperties properties = context.getBean(R2dbcProperties.class);
-					ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
-
-					assertThat(properties.getPool().getEnabled()).isFalse();
-					assertThat(connectionFactory).isNotInstanceOf(ConnectionPool.class);
-				});
-	}
-
-	@Test
-	void embeddedDataSourceCanBeConfigured() {
-		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class));
-	}
-
-	@Test
-	void embeddedDataSourceIsCreatedWhenNoUrlIsSpecified() {
-		this.contextRunner.run((context) -> {
-			ConnectionFactory connectionFactory = context.getBean(ConnectionFactory.class);
-			assertThat(connectionFactory).isExactlyInstanceOf(H2ConnectionFactory.class);
-			assertThat(context).doesNotHaveBean(DataSource.class);
-		});
-	}
-
-	@Test
-	void embeddedDataSourceCanBeCreatedWithoutSpringJdbc() {
+	void configureWithoutUrlAndSprigJdbcCreateEmbeddedConnectionFactory() {
 		this.contextRunner.withClassLoader(new FilteredClassLoader("org.springframework.jdbc"))
-				.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class));
+				.run((context) -> assertThat(context).hasSingleBean(ConnectionFactory.class)
+						.hasSingleBean(ConnectionPool.class));
+	}
+
+	@Test
+	void configureWithoutUrlAndEmbeddedCandidateFails() {
+		this.contextRunner.withClassLoader(new DisableEmbeddedDatabaseClassLoader()).run((context) -> {
+			assertThat(context).hasFailed();
+			assertThat(context).getFailure().isInstanceOf(BeanCreationException.class)
+					.hasMessageContaining("Failed to determine a suitable R2DBC Connection URL");
+		});
+	}
+
+	private String randomDatabaseName() {
+		return "testdb-" + UUID.randomUUID();
+	}
+
+	private Function<ApplicationContextRunner, ApplicationContextRunner> hideConnectionPool() {
+		return (runner) -> runner.withClassLoader(new FilteredClassLoader("io.r2dbc.pool"));
 	}
 
 	private static class DisableEmbeddedDatabaseClassLoader extends URLClassLoader {
