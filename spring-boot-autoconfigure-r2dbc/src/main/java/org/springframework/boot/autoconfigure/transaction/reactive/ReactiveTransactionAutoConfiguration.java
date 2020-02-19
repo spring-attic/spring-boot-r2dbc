@@ -16,12 +16,10 @@
 
 package org.springframework.boot.autoconfigure.transaction.reactive;
 
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
-import org.springframework.boot.autoconfigure.data.r2dbc.R2dbcTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -36,7 +34,6 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ReactiveTransactionManager.class)
 @ConditionalOnSingleCandidate(ReactiveTransactionManager.class)
-@AutoConfigureAfter(R2dbcTransactionManagerAutoConfiguration.class)
 public class ReactiveTransactionAutoConfiguration {
 
 	@Bean
