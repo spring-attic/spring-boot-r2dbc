@@ -21,6 +21,7 @@ import java.util.Map;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.r2dbc.pool.ConnectionPool;
+import io.r2dbc.spi.ConnectionFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
@@ -35,9 +36,10 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for metrics on all available
- * {@link ConnectionPool connection pools}.
+ * {@link ConnectionFactory R2DBC connection factories}.
  *
  * @author Tadaya Tsuyukubo
+ * @author Stephane Nicoll
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter({ MetricsAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class,
@@ -47,8 +49,9 @@ import org.springframework.context.annotation.Configuration;
 public class ConnectionPoolMetricsAutoConfiguration {
 
 	@Autowired
-	public void bindConnectionPoolsToRegistry(Map<String, ConnectionPool> pools, MeterRegistry registry) {
-		pools.forEach((beanName, pool) -> new ConnectionPoolMetrics(pool, beanName, Tags.empty()).bindTo(registry));
+	public void bindConnectionPoolsToRegistry(Map<String, ConnectionPool> connectionPools, MeterRegistry registry) {
+		connectionPools.forEach((beanName,
+				connectionPool) -> new ConnectionPoolMetrics(connectionPool, beanName, Tags.empty()).bindTo(registry));
 	}
 
 }
