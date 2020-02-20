@@ -16,8 +16,6 @@
 
 package org.springframework.boot.actuate.autoconfigure.r2dbc;
 
-import java.util.Random;
-
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.actuate.autoconfigure.health.HealthContributorAutoConfiguration;
@@ -36,19 +34,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConnectionFactoryHealthContributorAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withPropertyValues("spring.r2dbc.url:r2dbc:h2:mem:///testdb-" + new Random().nextInt())
-			.withConfiguration(AutoConfigurations.of(R2dbcAutoConfiguration.class,
-					ConnectionFactoryHealthContributorAutoConfiguration.class,
+			.withConfiguration(AutoConfigurations.of(ConnectionFactoryHealthContributorAutoConfiguration.class,
 					HealthContributorAutoConfiguration.class));
 
 	@Test
 	void runShouldCreateIndicator() {
-		this.contextRunner.run((context) -> assertThat(context).hasSingleBean(ConnectionFactoryHealthIndicator.class));
+		this.contextRunner.withConfiguration(AutoConfigurations.of(R2dbcAutoConfiguration.class))
+				.run((context) -> assertThat(context).hasSingleBean(ConnectionFactoryHealthIndicator.class));
+	}
+
+	@Test
+	void runWithNoConnectionFactoryShouldNotCreateIndicator() {
+		this.contextRunner
+				.run((context) -> assertThat(context).doesNotHaveBean(ConnectionFactoryHealthIndicator.class));
 	}
 
 	@Test
 	void runWhenDisabledShouldNotCreateIndicator() {
-		this.contextRunner.withPropertyValues("management.health.r2dbc.enabled:false")
+		this.contextRunner.withConfiguration(AutoConfigurations.of(R2dbcAutoConfiguration.class))
+				.withPropertyValues("management.health.r2dbc.enabled:false")
 				.run((context) -> assertThat(context).doesNotHaveBean(ConnectionFactoryHealthIndicator.class));
 	}
 
