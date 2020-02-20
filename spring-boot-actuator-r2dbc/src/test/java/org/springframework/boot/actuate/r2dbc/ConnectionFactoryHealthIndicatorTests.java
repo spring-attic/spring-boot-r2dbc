@@ -52,7 +52,8 @@ class ConnectionFactoryHealthIndicatorTests {
 			ConnectionFactoryHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory);
 			healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 				assertThat(actual.getStatus()).isEqualTo(Status.UP);
-				assertThat(actual.getDetails()).containsOnly(entry("database", "H2"), entry("valid", true));
+				assertThat(actual.getDetails()).containsOnly(entry("database", "H2"),
+						entry("validationQuery", "validate(REMOTE)"));
 			}).verifyComplete();
 		}
 		finally {

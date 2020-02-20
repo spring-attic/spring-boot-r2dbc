@@ -98,7 +98,7 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 				(connection) -> Mono.from(connection.validate(ValidationDepth.REMOTE)), Connection::close,
 				(o, throwable) -> o.close(), Connection::close);
 		return connectionValidation.map((valid) -> {
-			builder.withDetail("valid", valid);
+			builder.withDetail("validationQuery", "validate(REMOTE)");
 			return builder.build();
 		});
 	}
