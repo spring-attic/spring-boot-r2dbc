@@ -39,15 +39,15 @@ import org.springframework.context.annotation.Configuration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link ConnectionFactoryAutoConfiguration}.
+ * Tests for {@link R2dbcAutoConfiguration}.
  *
  * @author Mark Paluch
  * @author Stephane Nicoll
  */
-class ConnectionFactoryAutoConfigurationTests {
+class R2dbcAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class));
+			.withConfiguration(AutoConfigurations.of(R2dbcAutoConfiguration.class));
 
 	@Test
 	void configureWithUrlCreateConnectionPoolByDefault() {

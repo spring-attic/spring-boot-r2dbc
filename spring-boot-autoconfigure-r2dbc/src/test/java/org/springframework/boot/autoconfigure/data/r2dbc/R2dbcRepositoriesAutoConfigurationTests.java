@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.City;
 import org.springframework.boot.autoconfigure.data.r2dbc.city.CityRepository;
-import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -56,7 +56,7 @@ class R2dbcRepositoriesAutoConfigurationTests {
 
 	@Test
 	void backsOffWithNoDatabaseClientOperations() {
-		this.contextRunner.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
+		this.contextRunner.withConfiguration(AutoConfigurations.of(R2dbcAutoConfiguration.class))
 				.withUserConfiguration(TestConfiguration.class).run((context) -> {
 					assertThat(context).doesNotHaveBean(DatabaseClient.class);
 					assertThat(context).doesNotHaveBean(R2dbcRepositoryConfigurationExtension.class);
@@ -66,8 +66,8 @@ class R2dbcRepositoriesAutoConfigurationTests {
 	@Test
 	void basicAutoConfiguration() {
 		this.contextRunner
-				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
-						R2dbcDataAutoConfiguration.class))
+				.withConfiguration(
+						AutoConfigurations.of(R2dbcAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
 				.withUserConfiguration(DatabaseInitializationConfiguration.class, TestConfiguration.class)
 				.withPropertyValues("spring.r2dbc.generate-unique-name:true").run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);
@@ -78,7 +78,7 @@ class R2dbcRepositoriesAutoConfigurationTests {
 
 	@Test
 	void autoConfigurationWithNoRepositories() {
-		this.contextRunner.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class))
+		this.contextRunner.withConfiguration(AutoConfigurations.of(R2dbcAutoConfiguration.class))
 				.withUserConfiguration(EmptyConfiguration.class)
 				.run((context) -> assertThat(context).doesNotHaveBean(Repository.class));
 	}
@@ -86,8 +86,8 @@ class R2dbcRepositoriesAutoConfigurationTests {
 	@Test
 	void honorsUsersEnableR2dbcRepositoriesConfiguration() {
 		this.contextRunner
-				.withConfiguration(AutoConfigurations.of(ConnectionFactoryAutoConfiguration.class,
-						R2dbcDataAutoConfiguration.class))
+				.withConfiguration(
+						AutoConfigurations.of(R2dbcAutoConfiguration.class, R2dbcDataAutoConfiguration.class))
 				.withUserConfiguration(DatabaseInitializationConfiguration.class, EnableRepositoriesConfiguration.class)
 				.withPropertyValues("spring.r2dbc.generate-unique-name:true").run((context) -> {
 					assertThat(context).hasSingleBean(CityRepository.class);

@@ -40,7 +40,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Actual {@link ConnectionFactory} configurations imported by
- * {@link ConnectionFactoryAutoConfiguration}.
+ * {@link R2dbcAutoConfiguration}.
  *
  * @author Mark Paluch
  * @author Stephane Nicoll

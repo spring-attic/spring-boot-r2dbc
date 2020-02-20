@@ -79,7 +79,7 @@ class ConnectionFactoryBeanCreationFailureAnalyzerTests {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@ImportAutoConfiguration(ConnectionFactoryAutoConfiguration.class)
+	@ImportAutoConfiguration(R2dbcAutoConfiguration.class)
 	static class TestConfiguration {
 
 	}

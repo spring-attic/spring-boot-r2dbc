@@ -2,7 +2,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration, \
 org.springframework.boot.autoconfigure.data.r2dbc.R2dbcRepositoriesAutoConfiguration,\
 org.springframework.boot.autoconfigure.data.r2dbc.R2dbcTransactionManagerAutoConfiguration, \
-org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration,\
+org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration,\
 org.springframework.boot.autoconfigure.transaction.reactive.ReactiveTransactionAutoConfiguration
 
 org.springframework.boot.diagnostics.FailureAnalyzer=\

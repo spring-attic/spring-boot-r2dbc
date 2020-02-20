@@ -28,7 +28,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
-import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.convert.CustomConversions;
@@ -55,7 +55,7 @@ import org.springframework.data.relational.core.mapping.NamingStrategy;
 @ConditionalOnClass(DatabaseClient.class)
 @ConditionalOnMissingBean(DatabaseClient.class)
 @ConditionalOnSingleCandidate(ConnectionFactory.class)
-@AutoConfigureAfter(ConnectionFactoryAutoConfiguration.class)
+@AutoConfigureAfter(R2dbcAutoConfiguration.class)
 public class R2dbcDataAutoConfiguration {
 
 	private final ConnectionFactory connectionFactory;

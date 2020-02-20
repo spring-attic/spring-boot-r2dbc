@@ -30,7 +30,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -41,7 +41,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter({ MetricsAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class,
-		ConnectionFactoryAutoConfiguration.class })
+		R2dbcAutoConfiguration.class })
 @ConditionalOnClass({ ConnectionPool.class, MeterRegistry.class })
 @ConditionalOnBean({ ConnectionPool.class, MeterRegistry.class })
 public class ConnectionPoolMetricsAutoConfiguration {

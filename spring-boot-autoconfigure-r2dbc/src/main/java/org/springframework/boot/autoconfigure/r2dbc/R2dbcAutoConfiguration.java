@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for {@link ConnectionFactory}.
+ * {@link EnableAutoConfiguration Auto-configuration} for R2DBC.
  *
  * @author Mark Paluch
  * @author Stephane Nicoll
@@ -34,6 +34,6 @@ import org.springframework.context.annotation.Import;
 @ConditionalOnClass(ConnectionFactory.class)
 @EnableConfigurationProperties(R2dbcProperties.class)
 @Import({ ConnectionFactoryConfigurations.Pool.class, ConnectionFactoryConfigurations.Generic.class })
-public class ConnectionFactoryAutoConfiguration {
+public class R2dbcAutoConfiguration {
 
 }
