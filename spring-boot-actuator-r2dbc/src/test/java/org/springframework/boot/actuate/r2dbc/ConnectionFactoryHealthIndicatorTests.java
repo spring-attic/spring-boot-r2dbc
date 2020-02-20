@@ -22,8 +22,10 @@ import java.util.UUID;
 import io.r2dbc.h2.CloseableConnectionFactory;
 import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.h2.H2ConnectionOption;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.ValidationDepth;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -71,7 +73,23 @@ class ConnectionFactoryHealthIndicatorTests {
 		healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
 			assertThat(actual.getStatus()).isEqualTo(Status.DOWN);
 			assertThat(actual.getDetails()).containsOnly(entry("database", "mock"),
-					entry("error", "java.lang.RuntimeException: test"));
+					entry("validationQuery", "validate(REMOTE)"), entry("error", "java.lang.RuntimeException: test"));
+		}).verifyComplete();
+	}
+
+	@Test
+	void healthIndicatorWhenConnectionValidationFails() {
+		ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+		given(connectionFactory.getMetadata()).willReturn(() -> "mock");
+		Connection connection = mock(Connection.class);
+		given(connection.validate(ValidationDepth.REMOTE)).willReturn(Mono.just(false));
+		given(connection.close()).willReturn(Mono.empty());
+		given(connectionFactory.create()).willAnswer((invocation) -> Mono.just(connection));
+		ConnectionFactoryHealthIndicator healthIndicator = new ConnectionFactoryHealthIndicator(connectionFactory);
+		healthIndicator.health().as(StepVerifier::create).assertNext((actual) -> {
+			assertThat(actual.getStatus()).isEqualTo(Status.DOWN);
+			assertThat(actual.getDetails()).containsOnly(entry("database", "mock"),
+					entry("validationQuery", "validate(REMOTE)"));
 		}).verifyComplete();
 	}
 

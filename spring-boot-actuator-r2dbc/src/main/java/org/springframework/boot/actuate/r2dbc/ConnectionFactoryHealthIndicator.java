@@ -28,6 +28,7 @@ import org.springframework.boot.actuate.health.AbstractReactiveHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Health.Builder;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.actuate.health.Status;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -57,8 +58,8 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	 * Create a new {@link ConnectionFactoryHealthIndicator} using the specified
 	 * {@link ConnectionFactory} and validation query.
 	 * @param connectionFactory the connection factory
-	 * @param validationQuery the validation query (can be {@code null} to use connection
-	 * validation)
+	 * @param validationQuery the validation query, can be {@code null} to use connection
+	 * validation
 	 */
 	public ConnectionFactoryHealthIndicator(ConnectionFactory connectionFactory, String validationQuery) {
 		Assert.notNull(connectionFactory, "ConnectionFactory must not be null");
@@ -67,14 +68,13 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 	}
 
 	@Override
-	protected final Mono<Health> doHealthCheck(Health.Builder builder) {
-		String product = this.connectionFactory.getMetadata().getName();
-		builder.up().withDetail("database", product);
+	protected final Mono<Health> doHealthCheck(Builder builder) {
 		return validate(builder).defaultIfEmpty(builder.build()).onErrorResume(Exception.class,
 				(ex) -> Mono.just(builder.down(ex).build()));
 	}
 
-	protected Mono<Health> validate(Health.Builder builder) {
+	private Mono<Health> validate(Builder builder) {
+		builder.withDetail("database", this.connectionFactory.getMetadata().getName());
 		if (StringUtils.hasText(this.validationQuery)) {
 			return validateWithQuery(builder);
 		}
@@ -83,31 +83,21 @@ public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndi
 		}
 	}
 
-	private Mono<Health> validateWithQuery(Health.Builder builder) {
+	private Mono<Health> validateWithQuery(Builder builder) {
 		builder.withDetail("validationQuery", this.validationQuery);
-		Mono<Object> result = runValidationQuery(this.connectionFactory);
-		return result.map((it) -> {
-			builder.withDetail("result", it);
-			builder.withDetail("validationQuery", this.validationQuery);
-			return builder.build();
-		});
-	}
-
-	private Mono<Health> validateWithConnectionValidation(Builder builder) {
-		Mono<Boolean> connectionValidation = Mono.usingWhen(this.connectionFactory.create(),
-				(connection) -> Mono.from(connection.validate(ValidationDepth.REMOTE)), Connection::close,
-				(o, throwable) -> o.close(), Connection::close);
-		return connectionValidation.map((valid) -> {
-			builder.withDetail("validationQuery", "validate(REMOTE)");
-			return builder.build();
-		});
-	}
-
-	private Mono<Object> runValidationQuery(ConnectionFactory connectionFactory) {
-		return Mono.usingWhen(connectionFactory.create(),
+		Mono<Object> connectionValidation = Mono.usingWhen(this.connectionFactory.create(),
 				(conn) -> Flux.from(conn.createStatement(this.validationQuery).execute())
 						.flatMap((it) -> it.map(this::extractResult)).next(),
 				Connection::close, (o, throwable) -> o.close(), Connection::close);
+		return connectionValidation.map((result) -> builder.up().withDetail("result", result).build());
+	}
+
+	private Mono<Health> validateWithConnectionValidation(Builder builder) {
+		builder.withDetail("validationQuery", "validate(REMOTE)");
+		Mono<Boolean> connectionValidation = Mono.usingWhen(this.connectionFactory.create(),
+				(connection) -> Mono.from(connection.validate(ValidationDepth.REMOTE)), Connection::close,
+				(connection, ex) -> connection.close(), Connection::close);
+		return connectionValidation.map((valid) -> builder.status((valid) ? Status.UP : Status.DOWN).build());
 	}
 
 	private Object extractResult(Row row, RowMetadata metadata) {
