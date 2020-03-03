@@ -14,7 +14,7 @@
 	</organization>
 
 	<properties>
-		<cloud-spanner-r2dbc.version>0.2.0-SNAPSHOT</cloud-spanner-r2dbc.version>
+		<cloud-spanner-r2dbc.version>0.2.0</cloud-spanner-r2dbc.version>
 		<spring-data-r2dbc.version>1.1.0.M3</spring-data-r2dbc.version>
 		<jasync-r2dbc-mysql.version>1.0.14</jasync-r2dbc-mysql.version>
 		<r2dbc-releasetrain.version>Arabba-SR2</r2dbc-releasetrain.version>
@@ -65,6 +65,11 @@
 			<dependency>
 				<groupId>com.google.cloud</groupId>
 				<artifactId>cloud-spanner-r2dbc</artifactId>
+				<version>${cloud-spanner-r2dbc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.cloud</groupId>
+				<artifactId>cloud-spanner-spring-data-r2dbc</artifactId>
 				<version>${cloud-spanner-r2dbc.version}</version>
 			</dependency>
 			<dependency>
